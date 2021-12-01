@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "846171839154",
+    "project_id": "hollysapp-53492",
+    "storage_bucket": "hollysapp-53492.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:846171839154:android:9605165b1f2727e9dcc7ab",
+        "android_client_info": {
+          "package_name": "com.hkhollys.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "846171839154-tls7dc4ic7gd19t39c33sdh2315cichs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFavcZ05YVRUeZjgZKTYsKWFKcYOi0_C8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "846171839154-tls7dc4ic7gd19t39c33sdh2315cichs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
