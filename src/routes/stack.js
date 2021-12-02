@@ -183,7 +183,7 @@ function MemberRoute() {
 				// this options hide all header
 				screenOptions={{
 					headerShown: false,
-					gestureEnabled: true,
+					gestureEnabled: false,
 					gestureDirection: 'horizontal',
 					gestureResponseDistance: {
 						horizontal: 100,

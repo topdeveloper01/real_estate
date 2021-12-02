@@ -118,7 +118,7 @@ const VendorScreen = (props) => {
                                 <View style={styles.tag}>
                                     <AppText style={[styles.tag_txt]}>租</AppText>
                                 </View>
-                                <AppText style={[styles.price]}>${props.vendorData.price}</AppText>
+                                <AppText style={[styles.price]}>${props.vendorData.rent_price}</AppText>
                             </View>
                         }
                         <View style={[Theme.styles.col_center, { width: '100%', marginTop: 24 }]}>

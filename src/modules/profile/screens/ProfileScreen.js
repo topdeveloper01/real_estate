@@ -144,7 +144,7 @@ const ProfileScreen = (props) => {
 						onPress={() => { ShowLogoutModal(true) }}
 					>
 						<MaterialCommunityIcons name={'logout-variant'} size={18} color={Theme.colors.red} />
-						<Text style={[styles.itemTxt, { color: Theme.colors.red }]}>登出</Text>
+						<Text style={[styles.itemTxt, { color: Theme.colors.red, marginLeft: 6 }]}>登出</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>

@@ -203,6 +203,7 @@ const AddListingScreen = (props) => {
 				let newListingData = {
 					...state,
 					photo: photoUrl,
+					is_featured : false,
 					owner_id : props.user.id
 				}
 				await createListing(newListingData);
@@ -333,7 +334,7 @@ const AddListingScreen = (props) => {
 					<AuthInput
 						placeholder={'實用面積 '}
 						underlineColorAndroid={'transparent'}
-						keyboardType={'default'}
+						keyboardType='decimal-pad'
 						selectionColor={Theme.colors.cyan2}
 						onChangeText={(size) => setState({ ...state, size })}
 						returnKeyType={'next'}

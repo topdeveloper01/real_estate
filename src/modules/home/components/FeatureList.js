@@ -19,7 +19,7 @@ const FeatureList = ({ label, items, goVendorDetail, }) => {
             }}
         >
             {
-                items.slice(0, (showAll == true ? items.length : 2)).map((vendor, index) =>
+                items.slice(0, (showAll == true ? items.length : 4)).map((vendor, index) =>
                     <FeaturedVendorItem
                         key={vendor.id}
                         data={vendor}

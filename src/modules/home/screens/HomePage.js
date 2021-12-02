@@ -15,7 +15,7 @@ import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import { AuthInput, VendorItem, } from '../../../common/components';
 import FeatureList from '../components/FeatureList';
-
+import FilterBar from '../../../common/components/vendors/FilterVar';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
@@ -23,7 +23,6 @@ import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
 const vertPerPage = 10;
 
 const HomePage = (props) => {
- 
 
     const [featuredBlocks, setFeaturedBlocks] = useState([])
     const [allvendors, setAllVendors] = useState([])
@@ -31,74 +30,19 @@ const HomePage = (props) => {
     const [vertLoading, setVertLoading] = useState(null)
     const [isRefreshing, setRefreshing] = useState(false)
 
-    const filterCategories = [
-        {
-            label: '地區',
-            value: 0,
-            list: [
-                {
-                    label: '任何',
-                    value: ''
-                }
-            ]
-        },
-        {
-            label: '形式',
-            value: 0,
-            list: [
-                {
-                    label: '任何',
-                    value: ''
-                }
-            ]
-        },
-        {
-            label: '價格',
-            value: 0,
-            list: [
-                {
-                    label: '任何',
-                    value: ''
-                }
-            ]
-        },
-        {
-            label: '實用面積',
-            value: 0,
-            list: [
-                {
-                    label: '任何',
-                    value: ''
-                }
-            ]
-        },
-        {
-            label: '房數',
-            value: 0,
-            list: [
-                {
-                    label: '任何',
-                    value: ''
-                }
-            ]
-        },
-    ]
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const [filter_type, setFilterType] = useState(-1)
+    const [filter_price, setFilterPrice] = useState(-1)
+    const [filter_size, setFilterSize] = useState(-1)
+    const [filter_rooms, setFilterRooms] = useState(-1)
 
     useEffect(() => {
         loadVendors();
         loadFeaturedBlocks();
     }, [
-        props.home_vendor_filter.is_meal,
-        props.home_vendor_filter.is_dietary,
-        props.home_vendor_filter.ongoing_offer,
-        props.home_vendor_filter.open_now,
-        props.home_vendor_filter.online_payment,
-        props.home_vendor_filter.searchTerm,
-        props.home_vendor_filter.low_fee,
-        props.home_vendor_filter.high_fee,
-        props.home_vendor_sort,
+        searchTerm, filter_type, filter_price, filter_size, filter_rooms
     ])
-
 
     const goRootStackScreen = (name, params) => {
         if (params) {
@@ -110,7 +54,7 @@ const HomePage = (props) => {
     }
 
     const getFilers = () => {
-        return {}
+        return { searchTerm, filter_type, filter_price, filter_size, filter_rooms }
     }
 
     const loadVendors = async () => {
@@ -130,50 +74,22 @@ const HomePage = (props) => {
     const loadFeaturedBlocks = async () => {
         try {
             let filterKeys = getFilers();
+            filterKeys.is_featured = true;
             let vendorsData = await getAllListings(filterKeys);
             setFeaturedBlocks(vendorsData)
-            setVertLoading(false);
         }
         catch (error) {
-            setVertLoading(false);
             console.log('get Vendors', error)
         }
     };
 
-    const isEmptyData = () => { 
+    const isEmptyData = () => {
         return (featuredBlocks.length == 0 && allvendors.length == 0)
     }
 
     const goVendorDetail = (vendor) => {
         props.setVendorCart(vendor)
         goRootStackScreen(RouteNames.VendorScreen)
-    }
-
-    const _renderCategories = () => {
-        return <View style={[Theme.styles.col_center, styles.filterview]}>
-            <ScrollView
-                horizontal={true}
-                style={{ width: '100%', paddingBottom: 12 }}
-            >
-                {
-                    filterCategories.map((cat, index) =>
-                        <View key={cat.label} style={[Theme.styles.row_center]}>
-                            <TouchableOpacity style={[Theme.styles.col_center]}>
-                                <Text style={styles.filterLabel}>{cat.label}</Text>
-                                <Text style={styles.filterValue}>{cat.list[cat.value].label}</Text>
-                            </TouchableOpacity>
-                            {
-                                index < (filterCategories.length - 1) &&
-                                <View style={{ paddingHorizontal: 24 }}>
-                                    <Svg_divider />
-                                </View>
-                            }
-                        </View>
-                    )
-                }
-            </ScrollView>
-            <View style={styles.scrollviewHider} />
-        </View>
     }
 
     const _renderVertVendors = () => {
@@ -193,20 +109,12 @@ const HomePage = (props) => {
         </View>
     }
 
-    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
-    }
-
-    const isCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
-        return contentOffset.y == 0;
-    }
-
     return (
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-            <Spinner visible={vertLoading}/>
+            {/* <Spinner visible={vertLoading} /> */}
             <View style={[Theme.styles.row_center_start, styles.header]}>
                 <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity onPress={() => {
                     goRootStackScreen(RouteNames.NotificationsScreen)
                 }}>
                     <MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
@@ -219,13 +127,15 @@ const HomePage = (props) => {
                     autoCapitalize={'none'}
                     returnKeyType={'done'}
                     isSearch={true}
-                    value={props.home_vendor_filter.searchTerm}
+                    value={searchTerm}
                     onChangeText={(searchTerm) => {
+                        setSearchTerm(searchTerm)
                     }}
                     backgroundColor={Theme.colors.gray4}
                     style={{ borderWidth: 0, backgroundColor: Theme.colors.gray4 }}
-                    rightComp={props.home_vendor_filter.searchTerm !== '' ? (
+                    rightComp={searchTerm !== '' ? (
                         <TouchableOpacity onPress={() => {
+                            setSearchTerm('')
                         }}>
                             <Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
                         </TouchableOpacity>
@@ -233,7 +143,13 @@ const HomePage = (props) => {
                 />
             </View>
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
-                {_renderCategories()}
+                <FilterBar
+                    onChangeArea={(value) => { }}
+                    onChangeType={(value) => { setFilterType(value) }}
+                    onChangePrice={(value) => { setFilterPrice(value) }}
+                    onChangeSize={(value) => { setFilterSize(value) }}
+                    onChangeRooms={(value) => { setFilterRooms(value) }}
+                />
             </View>
             {
                 (vertLoading == false && isEmptyData() == true) ?
