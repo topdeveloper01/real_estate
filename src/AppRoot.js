@@ -44,7 +44,7 @@ class AppRoot extends React.Component {
 	}
 
 	onAuthStateChanged = (user) => {
-		this.loadLoginInfo(user.uid);
+		this.loadLoginInfo(user);
 	}
 
 	async componentDidMount() {
@@ -239,13 +239,15 @@ class AppRoot extends React.Component {
 		}
 	};
 
-	loadLoginInfo = async (user_id) => {
+	loadLoginInfo = async (user) => { 
 		let logged_user_data = null;
 		try {
-			logged_user_data = await this.props.getLoggedInUser(user_id);
-			if (logged_user_data != null) {
-				this.props.setAsLoggedIn();
-			} 
+			if (user != null && user.uid != null) {
+				logged_user_data = await this.props.getLoggedInUser(user.uid);
+				if (logged_user_data != null) {
+					this.props.setAsLoggedIn();
+				} 
+			}
 		} catch (e) {
 			console.log('load Login Info error', e);
 		}  

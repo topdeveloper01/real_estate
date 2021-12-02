@@ -67,6 +67,8 @@ import MessagesScreen from '../modules/chat/screens/MessagesScreen';
 import LocationPickupScreen from '../modules/chat/screens/LocationPickupScreen';
 import LocationMsgScreen from '../modules/chat/screens/LocationMsgScreen';
 
+import AddListingScreen from '../modules/profile/screens/AddListingScreen';
+
 const OnboardStack = createStackNavigator();
 const GuestStack = createStackNavigator();
 const PhoneVerifyStack = createStackNavigator();
@@ -262,6 +264,10 @@ function MemberRoute() {
 				<MemberStack.Screen name={RouteNames.ForgotScreen} component={ForgetPassScreen} />
 				<MemberStack.Screen name={RouteNames.ResetPassScreen} component={ResetPassScreen} />
 				<MemberStack.Screen name={RouteNames.ResetPassDoneScreen} component={ResetPassDoneScreen} />
+
+				{/* admin route */}
+				<MemberStack.Screen name={RouteNames.AddListingScreen} component={AddListingScreen} />
+				
 			</MemberStack.Navigator>
 		</NavigationContainer>
 	);

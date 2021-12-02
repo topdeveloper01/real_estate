@@ -26,7 +26,7 @@ const Header1 = ({ left, right, title, style, onLeft, onRight }) => {
 
 const styles = StyleSheet.create({
     header: {
-        width: '100%', height: 70, elevation: 6, paddingBottom: 8, marginBottom: 24, alignItems: 'flex-end', flexDirection: 'row',
+        width: '100%', height: 70, backgroundColor: Theme.colors.white, elevation: 6, paddingBottom: 8, marginBottom: 24, alignItems: 'flex-end', flexDirection: 'row',
     },
 })
 export default Header1;

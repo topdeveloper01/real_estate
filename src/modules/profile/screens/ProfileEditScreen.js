@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
-import FastImage from 'react-native-fast-image';
-import Spinner from 'react-native-loading-spinner-overlay';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Modal from 'react-native-modal';
-import ImagePicker from 'react-native-image-crop-picker';
-import DatePicker from 'react-native-date-picker';
+import FastImage from 'react-native-fast-image'; 
+import AntDesign from 'react-native-vector-icons/AntDesign'; 
+import ImagePicker from 'react-native-image-crop-picker'; 
 import { updateProfileDetails } from '../../../store/actions/auth';
+import { MainBtn } from '../../../common/components';
 import { translate } from '../../../common/services/translate';
 import alerts from '../../../common/services/alerts';
 import { getImageFullURL, isEmpty, validateUserData } from '../../../common/services/utility';
@@ -17,7 +15,8 @@ import AuthInput from '../../../common/components/AuthInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';
 import Header1 from '../../../common/components/Header1';
 import moment from 'moment';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; 
+import { uploadPhoto } from '../../../common/services/fbstorage';
 
 const ProfileEditScreen = (props) => {
 	const [isLoading, ShowLoading] = useState(false);
@@ -27,10 +26,7 @@ const ProfileEditScreen = (props) => {
 	const [full_name, setFullName] = useState(props.user.full_name);
 	const [phone, setPhone] = useState(props.user.phone);
 	const [email, setEmail] = useState(props.user.email);
-	const [birthday, setBirthday] = useState(
-		props.user.birthdate == null ? null : moment(props.user.birthdate).toDate()
-	);
-
+  
 	useEffect(() => { }, []);
 
 	const onImageUpload = () => {
@@ -47,7 +43,7 @@ const ProfileEditScreen = (props) => {
 		ImagePicker.openCamera({
 			cropping: true,
 			includeBase64: true,
-		}).then((image) => {
+		}).then((image) => { 
 			setPhoto(image);
 			setShowPickerModal(false);
 		});
@@ -58,64 +54,45 @@ const ProfileEditScreen = (props) => {
 			.then(async () => {
 				try {
 					ShowLoading(true);
-					const updated_user = await props.updateProfileDetails({
+					let photoUrl = ''
+					if (photo != null) {
+						photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photo.path);
+					}  
+					let newUserData = {
+						...props.user,
 						full_name,
 						email,
 						phone,
-						birthday: birthday == null ? null : moment(birthday).format('YYYY-MM-DD'),
-						photo: photo == null ? null : photo.data,
-					});
+						photo: photoUrl
+					}
+					const updated_user = await props.updateProfileDetails(newUserData);
 
 					console.log('updated_user', updated_user);
 					await updateChannelUserInfo(updated_user);
 
 					ShowLoading(false);
-					alerts.info('', translate('account_details.profile_update_success')).then((res) => {
+					alerts.info('', '您的個人資料已成功更新').then((res) => {
 						props.navigation.goBack();
 					});
 				} catch (error) {
 					ShowLoading(false);
 					console.log('on Save', error);
-					alerts.error(translate('alerts.error'), translate('checkout.something_is_wrong'));
+					alerts.error('警告', '出了些問題');
 				}
 			})
 	};
-
-	const renderDatepickerModal = () => {
-		return (
-			<Modal
-				isVisible={isDateModal}
-				backdropOpacity={0.33}
-				onSwipeComplete={() => ShowDateModal(false)}
-				onBackdropPress={() => ShowDateModal(false)}
-				swipeDirection={['down']}
-				style={{ justifyContent: 'flex-end', margin: 0 }}
-			>
-				<View style={[Theme.styles.col_center, styles.modalContent]}>
-					<Text style={styles.modalTitle}>{translate('account.update_birthday')}</Text>
-					<DatePicker
-						mode='date'
-						date={birthday == null ? new Date() : birthday}
-						onDateChange={setBirthday}
-					/>
-				</View>
-			</Modal>
-		);
-	};
-
+ 
 	return (
-		<View style={styles.container}>
-			<Spinner visible={isLoading} />
+		<View style={styles.container}> 
 			<Header1
 				onLeft={() => {
 					props.navigation.goBack();
-				}}
-				onRight={onSave}
-				right={<Text style={styles.applyBtn}>{translate('save')}</Text>}
-				title={''}
+				}}  
+				style={{paddingHorizontal: 20}}
+				title={'更改帳戶資料'}
 			/>
 			<View style={styles.formView}>
-				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%' }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>
+				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%', paddingHorizontal: 20 }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>
 					<View style={Theme.styles.col_center}>
 						<View style={[Theme.styles.col_center, { width: 116, height: 116 }]}>
 							<View style={[Theme.styles.col_center, styles.photoView]}>
@@ -141,7 +118,7 @@ const ProfileEditScreen = (props) => {
 					</View>
 
 					<AuthInput
-						placeholder={translate('auth_register.full_name')}
+						placeholder={'名稱'}
 						underlineColorAndroid={'transparent'}
 						keyboardType={'default'}
 						placeholderTextColor={'#DFDFDF'}
@@ -155,7 +132,7 @@ const ProfileEditScreen = (props) => {
 						style={{ marginTop: 25, marginBottom: 12 }}
 					/>
 					<AuthInput
-						placeholder={translate('add_new_address.phone')}
+						placeholder={'電話'}
 						underlineColorAndroid={'transparent'}
 						keyboardType={'phone-pad'}
 						placeholderTextColor={'#DFDFDF'}
@@ -169,7 +146,7 @@ const ProfileEditScreen = (props) => {
 						style={{ marginBottom: 12 }}
 					/>
 					<AuthInput
-						placeholder={translate('auth_login.email_address')}
+						placeholder={'電郵'}
 						underlineColorAndroid={'transparent'}
 						keyboardType={'email-address'}
 						placeholderTextColor={'#DFDFDF'}
@@ -181,20 +158,14 @@ const ProfileEditScreen = (props) => {
 						value={email}
 						secure={false}
 						style={{ marginBottom: 12 }}
-					/>
-					<TouchableOpacity onPress={() => ShowDateModal(true)}>
-						<View style={[styles.birthdayView]}>
-							<Text
-								style={[
-									styles.birthdayTxt,
-									{ color: birthday == null ? '#DFDFDF' : Theme.colors.text },
-								]}
-							>
-								{birthday == null ? 'Birth Date (DD/MM/YYYY)' : moment(birthday).format('DD/MM/YYYY')}
-							</Text>
-						</View>
-					</TouchableOpacity>
+					/> 
 					<View style={{ height: 20 }}></View>
+					<MainBtn
+                            disabled={isLoading}
+                            loading={isLoading}
+                            title={'確認'}
+                            onPress={onSave}
+                        />
 				</KeyboardAwareScrollView>
 			</View>
 			<ImgPickOptionModal
@@ -202,8 +173,7 @@ const ProfileEditScreen = (props) => {
 				onCapture={onCapture}
 				onImageUpload={onImageUpload}
 				onClose={() => setShowPickerModal(false)}
-			/>
-			{renderDatepickerModal()}
+			/> 
 		</View>
 	);
 };
@@ -212,9 +182,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		flexDirection: 'column',
-		alignItems: 'center',
-		paddingTop: 20,
-		paddingHorizontal: 20,
+		alignItems: 'center', 
 		backgroundColor: Theme.colors.white,
 	},
 	header: {

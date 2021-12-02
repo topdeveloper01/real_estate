@@ -86,7 +86,7 @@ Theme.colors = {
 	red: '#f00',
 	gray1: '#444444',
 	gray2: '#707a7c',
-	gray3: '#8c9799',
+	gray3: '#808080',
 	gray4: '#DDDDDD',
 	gray5: '#D5D4E0',
 	gray6: '#E9E9F7',
@@ -204,7 +204,7 @@ Theme.styles = {
 		backgroundColor: Theme.colors.transparent,
 	},
 	disabledButton: {
-		opacity: 0.5,
+		opacity: 0.9,
 	},
 	buttonText: {
 		fontFamily: Theme.fonts.semiBold,

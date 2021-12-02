@@ -393,3 +393,7 @@ export const Pay_COD = 'Cash On Delivery';
 export const Pay_Card = 'Pay With Card';
 export const Pay_Paypal = 'Paypal';
 export const Pay_Apple = 'Apple Pay';
+
+
+export const FOR_PERSONAL = 'personal';
+export const FOR_BUSINESS = 'business';

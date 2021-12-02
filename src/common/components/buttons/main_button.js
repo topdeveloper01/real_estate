@@ -19,7 +19,7 @@ class MainButton extends PureComponent {
             {!loading && <AppText style={Theme.styles.buttonText}>{title}</AppText>}
             {loading && <ActivityIndicator style={Theme.styles.buttonText}
                 size={Theme.sizes.normal}
-                color={Theme.colors.whitePrimary} />}
+                color={Theme.colors.cyan2} />}
         </TouchableOpacity>;
     }
 

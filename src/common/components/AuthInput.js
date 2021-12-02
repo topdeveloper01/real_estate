@@ -27,8 +27,8 @@ const AuthInput = (props) => {
                 flex: 1,
                 color: Theme.colors.text,
                 backgroundColor : props.backgroundColor ? props.backgroundColor : Theme.colors.white
-            }]}
-            placeholderTextColor={props.placeholderTextColor ? props.placeholderTextColor : Theme.colors.gray5}
+            }]} 
+            placeholderTextColor={props.placeholderTextColor ? props.placeholderTextColor : Theme.colors.gray3}
             secureTextEntry={props.secure == true && visible == false ? true : false}
         />
         {
@@ -44,9 +44,8 @@ const styles = StyleSheet.create({
     view: {
         flexDirection: 'row',
         borderWidth: 1,
-        borderColor: '#E9E9F7',
-        borderRadius: 12,
-        height: 50,
+        borderColor: Theme.colors.gray3,
+        borderRadius: 12, 
         paddingLeft: 12,
         paddingRight: 12,
         justifyContent: 'center',

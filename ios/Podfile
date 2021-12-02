@@ -27,6 +27,8 @@ target 'Snapfood' do
   # comment the next line to disable credit card scanning
   pod 'CardIO' 
 
+  pod 'RNFBStorage', :path => '../node_modules/@react-native-firebase/storage'
+
   target 'SnapfoodTests' do
     inherit! :complete
     # Pods for testing

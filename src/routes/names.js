@@ -77,6 +77,12 @@ export default {
     NewCardScreen : 'NewCardScreen',
     ProfileEditScreen : 'ProfileEditScreen',
     SnapfoodersSplitScreen : 'SnapfoodersSplitScreen',
+    PrivacyPolicyScreen : 'PrivacyPolicyScreen',
+    TermsScreen : 'TermsScreen',
+    SupportScreen : 'SupportScreen',
+    BugReportScreen : 'BugReportScreen',
+    AppVersionScreen : 'AppVersionScreen',
+    AddListingScreen : 'AddListingScreen'
 };
 
 export const headerLessRoutes = [

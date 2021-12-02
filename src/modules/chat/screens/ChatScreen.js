@@ -18,11 +18,12 @@ import { translate } from '../../../common/services/translate';
 import { appMoment } from '../../../common/services/translate';
 import alerts from '../../../common/services/alerts';
 import { isEmpty, convertTimestamp2Date, getImageFullURL, checkInSameWeek } from '../../../common/services/utility';
-import apiFactory from '../../../common/services/apiFactory'; 
+import apiFactory from '../../../common/services/apiFactory';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import Theme from "../../../theme";
 import { CALL_HISTORY, } from "../../../config/constants";
 import NoChats from '../components/NoChats';
+import Header1 from '../../../common/components/Header1';
 // svgs
 import Svg_newcall from '../../../common/assets/svgs/btn_new_call.svg'
 import Svg_newmsg from '../../../common/assets/svgs/btn_new_chat.svg'
@@ -30,7 +31,7 @@ import Svg_more from '../../../common/assets/svgs/btn_more.svg'
 import Svg_outgoingcall from '../../../common/assets/svgs/ic_outgoingcall.svg'
 import Svg_incomingcall from '../../../common/assets/svgs/ic_incomingcall.svg'
 import Svg_missedcall from '../../../common/assets/svgs/ic_missedcall.svg'
- 
+
 class ChatScreen extends React.Component {
     _isMounted = false
     constructor(props) {
@@ -132,56 +133,6 @@ class ChatScreen extends React.Component {
             });
     };
 
-    renderSearchbar() {
-        const { isChatList } = this.state;
-        return (<View style={styles.searchContainer}>
-            <SearchBox fontSize={15} onChangeText={this.onChangeSearch} hint={translate('social.search.chat')} />
-            <View style={styles.spaceRow} />
-            <TouchableOpacity onPress={() => {
-                if (isChatList) {
-                    this.setState({ showConvModal: true })
-                }
-                else {
-                    this.props.navigation.push(RouteNames.NewCallScreen);
-                }
-            }} >
-                {isChatList ? <Svg_newmsg /> : <Svg_newcall />}
-            </TouchableOpacity>
-            <View style={styles.spaceRow} />
-            <Menu>
-                <MenuTrigger>
-                    <View style={styles.moreContainer}>
-                        <Svg_more />
-                        {this.state.new_invites.length > 0 && <View style={styles.moreAlert} />}
-                    </View>
-                </MenuTrigger>
-                <MenuOptions optionsContainerStyle={styles.popupContainer}>
-                    <MenuOption onSelect={() => { this.props.navigation.push(RouteNames.InvitationsScreen); }} >
-                        <View style={{ padding: 5, paddingBottom: 12, alignItems: 'center', borderColor: '#F6F6F9', borderBottomWidth: 1, flexDirection: 'row' }}>
-                            <Text style={styles.popupText}>{translate('social.invitation')}</Text>
-                            {
-                                this.state.new_invites.length > 0 &&
-                                <Text style={{ color: '#F55A00', fontSize: 10, marginLeft: 5, fontFamily: Theme.fonts.medium }}>
-                                    ({this.state.new_invites.length} new)</Text>
-                            }
-                        </View>
-                    </MenuOption>
-                    <MenuOption onSelect={() => { this.props.navigation.push(RouteNames.MyFriendsScreen); }} >
-                        <View style={{ paddingHorizontal: 5, paddingBottom: 12, borderColor: '#F6F6F9', borderBottomWidth: 1, flexDirection: 'row' }}>
-                            <Text style={styles.popupText}>{translate('social.my_friends')}</Text>
-                        </View>
-                    </MenuOption>
-                    <MenuOption onSelect={() => { this.props.navigation.push(RouteNames.SnapfoodMapScreen); }}>
-                        <View style={{ paddingHorizontal: 5, paddingBottom: 10, flexDirection: 'row' }}>
-                            <Text style={styles.popupText}>{translate('social.snapfood_map')}</Text>
-                        </View>
-                    </MenuOption>
-                </MenuOptions>
-            </Menu>
-
-        </View>);
-    }
-
     renderTab() {
         const { isChatList } = this.state;
         return (
@@ -259,7 +210,7 @@ class ChatScreen extends React.Component {
                     return translate('social.chat.user_shared_location');
                 }
                 else if (item.last_msg.emoji != null) {
-                    return (item.last_msg.emoji != null && item.last_msg.emoji.length > 0) ? item.last_msg.emoji.map(item => item.code).join('') : '' ;
+                    return (item.last_msg.emoji != null && item.last_msg.emoji.length > 0) ? item.last_msg.emoji.map(item => item.code).join('') : '';
                 }
                 else if (item.last_msg.images != null) {
                     return translate('social.chat.user_shared_photo');
@@ -279,13 +230,13 @@ class ChatScreen extends React.Component {
                     last_msg_user = translate('you');
                     isMe = true;
                 }
-    
+
                 if (item.last_msg.map != null) {
                     return last_msg_user + ': ' + (isMe ? translate('social.chat.you_shared_location') : translate('social.chat.user_shared_location'));
                 }
                 else if (item.last_msg.emoji != null) {
                     return last_msg_user + ': ' + (isMe ? translate('social.chat.you_sent_emoji') : translate('social.chat.user_sent_emoji'))
-                        // + (item.last_msg.emoji.code != null ? item.last_msg.emoji.code : item.last_msg.emoji.name)
+                    // + (item.last_msg.emoji.code != null ? item.last_msg.emoji.code : item.last_msg.emoji.name)
                 }
                 else if (item.last_msg.images != null) {
                     return last_msg_user + ': ' + (isMe ? translate('social.chat.you_shared_photo') : translate('social.chat.user_shared_photo'))
@@ -330,83 +281,37 @@ class ChatScreen extends React.Component {
                     source={{ uri: getPhoto() }}
                     resizeMode={FastImage.resizeMode.cover} />
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.name}>{getName()}</Text>
-                        <Text style={styles.time}>{getTime()}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginTop: 5, alignItems: 'flex-end' }}>
-                        <Text style={styles.message} numberOfLines={2} >{getLastMsg()}</Text>
+                    <View style={[Theme.styles.col_center, {flex:1}]}>
+                        <Text style={styles.name}>
+                            {getName()}
                         {
                             getUnreadCnt() > 0 &&
                             <View style={styles.unreadContainer}>
                                 <Text style={styles.unread}>{getUnreadCnt()}</Text>
                             </View>
                         }
-                    </View>
+                        </Text>
+                        <Text style={styles.message} numberOfLines={2} >{getLastMsg()}</Text>
+                    </View> 
+                    <Text style={styles.time}>{getTime()}</Text>
                 </View>
             </TouchableOpacity>
         );
     }
-
-    renderCallHistory() {
-        return (
-            <FlatList
-                style={styles.listContainer}
-                data={CALL_HISTORY}
-                numColumns={1}
-                renderItem={this.renderCallItem}
-                ItemSeparatorComponent={() => <View style={styles.spaceCol} />}
-                ListFooterComponent={() => <View style={styles.spaceCol} />}
-            />);
-    }
-
-    renderCallItem(item, index) {
-        let lastCallColor;
-        let lastCallIcon;
-        let lastCallText;
-        if (item.item.missedCount > 0) {
-            lastCallColor = '#F55A00';
-            lastCallIcon = <Svg_missedcall />
-            lastCallText = "" + item.item.missedCount + " Missed Call" + (item.item.missedCount > 0 ? 's' : '');
-        } else if (item.item.lastCall === 'Incoming') {
-            lastCallColor = '#00C22D';
-            lastCallIcon = <Svg_incomingcall />
-            lastCallText = 'Incoming';
-        }
-        else {
-            lastCallColor = '#23CBD8';
-            lastCallIcon = <Svg_outgoingcall />
-            lastCallText = 'Outgoing';
-        }
-        return (
-            <TouchableOpacity style={styles.chatContainer}>
-                <FastImage
-                    style={styles.avatar}
-                    source={{ uri: item.item.avatar }}
-                    resizeMode={FastImage.resizeMode.contain} />
-                <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.name}>{item.item.name}</Text>
-                        <Text style={styles.time}>{item.item.time}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center' }}>
-                        {lastCallIcon}
-                        <Text style={{ marginLeft: 5, color: lastCallColor, fontSize: 12, fontFamily: Theme.fonts.regular }}>{lastCallText}</Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        );
-    }
+ 
 
     render() {
         const { isChatList } = this.state;
         return (
             <View style={styles.container}>
-                {this.renderSearchbar()}
-                {/* {this.renderTab()} */}
+                <Header1 
+                    left={<View />}
+                    style={{ paddingHorizontal: 20 }}
+                    title={'通訊'}
+                />
                 {
                     this.state.isLoadingChat ? <BlockSpinner /> :
-                    this.renderChatHistory()
+                        this.renderChatHistory()
                 }
                 <NewConvOptionModal showModal={this.state.showConvModal}
                     goChat={() => {
@@ -482,10 +387,11 @@ const styles = StyleSheet.create({
         fontFamily: Theme.fonts.semiBold
     },
     chatContainer: {
-        padding: 10,
         flexDirection: 'row',
-        borderRadius: 15,
-        backgroundColor: '#FAFAFC'
+        paddingVertical: 16,
+        backgroundColor: Theme.colors.white,
+        borderBottomColor: '#808080aa',
+        borderBottomWidth: 1
     },
     listContainer: {
         flex: 1,
@@ -494,15 +400,15 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     avatar: {
-        width: 30,
-        height: 30,
-        borderRadius: 6,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: 'red',
         marginRight: 10
     },
     name: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 16,
         color: Theme.colors.text,
         fontFamily: Theme.fonts.semiBold
     },
@@ -513,10 +419,9 @@ const styles = StyleSheet.create({
     },
     message: {
         flex: 1,
-        fontSize: 12,
-        color: Theme.colors.text,
-        fontFamily: Theme.fonts.medium,
-        marginRight: 24
+        fontSize: 14,
+        color: '#808080',
+        fontFamily: Theme.fonts.medium, 
     },
     unreadContainer: {
         marginLeft: 20,

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import io.invertase.firebase.storage.ReactNativeFirebaseStoragePackage;
 import tech.power.RNBraintreeDropIn.RNBraintreeDropInPackage;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.zmxv.RNSound.RNSoundPackage;

@@ -10,7 +10,7 @@ const getLoggedInUserData = (user_id) => {
     return new Promise(async (resolve, reject) => {
         try {
             userCollection.doc(user_id).get().then((res) => {
-                resolve(res.data);
+                resolve(res.data());
             })
                 .catch(err => {
                     reject(err);
@@ -286,31 +286,17 @@ export const logout = () => async dispatch => {
 };
 
 export const updateProfileDetails = (user) => async dispatch => {
-    return new Promise(async (resolve, reject) => {
-        apiFactory.put('users', {
-            full_name: user.full_name,
-            email: user.email,
-            phone: user.phone,
-            photo: user.photo,
-            birthday: user.birthday,
-            push_notis: user.push_notis,
-            email_notis: user.email_notis,
-            promo_notis: user.promo_notis,
-            latitude: user.latitude,
-            longitude: user.longitude,
-            default_card_id: user.default_card_id
-        }).then(async ({ data }) => {
-            // dispatch({
-            //     type: APP.SET_HAS_VERIFIED_PHONE,
-            //     payload: !!data.user['verified_by_mobile'],
-            // }); 
-            // console.log('updateProfileDetails', data.user)
-            await dispatch({
+    return new Promise(async (resolve, reject) => { 
+        userCollection.doc(user.id).update(user).then(() => {
+            dispatch({
                 type: APP.SET_USER_DATA,
-                payload: data.user,
+                payload: user,
             });
-            resolve(data.user);
-        }, reject);
+            resolve(user)
+        })
+        .catch((e)=>{
+            reject(e);
+        }) 
     });
 };
 
@@ -340,7 +326,7 @@ export const setUserNeedLogin = (value) => async dispatch => {
 export const getLoggedInUser = (user_id) => dispatch => {
     return new Promise(async (resolve) => {
         try {
-            const user = await getLoggedInUserData(user_id);
+            const user = await getLoggedInUserData(user_id); 
             dispatch({
                 type: APP.SET_USER_DATA,
                 payload: user,
