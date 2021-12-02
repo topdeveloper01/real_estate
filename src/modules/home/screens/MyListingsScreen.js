@@ -2,22 +2,22 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { width, height } from 'react-native-dimension'; 
+import { width, height } from 'react-native-dimension';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { connect } from 'react-redux'; 
-import { getMyListings, deleteListing } from '../../../store/actions/listings'; 
+import { connect } from 'react-redux';
+import { getMyListings, deleteListing } from '../../../store/actions/listings';
 import Theme from '../../../theme';
 import { setVendorCart } from '../../../store/actions/shop';
-import RouteNames from '../../../routes/names'; 
+import RouteNames from '../../../routes/names';
 import { VendorItem } from '../../../common/components';
 import Header1 from '../../../common/components/Header1';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
- 
+import FilterBar from '../../../common/components/vendors/FilterVar';
 
 const MyListingsScreen = (props) => {
-  
+
 	const [allvendors, setAllVendors] = useState([])
 
 	const [vertLoading, setVertLoading] = useState(null)
@@ -26,74 +26,27 @@ const MyListingsScreen = (props) => {
 	const [deleteListingItem, setDeleteListingItem] = useState(null)
 	const [isDeleteConfirmModal, ShowDeleteModal] = useState(false)
 	const [deleteLoading, setDeleteLoading] = useState(false)
-	
 
-	const filterCategories = [
-		{
-			label: '地區',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '形式',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '價格',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '實用面積',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '房數',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-	]
+	const [filter_type, setFilterType] = useState(-1)
+	const [filter_price, setFilterPrice] = useState(-1)
+	const [filter_size, setFilterSize] = useState(-1)
+	const [filter_rooms, setFilterRooms] = useState(-1)
 
 	useEffect(() => {
-		loadVendors(); 
-	}, []) 
+		loadVendors();
+	}, [
+		filter_type, filter_price, filter_size, filter_rooms
+	])
 
 	const getFilers = () => {
-		return {}
+		return { searchTerm: '', filter_type, filter_price, filter_size, filter_rooms }
 	}
 
 	const loadVendors = async () => {
 		try {
 			setVertLoading(true);
 			let filterKeys = getFilers();
-			let vendorsData = await getMyListings(props.user.id);
+			let vendorsData = await getMyListings(props.user.id, filterKeys);
 			setAllVendors(vendorsData)
 			setVertLoading(false);
 		}
@@ -102,9 +55,9 @@ const MyListingsScreen = (props) => {
 			console.log('get Vendors', error)
 		}
 	}
- 
 
-	const isEmptyData = () => { 
+
+	const isEmptyData = () => {
 		return allvendors.length == 0
 	}
 
@@ -113,7 +66,7 @@ const MyListingsScreen = (props) => {
 		props.navigation.navigate(RouteNames.VendorScreen)
 	}
 
-	const onDelete=()=>{
+	const onDelete = () => {
 		ShowDeleteModal(false)
 		if (deleteListingItem == null) {
 			return
@@ -123,36 +76,9 @@ const MyListingsScreen = (props) => {
 			loadVendors()
 			setDeleteLoading(false);
 		})
-		.catch(error => {
-			setDeleteLoading(false);
-		})
-	}
-
-	const _renderCategories = () => {
-		return <View style={[Theme.styles.col_center, styles.filterview]}>
-			<ScrollView
-				horizontal={true}
-				style={{ width: '100%', paddingBottom: 12 }}
-			>
-				{
-					filterCategories.map((cat, index) =>
-						<View key={cat.label} style={[Theme.styles.row_center]}>
-							<TouchableOpacity style={[Theme.styles.col_center]}>
-								<Text style={styles.filterLabel}>{cat.label}</Text>
-								<Text style={styles.filterValue}>{cat.list[cat.value].label}</Text>
-							</TouchableOpacity>
-							{
-								index < (filterCategories.length - 1) &&
-								<View style={{ paddingHorizontal: 24 }}>
-									<Svg_divider />
-								</View>
-							}
-						</View>
-					)
-				}
-			</ScrollView>
-			<View style={styles.scrollviewHider} />
-		</View>
+			.catch(error => {
+				setDeleteLoading(false);
+			})
 	}
 
 	const _renderVertVendors = () => {
@@ -166,7 +92,7 @@ const MyListingsScreen = (props) => {
 							can_delete={true}
 							style={{ width: '100%', marginRight: 0, }}
 							onSelect={() => goVendorDetail(vendor)}
-							onDelete={()=> {
+							onDelete={() => {
 								setDeleteListingItem(vendor);
 								ShowDeleteModal(true)
 							}}
@@ -188,8 +114,8 @@ const MyListingsScreen = (props) => {
 	console.log('vertLoading ', vertLoading)
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-			<Spinner visible={deleteLoading || vertLoading}/>
-			 <Header1
+			<Spinner visible={deleteLoading} />
+			<Header1
 				onLeft={() => {
 					props.navigation.goBack();
 				}}
@@ -197,7 +123,13 @@ const MyListingsScreen = (props) => {
 				title={'已上傳單位記錄'}
 			/>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
-				{_renderCategories()}
+				<FilterBar
+					onChangeArea={(value) => { }}
+					onChangeType={(value) => { setFilterType(value) }}
+					onChangePrice={(value) => { setFilterPrice(value) }}
+					onChangeSize={(value) => { setFilterSize(value) }}
+					onChangeRooms={(value) => { setFilterRooms(value) }}
+				/>
 			</View>
 			{
 				(vertLoading == false && isEmptyData() == true) ?
@@ -210,12 +142,12 @@ const MyListingsScreen = (props) => {
 							<RefreshControl
 								refreshing={isRefreshing}
 								onRefresh={() => {
-									loadVendors(); 
+									loadVendors();
 								}}
 							/>
 						}
 						extraHeight={50}
-					> 
+					>
 						{
 							_renderVertVendors()
 						}
@@ -255,10 +187,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app, shop }) => ({
 	user: app.user || {},
-	isLoggedIn: app.isLoggedIn, 
+	isLoggedIn: app.isLoggedIn,
 	vendorData: shop.vendorData,
 });
 
-export default connect(mapStateToProps, { 
+export default connect(mapStateToProps, {
 	setVendorCart,
 })(MyListingsScreen);
