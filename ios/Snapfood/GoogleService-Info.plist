@@ -3,21 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>82651546395-nnfoefr2g64e9h12a3e8jtsf3eduiira.apps.googleusercontent.com</string>
+	<string>846171839154-795bkes5lk1u6otkfg9psilubqfgh0at.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.82651546395-nnfoefr2g64e9h12a3e8jtsf3eduiira</string>
+	<string>com.googleusercontent.apps.846171839154-795bkes5lk1u6otkfg9psilubqfgh0at</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>846171839154-133v89msm8kbkmb1gp7m3jdncrm8n8u0.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBwnejsgG6RbFyjPgyAXEtZfo1NSVFHO1Y</string>
+	<string>AIzaSyCfO3y3aTym9auOndjmEV9NCgXWqXZOTuM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>82651546395</string>
+	<string>846171839154</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.snapfood.al</string>
+	<string>com.hkhollys.app</string>
 	<key>PROJECT_ID</key>
-	<string>snapfood-3f623</string>
+	<string>hollysapp-53492</string>
 	<key>STORAGE_BUCKET</key>
-	<string>snapfood-3f623.appspot.com</string>
+	<string>hollysapp-53492.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:82651546395:ios:a46813ff7c62b43e19c9be</string>
-	<key>DATABASE_URL</key>
-	<string>https://snapfood-3f623.firebaseio.com</string>
+	<string>1:846171839154:ios:0bee8043b89456f3dcc7ab</string>
 </dict>
 </plist>

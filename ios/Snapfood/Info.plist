@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Snapfood</string>
+	<string>滙槿地產</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -35,7 +35,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.82651546395-nnfoefr2g64e9h12a3e8jtsf3eduiira</string>
+				<string>com.googleusercontent.apps.846171839154-795bkes5lk1u6otkfg9psilubqfgh0at</string>
 			</array>
 		</dict>
 		<dict>
@@ -50,7 +50,7 @@
 	<key>FacebookAppID</key>
 	<string>298466897411357</string>
 	<key>FacebookDisplayName</key>
-	<string>Snapfood</string>
+	<string>Hollys</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
@@ -79,19 +79,19 @@
 	<key>NSContactsUsageDescription</key>
 	<string>Share articles through WhatsApp</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Allow Snapfood to get your location to display the restaurants near you.</string>
+	<string>Allow to get your location to display the restaurants near you.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Allow Snapfood to get your location to display the restaurants near you.</string>
+	<string>Allow to get your location to display the restaurants near you.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allow Snapfood to get your location to display the restaurants near you.</string>
+	<string>Allow to get your location to display the restaurants near you.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Allow Snapfood to access your camera to take photos so you can use those photos in the chat or profile section.</string>
+	<string>Allow to access your camera to take photos so you can use those photos in the chat or profile section.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow Snapfood to access your microphone so that you can record/hear voice messages for the chat.</string>
+	<string>Allow to access your microphone so that you can record/hear voice messages for the chat.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Allow Snapfood to access your photo library so you can save photos from chat to your camera roll.</string>
+	<string>Allow to access your photo library so you can save photos from chat to your camera roll.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Allow Snapfood access Photos so you can use photos in your chat conversations within the app.</string>
+	<string>Allow access Photos so you can use photos in your chat conversations within the app.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>fontello.ttf</string>
