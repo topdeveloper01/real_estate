@@ -14,6 +14,7 @@ import { getAllListings } from '../../../store/actions/listings';
 import { setVendorCart } from '../../../store/actions/shop';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
+import FilterBar from '../../../common/components/vendors/FilterVar';
 import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
@@ -27,62 +28,17 @@ const SearchScreen = (props) => {
 	const [vertLoading, setVertLoading] = useState(null)
 	const [isRefreshing, setRefreshing] = useState(false)
 
-	const filterCategories = [
-		{
-			label: '地區',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '形式',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '價格',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '實用面積',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-		{
-			label: '房數',
-			value: 0,
-			list: [
-				{
-					label: '任何',
-					value: ''
-				}
-			]
-		},
-	]
+	const [searchTerm, setSearchTerm] = useState('')
+	const [filter_type, setFilterType] = useState(-1)
+	const [filter_price, setFilterPrice] = useState(-1)
+	const [filter_size, setFilterSize] = useState(-1)
+	const [filter_rooms, setFilterRooms] = useState(-1)
 
 	useEffect(() => {
 		loadVendors(true);
-	}, [])
+	}, [
+		searchTerm, filter_type, filter_price, filter_size, filter_rooms
+	])
 
 	const goRootStackScreen = (name, params) => {
 		if (params) {
@@ -94,7 +50,7 @@ const SearchScreen = (props) => {
 	}
 
 	const getFilers = () => {
-		return {}
+		return { searchTerm, filter_type, filter_price, filter_size, filter_rooms }
 	}
 
 	const loadVendors = async (forceLoading) => {
@@ -110,7 +66,7 @@ const SearchScreen = (props) => {
 			console.log('get Vendors', error)
 		}
 	}
- 
+
 	const isEmptyData = () => {
 		return allvendors.length == 0
 	}
@@ -118,33 +74,6 @@ const SearchScreen = (props) => {
 	const goVendorDetail = (vendor) => {
 		props.setVendorCart(vendor)
 		goRootStackScreen(RouteNames.VendorScreen)
-	}
-
-	const _renderCategories = () => {
-		return <View style={[Theme.styles.col_center, styles.filterview]}>
-			<ScrollView
-				horizontal={true}
-				style={{ width: '100%', paddingBottom: 12 }}
-			>
-				{
-					filterCategories.map((cat, index) =>
-						<View key={cat.label} style={[Theme.styles.row_center]}>
-							<TouchableOpacity style={[Theme.styles.col_center]}>
-								<Text style={styles.filterLabel}>{cat.label}</Text>
-								<Text style={styles.filterValue}>{cat.list[cat.value].label}</Text>
-							</TouchableOpacity>
-							{
-								index < (filterCategories.length - 1) &&
-								<View style={{ paddingHorizontal: 24 }}>
-									<Svg_divider />
-								</View>
-							}
-						</View>
-					)
-				}
-			</ScrollView>
-			<View style={styles.scrollviewHider} />
-		</View>
 	}
 
 	const _renderVertVendors = () => {
@@ -174,7 +103,7 @@ const SearchScreen = (props) => {
 
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-			<Spinner visible={vertLoading}/>
+			{/* <Spinner visible={vertLoading}/> */}
 			<View style={[Theme.styles.row_center_start, styles.header]}>
 				<Text style={styles.headerTitle}>滙槿地產有限公司</Text>
 				<TouchableOpacity onPress={() => {
@@ -190,13 +119,15 @@ const SearchScreen = (props) => {
 					autoCapitalize={'none'}
 					returnKeyType={'done'}
 					isSearch={true}
-					value={props.home_vendor_filter.searchTerm}
+					value={searchTerm}
 					onChangeText={(searchTerm) => {
+						setSearchTerm(searchTerm)
 					}}
 					backgroundColor={Theme.colors.gray4}
 					style={{ borderWidth: 0, backgroundColor: Theme.colors.gray4 }}
-					rightComp={props.home_vendor_filter.searchTerm !== '' ? (
+					rightComp={searchTerm !== '' ? (
 						<TouchableOpacity onPress={() => {
+							setSearchTerm('')
 						}}>
 							<Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
 						</TouchableOpacity>
@@ -204,7 +135,13 @@ const SearchScreen = (props) => {
 				/>
 			</View>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
-				{_renderCategories()}
+				<FilterBar
+					onChangeArea={(value) => { }}
+					onChangeType={(value) => { setFilterType(value) }}
+					onChangePrice={(value) => { setFilterPrice(value) }}
+					onChangeSize={(value) => { setFilterSize(value) }}
+					onChangeRooms={(value) => { setFilterRooms(value) }}
+				/>
 			</View>
 			{
 				(vertLoading == false && isEmptyData() == true) ?
