@@ -14,31 +14,31 @@ import { toggleFavourite } from '../../../store/actions/vendors';
 // svgs
 import Svg_euro from '../../../common/assets/svgs/ic_euro.svg'
 
-const VendorItem = (props) => {
+const FeaturedVendorItem = (props) => {
     const { data, onSelect, style } = props
 
     return <TouchableOpacity onPress={() => onSelect()}
-        style={[Theme.styles.row_center, styles.container, style,]}>
+        style={[Theme.styles.col_center, styles.container, style,]}>
         <View style={[Theme.styles.col_center, styles.imgView]}>
             <FastImage
-                source={{ uri: data.photo}}
+                source={{ uri: data.photo }}
                 style={styles.img}
                 resizeMode={FastImage.resizeMode.cover}
             />
         </View>
-        <View style={{ flex: 1, height: '100%', paddingVertical:4, paddingLeft: 12, flexDirection: 'column', justifyContent: 'space-between' }}>
+        <View style={{ flex: 1, width: '100%', padding : 12, flexDirection: 'column',  }}>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <AppText style={[styles.title]}>{data.title}</AppText>
             </View>
-            <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 6 }]}>
                 <AppText style={[styles.text]}>{data.type_use}</AppText>
             </View>
-            <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+            <View style={[Theme.styles.row_center_start, { width: '100%' , marginTop: 6}]}>
                 {
                     data.isSell == true &&
                     <View style={styles.tag}>
                         <AppText style={[styles.tag_txt]}>售</AppText>
-                    </View> 
+                    </View>
                 }
                 {
                     data.isRent == true &&
@@ -46,7 +46,7 @@ const VendorItem = (props) => {
                         <AppText style={[styles.tag_txt]}>租</AppText>
                     </View>
                 }
-                <View style={{flex: 1}}/>
+                <View style={{ flex: 1 }} />
                 <AppText style={[styles.price]}>${data.price}</AppText>
             </View>
         </View>
@@ -54,12 +54,23 @@ const VendorItem = (props) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        height: 120, width: '100%', alignItems: 'flex-start', paddingVertical: 16,
-        backgroundColor: Theme.colors.white, borderBottomWidth: 1, borderBottomColor: Theme.colors.gray4
+    container: { 
+        width: 160,
+        backgroundColor: Theme.colors.white,
+        shadowColor: Theme.colors.blackPrimary,
+        shadowOffset: {
+            width: 2,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 2,
+        marginVertical: 6,
+        marginLeft: 2,
+        marginRight: 12
     },
-    imgView: { width: 150, height: 88, backgroundColor: '#F6F6F9' },
-    img: { width: 150, height: 88, },
+    imgView: { width: '100%', height: 110, backgroundColor: '#F6F6F9' },
+    img: { width: '100%', height: 110, },
     title: { fontSize: 14, color: Theme.colors.text, fontFamily: Theme.fonts.bold, marginRight: 6 },
     text: { fontSize: 12, color: Theme.colors.gray3, fontFamily: Theme.fonts.semiBold, },
     tag: { padding: 6, borderRadius: 6, backgroundColor: Theme.colors.yellow1 },
@@ -74,4 +85,4 @@ function arePropsEqual(prevProps, nextProps) {
 const mapStateToProps = ({ app, shop }) => ({
     isLoggedIn: app.isLoggedIn,
 });
-export default connect(mapStateToProps, { toggleFavourite })(React.memo(VendorItem, arePropsEqual));
+export default connect(mapStateToProps, { toggleFavourite })(React.memo(FeaturedVendorItem, arePropsEqual));

@@ -13,7 +13,7 @@ const AuthInput = (props) => {
 
         {
             props.isSearch == true && <TouchableOpacity style={{marginRight: 4}} onPress={() => SetVisible(!visible)}>
-                <Feather name={'search'} size={18} color={Theme.colors.gray5} />
+                <Feather name={'search'} size={18} color={Theme.colors.gray3} />
             </TouchableOpacity>
         }
 

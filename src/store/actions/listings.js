@@ -34,7 +34,7 @@ export const getMyListings = (user_id) => {
     });
 };
 
-export const getAllListings = () => {
+export const getAllListings = (filterKeys) => {
     return new Promise(async (resolve, reject) => {
         try {
             listingCollection.get().then((res) => {

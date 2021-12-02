@@ -133,7 +133,7 @@ const AddListingScreen = (props) => {
 	]);
 
 
-	const [state, setState] = useState({ isSell: true })
+	const [state, setState] = useState({})
 
 	useEffect(() => { }, []);
 
@@ -165,8 +165,19 @@ const AddListingScreen = (props) => {
 		if (isEmpty(state.title) || isEmpty(state.type_use) || isEmpty(state.area) ||
 			isEmpty(state.street) || isEmpty(state.building) || isEmpty(state.floor) ||
 			isEmpty(state.size) || isEmpty(state.living_rooms) || isEmpty(state.rooms) ||
-			isEmpty(state.toilets) || isEmpty(state.room_toilets) || isEmpty(state.helper_rooms) ||
-			isEmpty(state.price)) {
+			isEmpty(state.toilets) || isEmpty(state.room_toilets) || isEmpty(state.helper_rooms)) {
+			alerts.error('', '填寫所有字段');
+			return false
+		}
+		if (isEmpty(state.isSell) && isEmpty(state.isRent)) {
+			alerts.error('', '填寫所有字段');
+			return false
+		}
+		if (state.isSell == true && isEmpty(state.price)) {
+			alerts.error('', '填寫所有字段');
+			return false
+		}
+		if (state.isRent == true && isEmpty(state.rent_price)) {
 			alerts.error('', '填寫所有字段');
 			return false
 		}
@@ -423,7 +434,7 @@ const AddListingScreen = (props) => {
 						}}
 					/>
 					<AuthInput
-						placeholder={'價錢'}
+						placeholder={'售價錢'}
 						underlineColorAndroid={'transparent'}
 						keyboardType='decimal-pad'
 						selectionColor={Theme.colors.cyan2}
@@ -431,6 +442,18 @@ const AddListingScreen = (props) => {
 						returnKeyType={'next'}
 						autoCapitalize={'none'}
 						value={state.price}
+						secure={false}
+						style={{ marginBottom: 12 }}
+					/>
+					<AuthInput
+						placeholder={'租價錢'}
+						underlineColorAndroid={'transparent'}
+						keyboardType='decimal-pad'
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(rent_price) => setState({ ...state, rent_price })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.rent_price}
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
@@ -445,9 +468,9 @@ const AddListingScreen = (props) => {
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
 						/>
 						<RadioBtn
-							checked={state.isSell == false}
+							checked={state.isRent == false}
 							onPress={() => {
-								setState({ ...state, isSell: false })
+								setState({ ...state, isRent: false })
 							}}
 							text='租'
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { width, height } from 'react-native-dimension';
 import FastImage from 'react-native-fast-image';
@@ -10,7 +11,7 @@ import { connect } from 'react-redux';
 import {
     setHomeVendorFilter, setHomeVendorSort
 } from '../../../store/actions/app';
-import { getFavourites, getFeaturedBlocks, getVendors, getFoodCategories, toggleFavourite } from '../../../store/actions/vendors';
+import { getAllListings } from '../../../store/actions/listings';
 import { setVendorCart } from '../../../store/actions/shop';
 import { extractErrorMessage, getImageFullURL, openExternalUrl, } from '../../../common/services/utility';
 import { translate } from '../../../common/services/translate';
@@ -20,61 +21,80 @@ import RouteNames from '../../../routes/names';
 import { OrderType_Delivery, OrderType_Pickup, OrderType_Reserve } from '../../../config/constants'
 import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
 import FeatureList from '../components/FeatureList';
-import Switch from '../components/Switch';
-import CategItem from '../components/CategItem';
-import HomeHeader from '../components/HomeHeader';
+
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
+import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
 
-
-const expectedBlocks = [
-    { key: 'suggested', icon: 'top' },
-    { key: 'new', icon: 'new' },
-    { key: 'exclusive', icon: 'collision' },
-    // { key: 'free_delivery', icon: null },
-    // { key: 'all', icon: null },
-];
 const vertPerPage = 10;
 
 const HomePage = (props) => {
 
-    const catsLoaded = useRef(false);
     const featureLoaded = useRef(false);
     const vendorsLoaded = useRef(false);
 
-    const foodCategID = useRef(null);
-
-    const [curFoodCatID, setCurFoodCatID] = useState(null);
-
-    const [foodCategories, setFoodCats] = useState([])
     const [featuredBlocks, setFeaturedBlocks] = useState([])
     const [allvendors, setAllVendors] = useState([])
 
-    const [dataLoading, setDataLoading] = useState(null)
-    const [showCateg, setShowCateg] = useState(false)
-
     const [vertLoading, setVertLoading] = useState(false)
-
     const [isRefreshing, setRefreshing] = useState(false)
 
-    const [vertPage, setVertPage] = useState(1)
-    const [vertTotalPages, setVertTotalPages] = useState(1)
+    const filterCategories = [
+        {
+            label: '地區',
+            value: 0,
+            list: [
+                {
+                    label: '任何',
+                    value: ''
+                }
+            ]
+        },
+        {
+            label: '形式',
+            value: 0,
+            list: [
+                {
+                    label: '任何',
+                    value: ''
+                }
+            ]
+        },
+        {
+            label: '價格',
+            value: 0,
+            list: [
+                {
+                    label: '任何',
+                    value: ''
+                }
+            ]
+        },
+        {
+            label: '實用面積',
+            value: 0,
+            list: [
+                {
+                    label: '任何',
+                    value: ''
+                }
+            ]
+        },
+        {
+            label: '房數',
+            value: 0,
+            list: [
+                {
+                    label: '任何',
+                    value: ''
+                }
+            ]
+        },
+    ]
 
     useEffect(() => {
-        loadData(true);
-        foodCategID.current = null;
-        setCurFoodCatID(null);
-    }, [
-        props.home_vendor_filter.vendor_type,
-        props.home_vendor_filter.order_type,
-        props.coordinates.latitude,
-        props.coordinates.longitude,
-    ])
-
-    useEffect(() => {
-        if (dataLoading == false) {
-            loadVendors(1, vertPerPage, true);
-        }
+        loadVendors();
+        loadFeaturedBlocks();
     }, [
         props.home_vendor_filter.is_meal,
         props.home_vendor_filter.is_dietary,
@@ -87,11 +107,6 @@ const HomePage = (props) => {
         props.home_vendor_sort,
     ])
 
-    useEffect(() => {
-        if (dataLoading == false) {
-            onFavChange(props.vendorData)
-        }
-    }, [props.vendorData.isFav])
 
     const goRootStackScreen = (name, params) => {
         if (params) {
@@ -101,198 +116,40 @@ const HomePage = (props) => {
             props.rootStackNav.navigate(name)
         }
     }
-    const goTabStackScreen = (name) => {
-        props.homeTabNav.navigate(name);
+
+    const getFilers = () => {
+        return {}
     }
 
-    const getFilers = (flag) => {
-
-        const { vendor_type, order_type, is_meal, is_dietary, ongoing_offer, open_now, online_payment, low_fee, high_fee, searchTerm } = props.home_vendor_filter;
-        let filters = []
-        if (vendor_type == 'Vendors') {
-            filters.push("vendor_type=Restaurant")
-        }
-        else {
-            filters.push("vendor_type=Grocery")
-        }
-        filters.push("order_method=" + order_type)
-
-        if (flag == 1) {
-            return filters;
-        }
-
-        if (foodCategID.current != null) {
-            filters.push(`food_category_ids[]=${foodCategID.current}`);
-        }
-        if (flag == 2) {
-            return filters;
-        }
-        if (is_meal) {
-            filters.push("is_meal=1")
-        }
-        if (is_dietary) {
-            filters.push("is_dietary=1")
-        }
-        if (ongoing_offer) {
-            filters.push("promotions=1")
-        }
-        if (open_now) {
-            filters.push("open_now=1")
-        }
-        if (online_payment) {
-            filters.push("online_payment=1")
-        }
-        if (low_fee != null) {
-            filters.push(`low_fee=${low_fee}`)
-        }
-        if (high_fee != null) {
-            filters.push(`high_fee=${high_fee}`)
-        }
-        if (searchTerm != '') {
-            filters.push("name=" + searchTerm)
-        }
-        return filters;
-    }
-
-    const getSortDir = (sort_type) => {
-        if (sort_type == VSort_Title) {
-            return 1;
-        }
-        else if (sort_type == VSort_FastDelivery) {
-            return 1;
-        }
-        else if (sort_type == VSort_HighRating) {
-            return -1;
-        }
-        else if (sort_type == VSort_Closest) {
-            return 1;
-        }
-        else if (sort_type == VSort_Low2HighPrice) {
-            return 1;
-        }
-        else if (sort_type == VSort_PopularFirst) {
-            return -1;
-        }
-        else {
-            return 1;
-        }
-    }
-
-    const loadData = async (includeCatLoad = false, isHomeRefresh = false) => {
-        if (isHomeRefresh) {
-            setRefreshing(true);
-        }
-        else {
-            setDataLoading(true);
-        }
-
-        setShowCateg(includeCatLoad == false);
-        if (includeCatLoad) {
-            loadCategories();
-        }
-        loadVendors(1, vertPerPage, true);
-        loadFeaturedBlocks();
-    };
-
-    const loadCategories = async () => {
+    const loadVendors = async () => {
         try {
-            catsLoaded.current = false;
-            let formattedFoodCategories = [];
-            let categs_filterKeys = getFilers(1);
-            let categs_response = await getFoodCategories(categs_filterKeys);
-            if (!!categs_response && !!categs_response.food_categories && !!categs_response.food_categories.length >= 0) {
-                formattedFoodCategories = categs_response.food_categories.map(
-                    ({ icon, id, search_count, title_en, title_sq, image }) => ({
-                        id,
-                        icon,
-                        title_en,
-                        title_sq,
-                        image,
-                        selected: false,
-                    })
-                );
-            }
-
-            catsLoaded.current = true;
-            setFoodCats(formattedFoodCategories);
-            checkDataLoading();
-        }
-        catch (error) {
-            catsLoaded.current = true;
-            checkDataLoading();
-            console.log('get Food Categories', error)
-        }
-    }
-
-    const loadVendors = async (page, perPage, forceLoading = false) => {
-        try {
-            if (!vertLoading || forceLoading) {
-                vendorsLoaded.current = false;
-                if (forceLoading) {
-                    setVertLoading(true);
-                }
-                let { latitude, longitude } = props.coordinates;
-                let filterKeys = getFilers();
-                let order_dir = getSortDir(props.home_vendor_sort);
-
-                let vendorsData = await getVendors(page, latitude, longitude, props.home_vendor_sort, order_dir, perPage, filterKeys);
-
-                if (page > 1) {
-                    const currentVendorIds = allvendors.map((x) => x.id);
-                    const newVendors = vendorsData.data.filter((x) => currentVendorIds.indexOf(x.id) === -1);
-                    setVertPage(vendorsData['current_page']);
-                    setVertTotalPages(vendorsData['last_page']);
-                    setAllVendors([...allvendors, ...newVendors])
-                } else {
-                    setVertPage(vendorsData['current_page']);
-                    setVertTotalPages(vendorsData['last_page']);
-                    setAllVendors(vendorsData.data);
-                }
-                vendorsLoaded.current = true;
-                setVertLoading(false);
-                checkDataLoading();
-            }
-        }
-        catch (error) {
-            vendorsLoaded.current = true;
+            let filterKeys = getFilers();
+            let vendorsData = await getAllListings(filterKeys);
+            setAllVendors(vendorsData)
             setVertLoading(false);
-            checkDataLoading();
+        }
+        catch (error) {
+            setVertLoading(false);
             console.log('get Vendors', error)
         }
     }
 
     const loadFeaturedBlocks = async () => {
         try {
-            featureLoaded.current = false;
-            let { latitude, longitude } = props.coordinates;
-            let filterKeys = getFilers(2);
-            let _featuredBlocks = await props.getFeaturedBlocks(latitude, longitude, filterKeys);
-            setFeaturedBlocks(_featuredBlocks);
-            featureLoaded.current = true;
-            checkDataLoading();
+            let filterKeys = getFilers();
+            let vendorsData = await getAllListings(filterKeys);
+            setFeaturedBlocks(vendorsData)
+            setVertLoading(false);
         }
         catch (error) {
-            featureLoaded.current = true;
-            checkDataLoading();
-            console.log('load Featured Blocks ', error)
+            setVertLoading(false);
+            console.log('get Vendors', error)
         }
     };
 
-    const isEmptyData=()=>{
+    const isEmptyData = () => {
         let featured_cnt = 0;
-        expectedBlocks.map(({ key, icon }) => {
-            if (featuredBlocks[key] && featuredBlocks[key].vendors) {
-                featured_cnt = featured_cnt + featuredBlocks[key].vendors.length;
-            }
-        })
-        return (featured_cnt == 0 && allvendors.length == 0 ) 
-    }
-
-    const checkDataLoading = () => {
-        if (catsLoaded.current == true && featureLoaded.current == true && vendorsLoaded.current == true) {
-            setDataLoading(false);
-            setRefreshing(false);
-        }
+        return (featured_cnt == 0 && allvendors.length == 0)
     }
 
     const goVendorDetail = (vendor) => {
@@ -300,154 +157,47 @@ const HomePage = (props) => {
         goRootStackScreen(RouteNames.VendorScreen)
     }
 
-    const onFavChange = (data) => {
-        console.log('onFavChange onFavChange')
-        let found_all_index = allvendors.findIndex(i => i.id == data.id)
-        if (found_all_index != -1) {
-            let tmp = allvendors.slice(0, allvendors.length)
-            tmp[found_all_index].isFav = data.isFav
-            setAllVendors(tmp)
-
-            console.log('fave change', data.title, data.isFav)
-        }
-
-        let _featuredBlocks = Object.assign({}, featuredBlocks);
-
-        expectedBlocks.map(({ key, icon }) => {
-            if (_featuredBlocks[key] != null && _featuredBlocks[key].vendors != null && _featuredBlocks[key].vendors.length > 0) {
-                let found_index = _featuredBlocks[key].vendors.findIndex(i => i.id == data.id)
-                if (found_index != -1) {
-                    _featuredBlocks[key].vendors[found_index].isFav = data.isFav;
-                }
-            }
-        })
-        setFeaturedBlocks(_featuredBlocks);
-    }
-
     const _renderCategories = () => {
-        return <View style={[Theme.styles.col_center, (foodCategories != null && foodCategories.length > 0) && { marginTop: 16 }]}>
+        return <View style={[Theme.styles.col_center, styles.filterview]}>
             <ScrollView
                 horizontal={true}
-                style={{ width: '100%', paddingBottom: ((foodCategories != null && foodCategories.length > 0) ? 12 : 6), }}
+                style={{ width: '100%', paddingBottom: 12 }}
             >
                 {
-                    foodCategories.map((cat, index) =>
-                        <CategItem
-                            key={cat.id}
-                            category={cat}
-                            cat_id={cat.id}
-                            isSelected={curFoodCatID == cat.id}
-                            onSelect={(categ) => {
-                                if (foodCategID.current == categ.id) {
-                                    foodCategID.current = null;
-                                    setCurFoodCatID(null);
-                                }
-                                else {
-                                    foodCategID.current = categ.id;
-                                    setCurFoodCatID(categ.id);
-                                }
-                                loadData(false);
-                            }} />
+                    filterCategories.map((cat, index) =>
+                        <View key={cat.label} style={[Theme.styles.row_center]}>
+                            <TouchableOpacity style={[Theme.styles.col_center]}>
+                                <Text style={styles.filterLabel}>{cat.label}</Text>
+                                <Text style={styles.filterValue}>{cat.list[cat.value].label}</Text>
+                            </TouchableOpacity>
+                            {
+                                index < (filterCategories.length - 1) &&
+                                <View style={{ paddingHorizontal: 24 }}>
+                                    <Svg_divider />
+                                </View>
+                            }
+                        </View>
                     )
                 }
             </ScrollView>
             <View style={styles.scrollviewHider} />
         </View>
-
-    }
-
-    const _renderFeatureBlocks = () => {
-        return <View style={{ width: '100%', marginTop: 8, }}>
-            {
-                expectedBlocks.map(({ key, icon }) => {
-                    if ((featuredBlocks[key] && featuredBlocks[key].block && featuredBlocks[key].block['is_active'])) {
-                        const restaurants = featuredBlocks[key].vendors;
-                        if (!restaurants || restaurants.length === 0) {
-                            return null;
-                        }
-                        return <FeatureList
-                            key={key}
-                            label={props.language == 'sq' ? featuredBlocks[key].block.title_sq : featuredBlocks[key].block.title_en}
-                            items={restaurants}
-                            onFavChange={onFavChange}
-                            goVendorDetail={(vendor) => {
-                                goVendorDetail(vendor)
-                            }}
-                        />
-                    }
-                })
-            }
-        </View>
-    }
-
-    const _renderSearchView = () => {
-        if (dataLoading != false) { return null; }
-        return <View style={[Theme.styles.row_center, { width: '100%', marginBottom: 20 }]}>
-            <AuthInput
-                placeholder={props.home_vendor_filter.vendor_type == 'Vendors' ? translate('search.search_vendors') : translate('search.search_grocery')}
-                underlineColorAndroid={'transparent'}
-                autoCapitalize={'none'}
-                returnKeyType={'done'}
-                isSearch={true}
-                value={props.home_vendor_filter.searchTerm}
-                onChangeText={(searchTerm) => {
-                    props.setHomeVendorFilter({
-                        searchTerm: searchTerm
-                    })
-                }}
-                style={{ flex: 1, height: 45, marginRight: 12, }}
-                rightComp={props.home_vendor_filter.searchTerm !== '' ? (
-                    <TouchableOpacity onPress={() => {
-                        props.setHomeVendorFilter({
-                            searchTerm: ''
-                        })
-                    }}>
-                        <Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
-                    </TouchableOpacity>
-                ) : null}
-            />
-            <RoundIconBtn style={{ width: 45, height: 45 }} icon={<MaterialIcons name='filter-list' size={26} color={Theme.colors.cyan2} />}
-                onPress={() => goRootStackScreen(RouteNames.FilterScreen)} />
-        </View>
     }
 
     const _renderVertVendors = () => {
-        if (dataLoading == false && allvendors.length == 0) {
-            if (props.home_vendor_filter.searchTerm == null || props.home_vendor_filter.searchTerm == '') {
-                return <NoRestaurants desc={
-                    props.home_vendor_filter.vendor_type == 'Vendors' ? translate('no_restaurant_filter') : translate('no_grocery_filter')}
-                    style={{ marginVertical: 20, paddingBottom: 100 }}
-                />
-            }
-            return <NoRestaurants desc={
-                props.home_vendor_filter.vendor_type == 'Vendors' ? translate('no_restaurant_search') : translate('no_grocery_search')}
-                style={{ marginVertical: 20 , paddingBottom: 100}}
-            />
-        }
-
         return <View style={[Theme.styles.col_center_start, { width: '100%', alignItems: 'flex-start', }]}>
-            <Text style={styles.subjectTitle}>
-                {props.home_vendor_filter.vendor_type == 'Vendors' ? translate('all_vendors') : translate('all_grocery')}
-            </Text>
-            <ScrollView
-                style={{ width: '100%', marginTop: 16, }}
-            >
-                {
-                    allvendors.map((vendor, index) =>
-                        <View key={vendor.id} style={[Theme.styles.col_center, { width: '100%', }]}>
-                            <VendorItem
-                                data={vendor}
-                                vendor_id={vendor.id}
-                                isFav={vendor.isFav}
-                                is_open={vendor.is_open}
-                                style={{ width: '100%', marginBottom: 16, marginRight: 0, }}
-                                onFavChange={onFavChange}
-                                onSelect={() => goVendorDetail(vendor)}
-                            />
-                        </View>
-                    )
-                }
-            </ScrollView>
+            {
+                allvendors.map((vendor, index) =>
+                    <View key={vendor.id} style={[Theme.styles.col_center, { width: '100%', }]}>
+                        <VendorItem
+                            data={vendor}
+                            vendor_id={vendor.id}
+                            style={{ width: '100%', marginRight: 0, }}
+                            onSelect={() => goVendorDetail(vendor)}
+                        />
+                    </View>
+                )
+            }
         </View>
     }
 
@@ -461,50 +211,37 @@ const HomePage = (props) => {
 
     return (
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-            <HomeHeader
-                curTab={props.home_vendor_filter.vendor_type}
-                coordinates={props.coordinates}
-                isLoggedIn={props.isLoggedIn}
-                cashback_amount={props.user.cashback_amount}
-                photo={props.user.photo}
-                onLocationSetup={(coordinates) => {
-                    goRootStackScreen(RouteNames.LocationSetupScreen, { from_home: true, coords: coordinates })
-                }}
-                onGoWallet={() => {
-                    goRootStackScreen(RouteNames.WalletScreen)
-                }}
-                onGoProfile={() => {
-                    goTabStackScreen(RouteNames.ProfileStack)
-                }}
-                onTabChange={(item) => {
-                    props.setHomeVendorFilter({
-                        order_type: OrderType_Delivery,
-                    })
-                    setTimeout(() => {
-                        props.setHomeVendorFilter({
-                            vendor_type: item
-                        })
-                    }, 200);
-                }}
-            />
+            <View style={[Theme.styles.row_center_start, styles.header]}>
+                <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+                <TouchableOpacity>
+                    <MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
+                </TouchableOpacity>
+            </View>
+            <View style={{ width: '100%', marginTop: 10, paddingHorizontal: 20, }}>
+                <AuthInput
+                    placeholder={'關鍵字/地區/標籤'}
+                    underlineColorAndroid={'transparent'}
+                    autoCapitalize={'none'}
+                    returnKeyType={'done'}
+                    isSearch={true}
+                    value={props.home_vendor_filter.searchTerm}
+                    onChangeText={(searchTerm) => {
+                    }}
+                    backgroundColor={Theme.colors.gray4}
+                    style={{ borderWidth: 0, backgroundColor: Theme.colors.gray4 }}
+                    rightComp={props.home_vendor_filter.searchTerm !== '' ? (
+                        <TouchableOpacity onPress={() => {
+                        }}>
+                            <Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
+                        </TouchableOpacity>
+                    ) : null}
+                />
+            </View>
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
-                <View style={[Theme.styles.row_center, styles.operationTab]}>
-                    <SwitchTab
-                        curitem={props.home_vendor_filter.order_type}
-                        items={props.home_vendor_filter.vendor_type == 'Vendors' ? [OrderType_Delivery, OrderType_Pickup, OrderType_Reserve] : [OrderType_Delivery, OrderType_Pickup]}
-                        onSelect={(item) => {
-                            setTimeout(() => {
-                                props.setHomeVendorFilter({
-                                    order_type: item
-                                })
-                            }, 200);
-                        }}
-                        style={{ width: '100%' }}
-                    />
-                </View>
+                {_renderCategories()}
             </View>
             {
-                (dataLoading == false && isEmptyData() == true) ?
+                (vertLoading == false && isEmptyData() == true) ?
                     <NoRestaurants />
                     :
                     <KeyboardAwareScrollView
@@ -514,53 +251,43 @@ const HomePage = (props) => {
                             <RefreshControl
                                 refreshing={isRefreshing}
                                 onRefresh={() => {
-                                    loadData(true, true);
                                 }}
                             />
                         }
-                        onScroll={({ nativeEvent }) => {
-                            if (isCloseToTop(nativeEvent)) {
-                                loadVendors(1, vertPerPage)
-                            }
-                            if (isCloseToBottom(nativeEvent)) {
-                                if (vertPage < vertTotalPages) {
-                                    console.log('isCloseToBottom : load Next Vendors', vertPage + 1, vertPerPage)
-                                    loadVendors(vertPage + 1, vertPerPage)
-                                }
-                            }
-                        }}
                         extraHeight={50}
                     >
-                        {_renderCategories()}
-                        {_renderFeatureBlocks()}
-                        {_renderSearchView()}
                         {
-                            !isRefreshing && vertLoading ?
-                                <BlockSpinner style={{ minHeight: 80, paddingBottom : 260}} /> :
-                                _renderVertVendors()
+                            featuredBlocks.length > 0 &&
+                            <FeatureList
+                                label={'精選樓盤'}
+                                items={featuredBlocks}
+                                goVendorDetail={(vendor) => {
+                                    goVendorDetail(vendor)
+                                }}
+                            />
                         }
                         {
-                            vertLoading == false && (vertPage < vertTotalPages) &&
-                            <ActivityIndicator size='small' color={Theme.colors.cyan2} style={{ paddingVertical: 10, }} />
-                        }
+                            _renderVertVendors()
+                        } 
                     </KeyboardAwareScrollView>
-            }
-            {
-                dataLoading != false &&
-                <View style={{ height: (height(100) - 154 - (showCateg ? 120 : 0)), width: '100%', backgroundColor: Theme.colors.white, position: 'absolute', left: 0, top: (showCateg ? 274 : 154) }}>
-                    <BlockSpinner />
-                </View>
             }
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 40, backgroundColor: '#F7F7F7' },
+    headerTitle: { flex: 1, fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
     operationTab: { height: 62, width: '100%', marginTop: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
     subjectTitle: { fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
     divider: { width: '100%', height: 1, backgroundColor: '#F6F6F9' },
     scrollview: { flex: 1, width: '100%', paddingHorizontal: 20, backgroundColor: Theme.colors.white },
     scrollviewHider: { width: '100%', marginTop: -12, height: 15, backgroundColor: Theme.colors.white },
+
+    filterview : {marginTop: 16, marginBottom: 16, borderBottomColor: Theme.colors.gray4, borderBottomWidth: 1},
+    filterLabel: { fontSize: 14, fontFamily: Theme.fonts.medium, color: '#344655' },
+    filterValue: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: '#344655', marginTop: 4 },
+
     modalContent: { width: '100%', paddingVertical: 40, paddingHorizontal: 20, backgroundColor: Theme.colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
     modalBtnTxt: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
     modalCityContent: { width: '100%', height: height(90), paddingVertical: 35, backgroundColor: Theme.colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
@@ -580,5 +307,5 @@ const mapStateToProps = ({ app, shop }) => ({
 });
 
 export default connect(mapStateToProps, {
-    setHomeVendorFilter, setHomeVendorSort, setVendorCart, getFeaturedBlocks, toggleFavourite
+    setHomeVendorFilter, setHomeVendorSort, setVendorCart,
 })(HomePage);
