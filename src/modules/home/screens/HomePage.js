@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { width, height } from 'react-native-dimension';
-import FastImage from 'react-native-fast-image';
-import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { connect } from 'react-redux';
 import {
@@ -13,13 +10,9 @@ import {
 } from '../../../store/actions/app';
 import { getAllListings } from '../../../store/actions/listings';
 import { setVendorCart } from '../../../store/actions/shop';
-import { extractErrorMessage, getImageFullURL, openExternalUrl, } from '../../../common/services/utility';
-import { translate } from '../../../common/services/translate';
-import { SNAPFOOD_CITYS, VSort_Title, VSort_Closest, VSort_FastDelivery, VSort_HighRating, VSort_Low2HighPrice, VSort_PopularFirst } from '../../../config/constants';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
-import { OrderType_Delivery, OrderType_Pickup, OrderType_Reserve } from '../../../config/constants'
-import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
+import { AuthInput, VendorItem, } from '../../../common/components';
 import FeatureList from '../components/FeatureList';
 
 import BlockSpinner from '../../../common/components/BlockSpinner';
@@ -213,7 +206,9 @@ const HomePage = (props) => {
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
             <View style={[Theme.styles.row_center_start, styles.header]}>
                 <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>{
+                    goRootStackScreen(RouteNames.NotificationsScreen)
+                }}>
                     <MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
                 </TouchableOpacity>
             </View>
@@ -251,6 +246,8 @@ const HomePage = (props) => {
                             <RefreshControl
                                 refreshing={isRefreshing}
                                 onRefresh={() => {
+                                    loadVendors();
+                                    loadFeaturedBlocks();
                                 }}
                             />
                         }
@@ -268,7 +265,7 @@ const HomePage = (props) => {
                         }
                         {
                             _renderVertVendors()
-                        } 
+                        }
                     </KeyboardAwareScrollView>
             }
         </View>
@@ -284,7 +281,7 @@ const styles = StyleSheet.create({
     scrollview: { flex: 1, width: '100%', paddingHorizontal: 20, backgroundColor: Theme.colors.white },
     scrollviewHider: { width: '100%', marginTop: -12, height: 15, backgroundColor: Theme.colors.white },
 
-    filterview : {marginTop: 16, marginBottom: 16, borderBottomColor: Theme.colors.gray4, borderBottomWidth: 1},
+    filterview: { marginTop: 16, marginBottom: 16, borderBottomColor: Theme.colors.gray4, borderBottomWidth: 1 },
     filterLabel: { fontSize: 14, fontFamily: Theme.fonts.medium, color: '#344655' },
     filterValue: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: '#344655', marginTop: 4 },
 

@@ -210,14 +210,14 @@ export default class MessageBubble extends React.Component {
 						right: { marginTop: marginTop },
 					}}
 					textStyle={{
-						left: { color: Theme.colors.text, fontFamily: Theme.fonts.medium, fontSize: 15, lineHeight : 21,},
-						right: { color: Theme.colors.white, fontFamily: Theme.fonts.medium, fontSize: 15, lineHeight : 21, },
+						left: { color: Theme.colors.white, fontFamily: Theme.fonts.medium, fontSize: 14, lineHeight : 21,},
+						right: { color: Theme.colors.text, fontFamily: Theme.fonts.medium, fontSize: 14, lineHeight : 21, },
 					}}
 					linkStyle={{
 						left: { color: 'orange' },
 						right: { color: 'orange' },
 					}}
-					customTextStyle={{ fontSize: 15, lineHeight : 21, }}
+					customTextStyle={{ fontSize: 14, lineHeight : 21, }}
 				/>
 			);
 		}
@@ -479,7 +479,7 @@ export default class MessageBubble extends React.Component {
 			currentMessage.text
 		) {
 			return {
-				borderRadius: 60,
+				borderRadius: 5,
 			};
 		}
 		return null;
@@ -605,19 +605,19 @@ const styles = {
 			alignItems: 'flex-start',
 		},
 		wrapper: {
-			borderRadius: 28,
-			backgroundColor: Theme.colors.gray8,
+			borderRadius: 5,
+			backgroundColor: '#80808095',
 			marginRight: 60,
 			minHeight: 20,
 			justifyContent: 'flex-end',
-			paddingHorizontal: 18,
-			paddingVertical: 14,
+			paddingHorizontal: 12,
+			paddingVertical: 5,
 		},
 		containerToNext: {
-			borderBottomLeftRadius: 3,
+			borderBottomLeftRadius: 0,
 		},
 		containerToPrevious: {
-			borderBottomLeftRadius: 3,
+			borderBottomLeftRadius: 0,
 		},
 		bottom: {
 			flexDirection: 'row',
@@ -630,19 +630,19 @@ const styles = {
 			alignItems: 'flex-end',
 		},
 		wrapper: {
-			borderRadius: 28,
-			backgroundColor: Theme.colors.cyan2,
+			borderRadius: 5,
+			backgroundColor: '#F7F7F7',
 			marginLeft: 60,
 			minHeight: 20,
 			justifyContent: 'flex-end',
-			paddingHorizontal: 18,
-			paddingVertical: 14,
+			paddingHorizontal: 12,
+			paddingVertical: 5,
 		},
 		containerToNext: {
-			borderBottomRightRadius: 3,
+			borderBottomRightRadius: 0,
 		},
 		containerToPrevious: {
-			borderBottomRightRadius: 3,
+			borderBottomRightRadius: 0,
 		},
 		bottom: {
 			flexDirection: 'row',

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { Switch,ScrollView, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { connect } from 'react-redux'
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LoginManager } from 'react-native-fbsdk';
-import { logout, } from '../../../store/actions/auth';
+import { logout,  } from '../../../store/actions/auth';
 import auth from '@react-native-firebase/auth';
 import Config from '../../../config';
 import alerts from '../../../common/services/alerts';
@@ -14,8 +14,7 @@ import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import ProfileAvatarView from '../components/ProfileAvatarView';
 import ProfileInfoItem from '../components/ProfileInfoItem';
-import Header1 from '../../../common/components/Header1';
-import { ScrollView } from 'react-native-gesture-handler';
+import Header1 from '../../../common/components/Header1';  
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 // svgs
 import Svg_add from '../../../common/assets/svgs/btn-add.svg';
@@ -35,7 +34,6 @@ const ProfileScreen = (props) => {
 	]
 
 	const app_links = [
-		{ name: '支援', link: RouteNames.SupportScreen },
 		{ name: '報告錯誤', link: RouteNames.BugReportScreen },
 		{ name: '版本', link: RouteNames.AppVersionScreen },
 	]
@@ -50,14 +48,10 @@ const ProfileScreen = (props) => {
 		}
 		try {
 			await auth().signOut();
+			await props.logout();
 		} catch (e) {
 			console.log('logout', e)
-		}
-
-		if (props.hometab_navigation != null) {
-			props.hometab_navigation.jumpTo(RouteNames.HomeStack)
-		}
-		props.rootStackNav.navigate(RouteNames.WelcomeScreen);
+		} 
 	};
 
 	const toggleSwitch = (name, value) => {
@@ -117,6 +111,19 @@ const ProfileScreen = (props) => {
 					}
 					<Text style={styles.subjectTitle}>APP</Text>
 					{
+						props.user.admin == true &&
+						<TouchableOpacity 
+							delayPressIn={100}
+							style={[Theme.styles.row_center, styles.itemView]}
+							onPress={() => {
+								props.rootStackNav.navigate(item.link);
+							}}
+						>
+							<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄</Text>
+							<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+						</TouchableOpacity>
+					}
+					{
 						app_links.map(item =>
 							<TouchableOpacity
 								key={item.name}
@@ -141,11 +148,15 @@ const ProfileScreen = (props) => {
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
-			<TouchableOpacity style={styles.addlistingBtn} onPress={() => {
-				props.rootStackNav.navigate(RouteNames.AddListingScreen);
-			}}>
-				<Svg_add />
-			</TouchableOpacity>
+			{
+				props.user.admin == true && 
+				<TouchableOpacity style={styles.addlistingBtn} onPress={() => {
+					props.rootStackNav.navigate(RouteNames.AddListingScreen);
+				}}>
+					<Svg_add />
+				</TouchableOpacity>
+			}
+			
 			<ConfirmModal
 				showModal={isLogoutModal}
 				title={'確認登出？'}
@@ -178,5 +189,5 @@ const mapStateToProps = ({ app }) => ({
 });
 
 export default connect(mapStateToProps, {
-	logout
+	logout,  
 })(ProfileScreen);

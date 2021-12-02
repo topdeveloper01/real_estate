@@ -6,7 +6,7 @@ import { userCollection } from '../../common/services/firebase';
 
 export const PHONE_NOT_VERIFIED = 'PHONE_NOT_VERIFIED';
 
-const getLoggedInUserData = (user_id) => {
+export const getLoggedInUserData = (user_id) => {
     return new Promise(async (resolve, reject) => {
         try {
             userCollection.doc(user_id).get().then((res) => {
@@ -259,8 +259,7 @@ export const setAsSeenOnboard = () => async dispatch => {
 
 export const logout = () => async dispatch => {
     return new Promise(async (resolve) => {
-        try {
-            apiFactory.get('logout').then();
+        try { 
             await setStorageKey(KEYS.TOKEN, null);
             await dispatch({
                 type: APP.LOGGED_IN,

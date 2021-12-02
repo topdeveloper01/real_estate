@@ -13,14 +13,14 @@ export const createSingleChannel = async (user, partner) => {
             creator: {
                 id: user.id,
                 full_name: user.full_name,
-                photo: user.photo,
+                photo: user.photo || '',
                 phone: user.phone,
                 email: user.email
             },
             partner: {
                 id: partner.id,
                 full_name: partner.full_name,
-                photo: partner.photo,
+                photo: partner.photo || '',
                 phone: partner.phone,
                 email: partner.email
             },
@@ -35,6 +35,7 @@ export const createSingleChannel = async (user, partner) => {
         return channelId;
     }
     catch (error) {
+        console.log('createSingleChannel ', error)
         return null
     }
 };
@@ -132,20 +133,13 @@ const getMsgDescription = (msg) => {
 }
 
 export const sendMessage = async (channelId, user_id, message) => {
-    try {
-        let created_time = new Date().getTime();
-        let serverTimeResponse = await apiFactory.get('server-time');
-
-        if (serverTimeResponse != null && serverTimeResponse.data != null && serverTimeResponse.data.time != null) {
-            console.log('serverTimeResponse.data.time: ', serverTimeResponse.data.time);
-            created_time = serverTimeResponse.data.time;
-        }
+    try { 
         if (message._id == null) {
             message._id = channelCollection.doc(channelId).collection('messages').doc().id;
         }
         let new_msg = {
             ...message,
-            created_time: created_time,
+            created_time: new Date().getTime(),
             createdAt: FieldValue.serverTimestamp()
         };
         await channelCollection
@@ -171,15 +165,15 @@ export const sendMessage = async (channelId, user_id, message) => {
             })
             await channelCollection.doc(channelId).update('unread_cnt', unread_cnt, 'last_msg', new_msg);
 
-            // send notification
-            sendChatNotification(
-                channelId,
-                channel_ref.data().channel_type,
-                channel_ref.data().channel_type == 'group' ? channel_ref.data().full_name : null,
-                user_id,
-                member_ids,
-                getMsgDescription(new_msg)
-            );
+            // // send notification
+            // sendChatNotification(
+            //     channelId,
+            //     channel_ref.data().channel_type,
+            //     channel_ref.data().channel_type == 'group' ? channel_ref.data().full_name : null,
+            //     user_id,
+            //     member_ids,
+            //     getMsgDescription(new_msg)
+            // );
         }
 
     } catch (err) {
@@ -235,7 +229,7 @@ export const updateChannelUserInfo = async (user) => {
                     full_name: user.full_name,
                     email: user.email,
                     phone: user.phone,
-                    photo: user.photo
+                    photo: user.photo || ''
                 };
                 let channel_item_ref = channelCollection.doc(doc.data().id);
                 batch.update(channel_item_ref, { "creator": new_creator });
@@ -248,7 +242,7 @@ export const updateChannelUserInfo = async (user) => {
                     full_name: user.full_name,
                     email: user.email,
                     phone: user.phone,
-                    photo: user.photo
+                    photo: user.photo || ''
                 };
                 let channel_item_ref = channelCollection.doc(doc.data().id);
                 batch.update(channel_item_ref, { "partner": new_partner });

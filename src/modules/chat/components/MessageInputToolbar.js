@@ -95,7 +95,7 @@ export default class MessageInputToolbar extends React.Component {
             this.props.containerStyle,
             { position: this.state.position },
         ]}>
-            {
+            {/* {
                 this.props.quote_msg != null &&
                 <View style={[Theme.styles.row_center, { alignItems: 'flex-start', marginBottom: 6, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: Theme.colors.cyan2 }]}>
                     <View style={[Theme.styles.col_center, { flex: 1, alignItems: 'flex-start', }]}>
@@ -106,8 +106,8 @@ export default class MessageInputToolbar extends React.Component {
                         <AntDesign name='close' size={20} color={Theme.colors.text} />
                     </TouchableOpacity>
                 </View>
-            }
-            {
+            } */}
+            {/* {
                 this.props.images != null &&
                 <View style={[Theme.styles.row_center, { alignItems: 'flex-start', marginBottom: 6, }]}>
                     {
@@ -135,7 +135,7 @@ export default class MessageInputToolbar extends React.Component {
                         </ScrollView>
                     }
                 </View> 
-            }
+            } */}
             <View style={[styles.primary, this.props.primaryStyle]}>
                 {this.renderActions()}
                 {this.renderComposer()}

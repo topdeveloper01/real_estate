@@ -115,40 +115,17 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
 
     console.log('message header')
 
-    return (
-        // <LinearGradient
-        //     start={{ x: 0.0, y: 0.25 }} end={{ x: 0.5, y: 1.0 }}
-        //     locations={[0, 0.5, 0.6]}
-        //     colors={['#4c669f', '#3b5998', '#192f6a']} 
-        //     style={[Theme.styles.row_center, styles.container]}>
-        <View style={[Theme.styles.row_center, styles.container, style]}>
-            <BlurView blurRadius={4} blurType='light' style={{ position: 'absolute', opacity: 1, top: 0, left: 0, width: width(100), height: 100 }} />
+    return ( 
+        <View style={[Theme.styles.row_center, styles.container, style]}> 
             <TouchableOpacity style={{ paddingHorizontal: 5, }} onPress={onBack ? onBack : () => { }}>
                 <Feather name="chevron-left" size={24} color={Theme.colors.text} />
             </TouchableOpacity>
-            <View >
-                <TouchableOpacity style={[Theme.styles.row_center, { marginLeft: 15 }]} onPress={onPressName ? onPressName : () => { }}>
-                    <FastImage
-                        style={styles.avatar}
-                        source={{ uri: getPhoto() }}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
-                    <View style={[Theme.styles.col_center, { alignItems: 'flex-start' }]}>
-                        <View style={[Theme.styles.row_center,]} >
-                            <Text style={styles.name}>{getName()}</Text>
-                            {
-                                isMuted && <Svg_muted />
-                            }
-                        </View>
-                        <Text style={styles.desc}>{getDesc()}</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-            <View style={{ flex: 1 }} />
+            <Text style={styles.name}>{getName()}</Text>
+            <View style={{width: 35}} />
             {/* <TouchableOpacity style={{ marginRight: 15, }} onPress={onCall ? onCall : () => { }}>
                 <Svg_call width={30} height={30} />
             </TouchableOpacity> */}
-            <Menu>
+            {/* <Menu>
                 <MenuTrigger>
                     <Svg_more width={30} height={30} />
                 </MenuTrigger>
@@ -170,13 +147,7 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
                                 <Text style={styles.popupText}>{data.channel_type != 'single' ? translate('social.chat.mute_group') : translate('social.chat.mute')}</Text>
                             </View>
                         </MenuOption>
-                    }
-                    {/* <MenuOption onSelect={onGallery ? onGallery : () => { }}>
-                        <View style={[Theme.styles.row_center, styles.popupBtn, data.channel_type == 'single' && { borderBottomWidth: 0 }]}>
-                            <Svg_gallery />
-                            <Text style={styles.popupText}>{translate('social.chat.view_media')}</Text>
-                        </View>
-                    </MenuOption> */}
+                    } 
                     {
                         canExitGroup() &&
                         <MenuOption onSelect={onExit ? onExit : () => { }}>
@@ -187,7 +158,7 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
                         </MenuOption>
                     }
                 </MenuOptions>
-            </Menu>
+            </Menu> */}
         </View>
     );
 };
@@ -196,12 +167,14 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         paddingHorizontal: 20,
-        paddingTop: 48,
-        height: 100,
-        backgroundColor: '#ffffffdd'
+        paddingTop: 32,
+        height: 84,
+        backgroundColor: '#ffffff',
+        borderBottomColor: Theme.colors.gray4,
+        borderBottomWidth: 1
     },
     avatar: { backgroundColor: '#fff', width: 30, height: 30, borderRadius: 6, marginRight: 10, },
-    name: { marginRight: 7, backgroundColor: '#ffffff88', fontSize: 14, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text, marginBottom: 5, },
+    name: { flex: 1, textAlign: 'center', marginRight: 7, backgroundColor: '#ffffff88', fontSize: 18, fontFamily: Theme.fonts.bold, color: Theme.colors.text, marginBottom: 5, },
     desc: { fontSize: 10, fontFamily: Theme.fonts.medium, color: Theme.colors.red1 },
     popupContainer: {
         width: 156,

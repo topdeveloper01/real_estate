@@ -9,7 +9,7 @@ import { MainBtn } from '../../../common/components';
 import { translate } from '../../../common/services/translate';
 import alerts from '../../../common/services/alerts';
 import { getImageFullURL, isEmpty, validateUserData } from '../../../common/services/utility';
-import { channel_collection, updateChannelUserInfo } from '../../../common/services/chat';
+import {  updateChannelUserInfo } from '../../../common/services/chat';
 import Theme from '../../../theme';
 import AuthInput from '../../../common/components/AuthInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';

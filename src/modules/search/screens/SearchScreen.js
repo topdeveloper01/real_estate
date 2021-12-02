@@ -1,663 +1,287 @@
-import React from 'react';
-import { FlatList, ScrollView, TouchableOpacity, View, Text, AsyncStorage, Dimensions } from 'react-native';
+
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
+import { width, height } from 'react-native-dimension';
 import FastImage from 'react-native-fast-image';
+import Modal from 'react-native-modal';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { connect } from 'react-redux';
-import Icon from 'react-native-vector-icons/Entypo';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import { throttle } from 'throttle-debounce';
-import { withNavigation } from 'react-navigation';
-import styles from '../styles/styles';
-import { translate } from '../../../common/services/translate';
-import apiFactory from '../../../common/services/apiFactory';
-import VendorItem from '../../../common/components/vendors/VendorItem';
-import VendorFoodItem from '../../../common/components/vendors/VendorFoodItem';
-import StartItem from '../components/StartItem';
-import PopularItem from '../components/PopularItem';
+import {
+	setHomeVendorFilter, setHomeVendorSort
+} from '../../../store/actions/app';
+import { getAllListings } from '../../../store/actions/listings';
 import { setVendorCart } from '../../../store/actions/shop';
-import { AuthInput, RoundIconBtn } from '../../../common/components';
-import BlockSpinner from '../../../common/components/BlockSpinner';
+import { extractErrorMessage, getImageFullURL, openExternalUrl, } from '../../../common/services/utility';
+import { translate } from '../../../common/services/translate';
+import { SNAPFOOD_CITYS, VSort_Title, VSort_Closest, VSort_FastDelivery, VSort_HighRating, VSort_Low2HighPrice, VSort_PopularFirst } from '../../../config/constants';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
+import { OrderType_Delivery, OrderType_Pickup, OrderType_Reserve } from '../../../config/constants'
+import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
+ 
 
-const windowHeight = Dimensions.get('window').height;
-const IS_LOADING_CATEGORIES = 'isLoadingCategories';
-const IS_LOADING_RESTAURANTS = 'isLoadingRestaurants';
+import BlockSpinner from '../../../common/components/BlockSpinner';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
+import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
 
-class SearchScreen extends React.Component {
-	getRestaurants = throttle(500, (text) => {
-		let { latitude, longitude } = this.props.coordinates;
-		const { selectedAddress } = this.props;
-		if (selectedAddress && selectedAddress.id) {
-			latitude = selectedAddress.lat;
-			longitude = selectedAddress.lng;
+const vertPerPage = 10;
+
+const SearchScreen = (props) => {
+  
+	const [allvendors, setAllVendors] = useState([])
+
+	const [vertLoading, setVertLoading] = useState(false)
+	const [isRefreshing, setRefreshing] = useState(false)
+
+	const filterCategories = [
+		{
+			label: '地區',
+			value: 0,
+			list: [
+				{
+					label: '任何',
+					value: ''
+				}
+			]
+		},
+		{
+			label: '形式',
+			value: 0,
+			list: [
+				{
+					label: '任何',
+					value: ''
+				}
+			]
+		},
+		{
+			label: '價格',
+			value: 0,
+			list: [
+				{
+					label: '任何',
+					value: ''
+				}
+			]
+		},
+		{
+			label: '實用面積',
+			value: 0,
+			list: [
+				{
+					label: '任何',
+					value: ''
+				}
+			]
+		},
+		{
+			label: '房數',
+			value: 0,
+			list: [
+				{
+					label: '任何',
+					value: ''
+				}
+			]
+		},
+	]
+
+	useEffect(() => {
+		loadVendors(); 
+	}, [
+		props.home_vendor_filter.is_meal,
+		props.home_vendor_filter.is_dietary,
+		props.home_vendor_filter.ongoing_offer,
+		props.home_vendor_filter.open_now,
+		props.home_vendor_filter.online_payment,
+		props.home_vendor_filter.searchTerm,
+		props.home_vendor_filter.low_fee,
+		props.home_vendor_filter.high_fee,
+		props.home_vendor_sort,
+	])
+
+
+	const goRootStackScreen = (name, params) => {
+		if (params) {
+			props.rootStackNav.navigate(name, params)
 		}
-		this.setState({ is_loading_restaurants: true });
-		apiFactory
-			.get(`vendors?lat=${latitude}&lng=${longitude}&name=${text}&per_page=999`)
-			.then(({ data }) => {
-				this.setState({ is_loading_restaurants: false, restaurants: data.vendors.data });
-			})
-			.catch((error) => {
-				this.setState({ is_loading_restaurants: false });
-			});
-	});
-
-	getFilteredRestaurants = throttle(500, () => {
-		this.setState({ modalVisible: false });
-		let { latitude, longitude } = this.props.coordinates;
-		const { selectedAddress } = this.props;
-		if (selectedAddress && selectedAddress.id) {
-			latitude = selectedAddress.lat;
-			longitude = selectedAddress.lng;
+		else {
+			props.rootStackNav.navigate(name)
 		}
+	}
 
-		let arr = [];
+	const getFilers = () => {
+		return {}
+	}
 
-		this.state.filters.map((item) => {
-			if (item.check === true) {
-				arr.push(item);
-			}
-		});
+	const loadVendors = async () => {
+		try {
+			let filterKeys = getFilers();
+			let vendorsData = await getAllListings(filterKeys);
+			setAllVendors(vendorsData)
+			setVertLoading(false);
+		}
+		catch (error) {
+			setVertLoading(false);
+			console.log('get Vendors', error)
+		}
+	}
+ 
 
-		if (arr.length === 0) {
-			apiFactory.get(`vendors?lat=${latitude}&lng=${longitude}&name=${this.state.text}`).then(({ data }) => {
-				this.setState({ restaurants: data.vendors.data });
-			});
-		} else if (arr.length === 1) {
-			apiFactory
-				.get(`vendors?lat=${latitude}&lng=${longitude}&name=${this.state.text}&${arr[0].keyFilter}=1`)
-				.then(({ data }) => {
-					this.setState({ restaurants: data.vendors.data });
-				});
-		} else {
-			apiFactory
-				.get(
-					`vendors?lat=${latitude}&lng=${longitude}&name=${this.state.text}&${arr[0].keyFilter}=1&${arr[1].keyFilter}=1`
+	const isEmptyData = () => { 
+		return allvendors.length == 0
+	}
+
+	const goVendorDetail = (vendor) => {
+		props.setVendorCart(vendor)
+		goRootStackScreen(RouteNames.VendorScreen)
+	}
+
+	const _renderCategories = () => {
+		return <View style={[Theme.styles.col_center, styles.filterview]}>
+			<ScrollView
+				horizontal={true}
+				style={{ width: '100%', paddingBottom: 12 }}
+			>
+				{
+					filterCategories.map((cat, index) =>
+						<View key={cat.label} style={[Theme.styles.row_center]}>
+							<TouchableOpacity style={[Theme.styles.col_center]}>
+								<Text style={styles.filterLabel}>{cat.label}</Text>
+								<Text style={styles.filterValue}>{cat.list[cat.value].label}</Text>
+							</TouchableOpacity>
+							{
+								index < (filterCategories.length - 1) &&
+								<View style={{ paddingHorizontal: 24 }}>
+									<Svg_divider />
+								</View>
+							}
+						</View>
+					)
+				}
+			</ScrollView>
+			<View style={styles.scrollviewHider} />
+		</View>
+	}
+
+	const _renderVertVendors = () => {
+		return <View style={[Theme.styles.col_center_start, { width: '100%', alignItems: 'flex-start', }]}>
+			{
+				allvendors.map((vendor, index) =>
+					<View key={vendor.id} style={[Theme.styles.col_center, { width: '100%', }]}>
+						<VendorItem
+							data={vendor}
+							vendor_id={vendor.id}
+							style={{ width: '100%', marginRight: 0, }}
+							onSelect={() => goVendorDetail(vendor)}
+						/>
+					</View>
 				)
-				.then(({ data }) => {
-					this.setState({ restaurants: data.vendors.data });
-				});
-		}
-
-		this.RBSheet.close();
-	});
-
-	getItems = throttle(500, (text) => {
-		let { latitude, longitude } = this.props.coordinates;
-		const { selectedAddress } = this.props;
-		if (selectedAddress && selectedAddress.id) {
-			latitude = selectedAddress.lat;
-			longitude = selectedAddress.lng;
-		}
-
-		this.setState({ is_loading_items: true });
-		apiFactory
-			.get(`products?lat=${latitude}&lng=${longitude}&title=${text}`)
-			.then(({ data }) => {
-				this.setState({ is_loading_items: false, foodItems: data.products.data });
-			})
-			.catch((error) => {
-				this.setState({ is_loading_items: false });
-			});
-	});
-
-	constructor(props) {
-		super(props);
-		this.state = {
-			categories: [],
-			foodItems: [],
-			selected: '',
-			modalVisible: true,
-			restaurants: [],
-			popularSearches: [],
-			filters: [
-				{
-					title: translate('search.recommended'),
-					check: false,
-					keyFilter: 'recommended',
-				},
-				{
-					title: translate('search.free_delivery'),
-					check: false,
-					keyFilter: 'free_delivery',
-				},
-				{
-					title: translate('search.fastest'),
-					check: false,
-					keyFilter: 'fastest',
-				},
-				{
-					title: translate('search.distance'),
-					check: false,
-					keyFilter: 'distance',
-				},
-			],
-			recents: [],
-			text: '',
-			[IS_LOADING_CATEGORIES]: false,
-			[IS_LOADING_RESTAURANTS]: false,
-			is_loading_restaurants: null,
-			is_loading_items: null,
-			selectedRestaurant: {},
-			restaurantSelected: false,
-		};
+			}
+		</View>
 	}
 
-	componentDidMount() {
-		this.getCategories();
-		this.getPopularSearch();
-		this.getRecents();
+	const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+		return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 	}
 
-	getRecents = async () => {
-		let recents = await AsyncStorage.getItem('recents');
-		let newrecents = JSON.parse(recents);
-		if (newrecents == null) {
-			this.setState({ recents: [] });
-		} else {
-			var filtered = newrecents.filter(function (el) {
-				return el != null;
-			});
+	const isCloseToTop = ({ layoutMeasurement, contentOffset, contentSize }) => {
+		return contentOffset.y == 0;
+	}
 
-			this.setState({ recents: filtered });
-		}
-	};
-
-	clearAllRecents = async () => {
-		try {
-			await AsyncStorage.removeItem('recents');
-			this.setState({ recents: [] });
-		} catch (err) {
-			console.log('clearAllRecents ', err);
-		}
-	};
-
-	removeRecentItem = async (text) => {
-		try {
-			let { recents } = this.state;
-			if (text) {
-				var filtered = recents.filter(function (el) {
-					return el != text;
-				});
-				await AsyncStorage.setItem('recents', JSON.stringify(filtered));
-				this.setState({ recents: filtered });
-			}
-		} catch (err) {
-			console.log('clearAllRecents ', err);
-		}
-	};
-
-	getCategories = async () => {
-		await this.setState({
-			[IS_LOADING_CATEGORIES]: true,
-		});
-		apiFactory.get('vendors/food-categories').then(({ data }) => {
-			this.setState({ [IS_LOADING_CATEGORIES]: false, categories: data['food_categories'] });
-		});
-	};
-
-	getPopularSearch = async () => {
-		await this.setState({
-			[IS_LOADING_CATEGORIES]: true,
-		});
-		apiFactory.get('search/suggestions').then(({ data }) => {
-			this.setState({ [IS_LOADING_CATEGORIES]: false, popularSearches: data['suggestions'] });
-		});
-	};
-
-	search = (text) => {
-		this.setState({ text });
-		if (text.length > 2) {
-			this.getRestaurants(text);
-			this.getItems(text);
-		} else {
-			this.setState({ restaurants: [] });
-		}
-	};
-
-	onFavChange = (data) => {
-		let found_index = this.state.restaurants.findIndex((i) => i.id == data.id);
-
-		if (found_index != -1) {
-			let tmp = this.state.restaurants.slice(0, this.state.restaurants.length);
-			tmp[found_index].isFav = data.isFav;
-			this.setState({ restaurants: tmp });
-		}
-	};
-	onProductFavChange = (data) => {
-		let found_index = this.state.foodItems.findIndex((i) => i.id == data.id);
-
-		if (found_index != -1) {
-			let tmp = this.state.foodItems.slice(0, this.state.foodItems.length);
-			tmp[found_index].isFav = data.isFav;
-			this.setState({ foodItems: tmp });
-		}
-	};
-
-	showSimilar = async (restaurant) => {
-		let { recents } = this.state;
-		this.goToRestaurantDetails(restaurant);
-		let text = restaurant.title;
-		if (text) {
-			recents.push(text);
-			if (recents.length >= 8) {
-				let newrecents = recents.slice(1);
-				this.setState({ recents: newrecents });
-			}
-			await AsyncStorage.setItem('recents', JSON.stringify(recents));
-		}
-	};
-
-	goToRestaurantDetails = (vendor) => {
-		this.props.setVendorCart(vendor);
-		this.props.rootStackNav.navigate(RouteNames.VendorScreen);
-	};
-
-	renderSearchView = () => {
-		const { restaurants, foodItems, text } = this.state;
-
-		return (
-			<View style={[Theme.styles.row_center, { width: '100%', marginBottom: 16, paddingHorizontal: 20 }]}>
+	return (
+		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
+			<View style={[Theme.styles.row_center_start, styles.header]}>
+				<Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+				<TouchableOpacity onPress={()=>{
+					goRootStackScreen(RouteNames.NotificationsScreen)
+				}}>
+					<MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
+				</TouchableOpacity>
+			</View>
+			<View style={{ width: '100%', marginTop: 10, paddingHorizontal: 20, }}>
 				<AuthInput
-					placeholder={translate('search.search_vendors_on_search')}
+					placeholder={'關鍵字/地區/標籤'}
 					underlineColorAndroid={'transparent'}
 					autoCapitalize={'none'}
 					returnKeyType={'done'}
 					isSearch={true}
-					value={this.state.text}
-					onChangeText={this.search}
-					style={{ flex: 1, height: 45 }}
-					rightComp={
-						this.state.text !== '' ? (
-							<TouchableOpacity onPress={() => this.setState({ text: '' })}>
-								<Icon name={'circle-with-cross'} color={'#878E97'} size={18} />
-							</TouchableOpacity>
-						) : null
-					}
-				/>
-				{text.length > 2 && (restaurants.length > 0 || foodItems.length > 0) && (
-					<RoundIconBtn
-						style={{ marginLeft: 12, width: 45, height: 45 }}
-						icon={<MaterialIcons name='filter-list' size={26} color={Theme.colors.cyan2} />}
-						onPress={() => this.RBSheet.open()}
-					/>
-				)}
-			</View>
-		);
-	};
-
-	render() {
-		if (this.state[IS_LOADING_CATEGORIES]) {
-			return <BlockSpinner />;
-		}
-
-		const {
-			filters,
-			restaurants,
-			selected,
-			recents,
-			foodItems,
-			popularSearches,
-			selectedRestaurant,
-			restaurantSelected,
-		} = this.state;
-		const { text } = this.state;
-
-		let filteredRecents = recents.filter((value, index, self) => self.indexOf(value) === index);
-
-		let array_last_eight;
-		array_last_eight = filteredRecents.slice(-8);
-		filteredRecents = array_last_eight;
-
-		return (
-			<View style={[styles.searchView]}>
-				<RBSheet
-					ref={(ref) => (this.RBSheet = ref)}
-					closeOnDragDown={true}
-					duration={300}
-					closeOnPressBack={true}
-					height={380}
-					customStyles={{
-						container: {
-							borderTopLeftRadius: 10,
-							borderTopRightRadius: 10,
-							alignItems: 'center',
-						},
+					value={props.home_vendor_filter.searchTerm}
+					onChangeText={(searchTerm) => {
 					}}
-				>
-					<View onPress={() => {}} style={{ height: '100%' }}>
-						<View style={{ borderTopLeftRadius: 15, borderTopRightRadius: 15, backgroundColor: '#fff' }}>
-							<View style={{ flexDirection: 'row' }}>
-								<TouchableOpacity
-									onPress={() => this.RBSheet.close()}
-									style={{ height: 20, width: 20, left: 15, top: 15, flex: 1, zIndex: 1 }}
-								>
-									<Icon name={'cross'} size={25} color={'#000'} />
-								</TouchableOpacity>
-								<Text
-									style={{
-										width: '95%',
-										top: 15,
-										fontSize: 16,
-										textAlign: 'center',
-										fontFamily: Theme.fonts.bold,
-										color: '#25252D',
-									}}
-								>
-									{translate('search.filter')}
-								</Text>
-							</View>
-							<FlatList
-								data={filters}
-								style={{ marginTop: 45 }}
-								renderItem={({ item, index }) => {
-									return (
-										<TouchableOpacity
-											onPress={() => {
-												let arr = filters;
-												arr[index].check = !arr[index].check;
-												this.setState({ filters: arr });
-											}}
-											style={{
-												flexDirection: 'row',
-												paddingVertical: 10,
-												alignItems: 'center',
-												justifyContent: 'center',
-											}}
-										>
-											<Text
-												style={{
-													width: '80%',
-													left: 0,
-													height: '100%',
-													fontSize: 14,
-													fontFamily: Theme.fonts.medium,
-													color: '#25252D',
-												}}
-											>
-												{item.title}
-											</Text>
-											<FontAwesome
-												name={item.check === true ? 'check-circle' : 'circle-thin'}
-												size={30}
-												style={{}}
-												color={item.check === true ? Theme.colors.cyan2 : 'lightgray'}
-											/>
-										</TouchableOpacity>
-									);
-								}}
-							/>
-							<TouchableOpacity
-								onPress={() => this.getFilteredRestaurants()}
-								style={{
-									width: '90%',
-									height: '13%',
-									alignItems: 'center',
-									justifyContent: 'center',
-									borderRadius: 5,
-									bottom: '10%',
-									backgroundColor: Theme.colors.cyan2,
-									alignSelf: 'center',
-									marginBottom: 8,
-								}}
-							>
-								<Text style={{ color: '#fff', fontSize: 16, fontFamily: Theme.fonts.bold }}>
-									{translate('search.applyFilters')}
-								</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</RBSheet>
-				<View style={{ flexDirection: 'row', alignItems: 'center' }}>{this.renderSearchView()}</View>
-				<ScrollView>
-					{text.length > 2 && (
-						<View
-							style={{
-								flexDirection: 'row',
-								paddingHorizontal: 20,
-								justifyContent: 'flex-start',
-							}}
-						>
-							<View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 14 }}>
-								<TouchableOpacity onPress={() => this.setState({ selectedRestaurant: true })}>
-									<Text
-										style={{
-											color: selectedRestaurant ? Theme.colors.cyan2 : '#B5B5B5',
-											fontSize: 16.5,
-											fontFamily: Theme.fonts.medium,
-										}}
-									>
-										{translate('search.restaurants_tab')}
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									style={{ marginLeft: 20 }}
-									onPress={() => this.setState({ selectedRestaurant: false })}
-								>
-									<Text
-										style={{
-											color: !selectedRestaurant ? Theme.colors.cyan2 : '#B5B5B5',
-											fontSize: 16.5,
-											fontFamily: Theme.fonts.medium,
-										}}
-									>
-										{translate('search.items_tab')}
-									</Text>
-								</TouchableOpacity>
-							</View>
-							{/* {selectedRestaurant && (
-                <TouchableOpacity
-                  onPress={() => this.RBSheet.open()}
-                  style={{
-                    flexDirection: 'row', marginTop: 14, borderRadius: 4, borderWidth: 1, borderColor: '#EBEBEB', width: 69,
-                    alignItems: 'center', justifyContent: 'center', height: 24
-                  }}
-                >
-                  <Text style={{ color: '#25252D', fontSize: 12, }}>{translate('search.filter')}</Text>
-                  <MaterialIcons name={'filter-list'} color={'#000000'} size={14} style={{ marginLeft: 3 }} />
-                </TouchableOpacity>
-              )} */}
-						</View>
-					)}
-					<View></View>
-					{text.length < 3 ? (
-						<View style={{ paddingHorizontal: 20 }}>
-							<View style={[Theme.styles.row_center]}>
-								<Text style={styles.subjectTitle}>{translate('search.recents')}</Text>
-								<TouchableOpacity onPress={this.clearAllRecents}>
-									<Text style={styles.clearallBtn}>{translate('search.clear_all')}</Text>
-								</TouchableOpacity>
-							</View>
-							<FlatList
-								data={filteredRecents.reverse()}
-								keyExtractor={(item) => item}
-								renderItem={({ item }) => {
-									return (
-										<StartItem
-											title={item}
-											cat='recents'
-											onPress={() => this.search(item)}
-											onRemove={(text) => this.removeRecentItem(text)}
-										/>
-									);
-								}}
-							/>
-							<Text style={styles.subjectTitle}>{translate('search.popular')}</Text>
-							<View style={styles.popularSearches}>
-								{popularSearches.map((item, index) => (
-									<PopularItem key={index} title={item} onPress={() => this.search(item)} />
-								))}
-							</View>
-						</View>
-					) : (
-						<View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
-							{selectedRestaurant ? (
-								<View>
-									{restaurants.length > 0 ? (
-										<FlatList
-											data={restaurants}
-											keyExtractor={(item) => item.id.toString()}
-											renderItem={({ item }) => {
-												return (
-													<VendorItem
-														data={item}
-														vendor_id={item.id}
-														isFav={item.isFav}
-														is_open={item.is_open}
-														style={{ width: '100%', marginBottom: 12 }}
-														onFavChange={this.onFavChange}
-														onSelect={() => {
-															this.showSimilar(item);
-														}}
-													/>
-												);
-											}}
-										/>
-									) : (
-										this.state.is_loading_restaurants == false && (
-											<View
-												style={{
-													height: windowHeight / 1.5,
-													justifyContent: 'center',
-													alignItems: 'center',
-												}}
-											>
-												<View>
-													<FastImage
-														source={require('../../../common/assets/images/search.png')}
-														style={{
-															marginBottom: 30,
-															width: 40,
-															height: 40,
-															resizeMode: 'contain',
-														}}
-													/>
-												</View>
-												<Text
-													style={{
-														fontSize: 16,
-														color: '#7E7E7E',
-														fontFamily: Theme.fonts.medium,
-													}}
-												>
-													{translate('search.not_found_part_one')}
-												</Text>
-												<Text
-													style={{
-														color: '#25252D',
-														fontSize: 16,
-														fontFamily: Theme.fonts.medium,
-														marginTop: 3,
-													}}
-												>
-													{"'" + text + "'"}
-												</Text>
-												<Text
-													style={{
-														fontSize: 16,
-														color: '#7E7E7E',
-														fontFamily: Theme.fonts.medium,
-														marginTop: 12,
-													}}
-												>
-													{translate('search.not_found_part_two')}
-												</Text>
-											</View>
-										)
-									)}
-								</View>
-							) : (
-								<View>
-									{foodItems.length > 0 ? (
-										<FlatList
-											data={foodItems}
-											keyExtractor={(item) => item.id.toString()}
-											renderItem={({ item }) => {
-												return (
-													<VendorFoodItem
-														data={item}
-														food_id={item.id}
-														isFav={item.isFav}
-														onSelect={(data) => {
-															this.goToRestaurantDetails(data.vendor);
-														}}
-														onFavChange={this.onProductFavChange}
-													/>
-												);
-											}}
-										/>
-									) : (
-										this.state.is_loading_items == false && (
-											<View
-												style={{
-													height: windowHeight / 1.5,
-													justifyContent: 'center',
-													alignItems: 'center',
-												}}
-											>
-												<View>
-													<FastImage
-														source={require('../../../common/assets/images/search.png')}
-														style={{
-															marginBottom: 30,
-															width: 40,
-															height: 40,
-															resizeMode: 'contain',
-														}}
-													/>
-												</View>
-												<Text
-													style={{
-														fontSize: 16,
-														color: '#7E7E7E',
-														fontFamily: Theme.fonts.medium,
-													}}
-												>
-													{translate('search.not_found_part_one')}
-												</Text>
-												<Text
-													style={{
-														color: '#25252D',
-														fontSize: 16,
-														fontFamily: Theme.fonts.medium,
-														marginTop: 3,
-													}}
-												>
-													{"'" + text + "'"}
-												</Text>
-												<Text
-													style={{
-														fontSize: 16,
-														color: '#7E7E7E',
-														fontFamily: Theme.fonts.medium,
-														marginTop: 12,
-													}}
-												>
-													{translate('search.not_found_part_two')}
-												</Text>
-											</View>
-										)
-									)}
-								</View>
-							)}
-						</View>
-					)}
-				</ScrollView>
+					backgroundColor={Theme.colors.gray4}
+					style={{ borderWidth: 0, backgroundColor: Theme.colors.gray4 }}
+					rightComp={props.home_vendor_filter.searchTerm !== '' ? (
+						<TouchableOpacity onPress={() => {
+						}}>
+							<Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
+						</TouchableOpacity>
+					) : null}
+				/>
 			</View>
-		);
-	}
+			<View style={{ width: '100%', paddingHorizontal: 20, }}>
+				{_renderCategories()}
+			</View>
+			{
+				(vertLoading == false && isEmptyData() == true) ?
+					<NoRestaurants />
+					:
+					<KeyboardAwareScrollView
+						keyboardShouldPersistTaps='handled'
+						style={styles.scrollview}
+						refreshControl={
+							<RefreshControl
+								refreshing={isRefreshing}
+								onRefresh={() => {
+									loadVendors(); 
+								}}
+							/>
+						}
+						extraHeight={50}
+					> 
+						{
+							_renderVertVendors()
+						}
+					</KeyboardAwareScrollView>
+			}
+		</View>
+	);
 }
 
-function mapStateToProps({ app, vendors, shop }) {
-	return {
-		coordinates: app.coordinates,
-		favourites: vendors.favourites,
-		selectedAddress: shop.selectedAddress,
-	};
-}
+const styles = StyleSheet.create({
+	header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 40, backgroundColor: '#F7F7F7' },
+	headerTitle: { flex: 1, fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+	operationTab: { height: 62, width: '100%', marginTop: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
+	subjectTitle: { fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
+	divider: { width: '100%', height: 1, backgroundColor: '#F6F6F9' },
+	scrollview: { flex: 1, width: '100%', paddingHorizontal: 20, backgroundColor: Theme.colors.white },
+	scrollviewHider: { width: '100%', marginTop: -12, height: 15, backgroundColor: Theme.colors.white },
+
+	filterview: { marginTop: 16, marginBottom: 16, borderBottomColor: Theme.colors.gray4, borderBottomWidth: 1 },
+	filterLabel: { fontSize: 14, fontFamily: Theme.fonts.medium, color: '#344655' },
+	filterValue: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: '#344655', marginTop: 4 },
+
+	modalContent: { width: '100%', paddingVertical: 40, paddingHorizontal: 20, backgroundColor: Theme.colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+	modalBtnTxt: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+	modalCityContent: { width: '100%', height: height(90), paddingVertical: 35, backgroundColor: Theme.colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+	modalQContent: { width: '100%', paddingBottom: 35, paddingTop: 20, paddingHorizontal: 20, backgroundColor: Theme.colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+})
+
+
+const mapStateToProps = ({ app, shop }) => ({
+	user: app.user || {},
+	isLoggedIn: app.isLoggedIn,
+	coordinates: app.coordinates,
+	address: app.address || {},
+	language: app.language,
+	home_vendor_filter: app.home_vendor_filter,
+	home_vendor_sort: app.home_vendor_sort,
+	vendorData: shop.vendorData,
+});
 
 export default connect(mapStateToProps, {
-	setVendorCart,
-})(withNavigation(SearchScreen));
+	setHomeVendorFilter, setHomeVendorSort, setVendorCart,
+})(SearchScreen);

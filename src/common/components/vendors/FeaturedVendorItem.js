@@ -31,7 +31,7 @@ const FeaturedVendorItem = (props) => {
                 <AppText style={[styles.title]}>{data.title}</AppText>
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 6 }]}>
-                <AppText style={[styles.text]}>{data.type_use}</AppText>
+                <AppText style={[styles.text]} numberOfLines={1}>{data.area} {data.street} {data.building} {data.floor}</AppText>
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' , marginTop: 6}]}>
                 {

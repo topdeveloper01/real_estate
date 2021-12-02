@@ -34,6 +34,8 @@ import {
 import { getAddresses, setAddress, addDefaultAddress } from '../../../store/actions/app';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
+import Svg_facebook from '../../../common/assets/svgs/auth/facebook.svg'
+import Svg_google from '../../../common/assets/svgs/auth/google.svg'
 
 const WelcomeScreen = (props) => {
 	const backRoute = props.route.params != null ? props.route.params.backRoute : null;
@@ -108,6 +110,7 @@ const WelcomeScreen = (props) => {
 	};
 
 	const onFbLogin = () => {
+		return;
 		if (Config.isAndroid) {
 			LoginManager.setLoginBehavior('web_only');
 		}
@@ -128,6 +131,7 @@ const WelcomeScreen = (props) => {
 
 
 	const onGoogleSignin = async () => {
+		return
 		// Get the users ID token
 		const { idToken } = await GoogleSignin.signIn();
 		console.log('onGoogleSignin idToken', idToken);
@@ -157,14 +161,14 @@ const WelcomeScreen = (props) => {
 			return (
 				<View style={[Theme.styles.col_center, styles.socials]}>
 					<IconButton
-						icon={<Fontisto name='facebook' size={26} color={Theme.colors.text} />}
+						icon={<Svg_facebook width={28} height={28}/>}
 						text={'Log in with Facebook'}
 						textStyle={{ color: Theme.colors.white }}
 						style={{ backgroundColor: '#3B5998', marginTop: 10 }}
 						onPress={onFbLogin}
 					/>
 					<IconButton
-						icon={<AntDesign name='google' size={26} color={Theme.colors.text} />}
+						icon={<Svg_google  width={24} height={24}/>}
 						text={' Log in with Google '}
 						onPress={onGoogleSignin}
 						style={{ marginTop: 10, backgroundColor: Theme.colors.white, elevation: 2 }}
@@ -176,6 +180,8 @@ const WelcomeScreen = (props) => {
 
 	const onLoadUserData = async (uid) => { 
 		let logged_user_data = await props.getLoggedInUser(uid);
+
+		console.log('onLoadUserData ', id, logged_user_data)
 		if (logged_user_data != null) { 
 			props.setAsLoggedIn();
 		} 

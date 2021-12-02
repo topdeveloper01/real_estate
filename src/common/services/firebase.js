@@ -14,6 +14,7 @@ firebase.initializeApp(firebaseConfig);
 
 export const userCollection = firebase.firestore().collection('Users');
 export const listingCollection = firebase.firestore().collection('Listings');
+export const channelCollection = firebase.firestore().collection('Channels');
 
 export const FieldValue = firebase.firestore.FieldValue;
 export const FbStorage = firebase.storage();

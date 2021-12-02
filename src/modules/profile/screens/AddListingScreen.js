@@ -13,7 +13,6 @@ import { translate } from '../../../common/services/translate';
 import { createListing } from '../../../store/actions/listings'
 import alerts from '../../../common/services/alerts';
 import { getImageFullURL, isEmpty, validateUserData } from '../../../common/services/utility';
-import { channel_collection, updateChannelUserInfo } from '../../../common/services/chat';
 import Theme from '../../../theme';
 import AuthInput from '../../../common/components/AuthInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';
@@ -173,6 +172,10 @@ const AddListingScreen = (props) => {
 			alerts.error('', '填寫所有字段');
 			return false
 		}
+		if (state.isSell == false && state.isRent == false) {
+			alerts.error('', '填寫所有字段');
+			return false
+		}
 		if (state.isSell == true && isEmpty(state.price)) {
 			alerts.error('', '填寫所有字段');
 			return false
@@ -199,7 +202,8 @@ const AddListingScreen = (props) => {
 				}
 				let newListingData = {
 					...state,
-					photo: photoUrl
+					photo: photoUrl,
+					owner_id : props.user.id
 				}
 				await createListing(newListingData);
 				 
@@ -461,7 +465,8 @@ const AddListingScreen = (props) => {
 						<RadioBtn
 							checked={state.isSell == true}
 							onPress={() => {
-								setState({ ...state, isSell: true })
+								Keyboard.dismiss()
+								setState({ ...state, isSell: !state.isSell })
 							}}
 							text='售'
 							style={{ marginRight: '30%' }}
@@ -470,7 +475,8 @@ const AddListingScreen = (props) => {
 						<RadioBtn
 							checked={state.isRent == false}
 							onPress={() => {
-								setState({ ...state, isRent: false })
+								Keyboard.dismiss()
+								setState({ ...state, isRent: !state.isRent })
 							}}
 							text='租'
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}

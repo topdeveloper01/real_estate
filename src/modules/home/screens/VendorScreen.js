@@ -1,165 +1,32 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { Image, StatusBar, View, Animated, ScrollView, Share, InteractionManager, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Feather from 'react-native-vector-icons/Feather';
-import Modal from 'react-native-modal';
-import Spinner from 'react-native-loading-spinner-overlay';
-import { width, height } from 'react-native-dimension';
-import Swiper from 'react-native-swiper';
-import FastImage from 'react-native-fast-image';
-import { connect } from 'react-redux'
-import { setTmpFood } from '../../../store/actions/app';
-import { getVendorDetail, toggleFavourite } from '../../../store/actions/vendors';
-import { getPastOrders, changeOrderStatus } from '../../../store/actions/orders';
-import { extractErrorMessage, openExternalUrl } from '../../../common/services/utility';
-import { translate } from '../../../common/services/translate';
-import alerts from '../../../common/services/alerts'
 import Theme from '../../../theme';
-import Config from '../../../config'
-import { appMoment } from '../../../common/services/translate';
-import { CartViewButton, VendorFoodItem, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
+import { connect } from 'react-redux'
+import Spinner from 'react-native-loading-spinner-overlay';
+import Feather from 'react-native-vector-icons/Feather'
+import { width } from 'react-native-dimension';
+import FastImage from 'react-native-fast-image';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { AppText } from '../../../common/components';
+import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
+import RoundIconBtn from '../../../common/components/buttons/round_icon_button';
+import alerts from '../../../common/services/alerts';
+import { FOR_PERSONAL } from '../../../config/constants';
+import ImgGalleryModal from '../../../common/components/modals/ImgGalleryModal';
+import { createSingleChannel, findChannel } from '../../../common/services/chat';
+import { getLoggedInUserData } from '../../../store/actions/auth';
+import { isEmpty } from '../../../common/services/utility';
 import RouteNames from '../../../routes/names';
-import ShopInfoView from '../components/ShopInfoView';
-import PastorderView from '../components/PastorderView';
-import VendorInfoLocItem from '../components/VendorInfoLocItem';
-import VendorInfoItem from '../components/VendorInfoItem';
-import BlockSpinner from '../../../common/components/BlockSpinner';
-import VendorFoodList from '../components/VendorFoodList';
-import ScrollableHorizontalMenu from '../../../common/components/ScrollableHorizontalMenu';
-import VendorClosedModal from '../../../common/components/modals/VendorClosedModal';
-import { setVendorCart, AddProduct2Cart, updateCartItems, getDiscount } from '../../../store/actions/shop';
-
-
-function getSwiperHeight(cur_tab, vendor_data, latest_offers, all_offers, scrollChanged) {
-    console.log('getSwiperHeight called!');
-    const FoodCatHeight = 38;
-    const FoodItemHeight = 122;
-    const GroceryItemHeight = 192;
-    const Empty_Offer_Height = 280;
-    const First_Products_ShowCnt = 6;
-    const bottomPadding = 0;
-    if (cur_tab == 'Menu') {
-
-        let height = 0;
-        let first_visible_cat_index = -1;
-        let total_products_cnt = 0;
-        if (vendor_data != null && vendor_data.categories != null && vendor_data.categories.length > 0) {
-            vendor_data.categories.map((cat, index) => {
-                height = height + FoodCatHeight;
-                if (cat.products != null && cat.products.length > 0) {
-                    if (vendor_data.vendor_type == 'Restaurant') {
-                        height = height + FoodItemHeight * cat.products.length;
-                    }
-                    else {
-                        height = height + GroceryItemHeight * (parseInt(cat.products.length / 2) + (cat.products.length % 2));
-                    }
-                    total_products_cnt = total_products_cnt + cat.products.length;
-                    if (first_visible_cat_index == -1 && total_products_cnt > First_Products_ShowCnt) {
-                        first_visible_cat_index = index;
-                    }
-                }
-            })
-        }
-
-        if (scrollChanged == false) {
-            if (vendor_data.vendor_type == 'Restaurant') {
-                return FoodItemHeight * Math.min(First_Products_ShowCnt, total_products_cnt) + (first_visible_cat_index + 1) * FoodCatHeight;
-            }
-            else {
-                return GroceryItemHeight * ((Math.min(First_Products_ShowCnt, total_products_cnt) / 2) + 1) + (first_visible_cat_index + 1) * FoodCatHeight;
-            }
-        }
-        height = height + bottomPadding;
-        return Math.max(height, Empty_Offer_Height);
-    }
-    else if (cur_tab == 'Offers') {
-        let height = 0;
-        if (latest_offers != null && latest_offers.length > 0) {
-            height = height + FoodItemHeight * latest_offers.length;
-        }
-        if (all_offers != null && all_offers.length > 0) {
-            height = height + FoodItemHeight * all_offers.length;
-        }
-        height = height + bottomPadding;
-        return Math.max(height, Empty_Offer_Height);
-    }
-    return 280; // for info view
-}
-
-const getClosedVendorModalTitle = (vendorData, language) => {
-    if (vendorData.custom_closed_info != null && vendorData.custom_closed_info != '') {
-        return vendorData.custom_closed_info;
-    }
-    if (vendorData.vendor_opening_days != null) {
-        let day_index = vendorData.vendor_opening_days.findIndex(i => i.week_day == new Date().getDay().toString())
-        if (day_index != -1) {
-            if (vendorData.vendor_opening_days[day_index].time_open != null) {
-                let open_time = appMoment(vendorData.vendor_opening_days[day_index].time_open, "HH:mm:ss").format("h:mm A")
-                if (language == 'en') {
-                    return `This vendor is currently closed and will open at ${open_time}. You can still see their menu.`
-                }
-                else {
-                    return `Ky shitës aktualisht është i mbyllur dhe do të hapet në ${open_time}. Ende mund të shihni menunë e tyre.`
-                }
-            }
-        }
-    }
-    if (language == 'en') {
-        return 'This vendor is currently closed. You can still see their menu.'
-    }
-    else {
-        return 'Ky shitës aktualisht është i mbyllur. Ende mund të shihni menunë e tyre.'
-    }
-}
 
 const VendorScreen = (props) => {
-    const scrollView = useRef(null);
     const _mounted = useRef(true);
-    const currentCatIndex = useRef(0);
-    const scrollOnLayout = useRef(false);
-    const scrollToValue = useRef(null);
-    const productsListDimensions = useRef([]);
 
-    const tabs = ['Menu', 'Offers', 'Info']
-
-    const [goCartLoading, showGoCartLoading] = useState(false)
-
-    const [isShowHeaderTitle, setShowHeaderTitle] = useState(false)
-
-    const [isLoading, showLoading] = useState(false)
-    const [isClosedVendorModal, showClosedVendorModal] = useState(false)
-    const [curTab, setCurTab] = useState('Menu')
-
-    const [scrollChanged, setScrollChanged] = useState(false)
-
-    const [horizontalScrollMenuIndex, setHorizontalScrollMenuIndex] = useState(0);
-
-    const [past_orders, setPastOrders] = useState([])
-    const [latest_offers, setLatestOffers] = useState([])
-    const [all_offers, setAllOffers] = useState([])
-
-    const [order_methods, setOrderMethods] = useState([])
-    const [handover_method, setHandoverMethod] = useState(null)
-    const [vendorCartItems, setVendorCartItems] = useState([])
-    const [bannerData, setBanner] = useState(null)
-
-    const [cartVendorLoaded, setCartVendorLoaded] = useState(false)
-
-    const scrollX = useRef(new Animated.Value(0)).current;
-    const v_transY = scrollX.interpolate({
-        inputRange: [0, 40, 80, 120, 150, 200, 300],
-        outputRange: [0, -40, -50, -80, -80, -80, -250],
-        extrapolate: "clamp"
-    });
-
-    const closedVendorTitle = useMemo(() => getClosedVendorModalTitle(props.vendorData, props.language),
-        [props.vendorData, props.language]);
-    const swiperHeight = useMemo(() => getSwiperHeight(curTab, props.vendorData, latest_offers, all_offers, scrollChanged),
-        [curTab, props.vendorData, latest_offers, all_offers, scrollChanged]);
+    const [ownerData, setOwner] = useState(null)
+    const [isCreatingChannel, setCreateChannelLoading] = useState(false)
+    const [isGalleryModal, ShowGalleryModal] = useState(false);
 
     useEffect(() => {
-        loadData();
+        loadOwnerDetails(props.vendorData.owner_id);
 
         return () => {
             console.log("vendor screen unmount")
@@ -167,620 +34,208 @@ const VendorScreen = (props) => {
         };
     }, [props.vendorData.id])
 
-    const loadData = () => {
-        _mounted.current = true;
+    const loadOwnerDetails = async (id) => {
+        if (id == null) { return; }
+        try {
+            const user = await getLoggedInUserData(id);
+            setOwner(user);
+        } catch (error) {
+            console.log('loadOwnerDetails ', error)
+        }
+    };
 
-        let items = props.cartItems.filter(i => i.vendor_id == props.vendorData.id && i.quantity > 0)
-        setVendorCartItems(items)
-
-        if (props.vendorData.banners != null && props.vendorData.banners.length > 0) {
-            let banners = []
-            let titles = []
-            let descs = []
-            // console.log('banners', props.vendorData.banners)
-            props.vendorData.banners.map(banner => {
-                banners.push({ source: { uri: Config.IMG_BASE_URL + banner.image_path } })
-                titles.push(banner.title)
-                descs.push(banner.description)
-            })
-            setBanner({ banners, titles, descs })
+    const onEnterChannel = async () => {
+        let found_channel = await findChannel(props.user.id, ownerData.id)
+        if (found_channel != null) {
+            props.navigation.navigate(RouteNames.MessagesScreen, { channelId: found_channel.id })
         }
         else {
-            setBanner(null)
-        }
-
-        loadOffer(props.vendorData.id);
-        loadPastOrders(props.vendorData.id);
-
-        console.log('props.vendorData.order_method ', props.vendorData.order_method)
-        if (props.vendorData.order_method != null) {
-            let supported_order_methods = props.vendorData.order_method.split('-');
-            if (supported_order_methods.length > 0) {
-                setOrderMethods(supported_order_methods);
-                setHandoverMethod(supported_order_methods[0]);
-                loadVendorDetails(props.vendorData.id, supported_order_methods[0], cartVendorLoaded == false);
-            }
-        }
-    }
-
-    useEffect(() => {
-        let items = props.cartItems.filter(i => i.vendor_id == props.vendorData.id && i.quantity > 0)
-        setVendorCartItems(items)
-    }, [props.cartItems])
-
-    useEffect(() => {
-        console.log('tmpFoodData.isFav')
-        onProductFavChange(props.tmpFoodData)
-    }, [props.tmpFoodData.isFav])
-
-    const loadVendorDetails = async (id, order_method, showClosedModal) => {
-        if (id == null) { return; }
-        let { latitude, longitude } = props.coordinates;
-
-        showLoading(true);
-        getVendorDetail(id, latitude, longitude, order_method).then((data) => {
-            props.setVendorCart(data);
-            showLoading(false);
-            
-            setTimeout(() => {
-                setScrollChanged(true);
-                if (showClosedModal == true) {
-                    showClosedVendorModal(data.is_open != 1)
-                }
-            }, 200)
-        })
-            .catch(error => {
-                showLoading(false);
-                console.log('get Vendor Detail', error)
-                alerts.error(translate('restaurant_details.we_are_sorry'), extractErrorMessage(error));
-            })
-    };
-
-    const loadPastOrders = (vendor_id) => {
-        getPastOrders(vendor_id).then(data => {
-            if (_mounted.current == false) {
-                return;
-            }
-            setPastOrders(data)
-        })
-            .catch(error => {
-                console.log('getPastOrders', error)
-            })
-    }
-
-    const loadOffer = (vendor_id) => {
-        props.getDiscount(vendor_id, 'time').then(res => {
-            if (_mounted.current == false) {
-                return;
-            }
-            setLatestOffers(res)
-        })
-            .catch(err => {
-                console.log('load latest Offer', err)
-            })
-
-        props.getDiscount(vendor_id).then(res => {
-            if (_mounted.current == false) {
-                return;
-            }
-            setAllOffers(res)
-        })
-            .catch(err => {
-                console.log('load all Offer', err)
-            })
-    }
-
-    const onPressFav = () => {
-        props.toggleFavourite(props.vendorData.id, props.vendorData.isFav == 1 ? 0 : 1).then((res) => {
-            if (_mounted.current == false) {
-                return;
-            }
-            props.setVendorCart({ ...props.vendorData, isFav: props.vendorData.isFav == 1 ? 0 : 1 })
-        })
-            .catch((error) => {
-                console.log('onPressFav', error)
-            })
-    }
-
-    const goPastOrder = () => {
-        props.navigation.navigate(RouteNames.PastOrderScreen, {
-            vendor_id: props.vendorData.id,
-            logo: props.vendorData.logo_thumbnail_path,
-            title: props.vendorData.title
-        });
-    };
-
-    const goFoodDetail = (food_data) => {
-        props.setTmpFood(food_data)
-        props.navigation.navigate(RouteNames.FoodScreen);
-    }
-
-    const goCart = () => {
-        if (props.isLoggedIn == false) {
-            props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
-            return;
-        }
-        if (props.cartItems != null && props.cartItems.length > 0) {
-            let vendor_id = props.cartItems[0].vendor_id;
-            if (vendor_id == props.vendorData.id) {
-                props.navigation.navigate(RouteNames.CartScreen)
-                return;
+            setCreateChannelLoading(true)
+            let channelID = await createSingleChannel(props.user, ownerData);
+            setCreateChannelLoading(false)
+            if (channelID != null) {
+                props.navigation.navigate(RouteNames.MessagesScreen, { channelId: channelID })
             }
             else {
-                showGoCartLoading(true);
-                let { latitude, longitude } = props.coordinates;
-                getVendorDetail(vendor_id, latitude, longitude).then((data) => {
-                    showGoCartLoading(false);
-                    if (_mounted.current == false) {
-                        return;
-                    }
-                    setCartVendorLoaded(true);
-                    props.setVendorCart(data);
-
-                    props.navigation.navigate(RouteNames.CartScreen)
-                })
-                    .catch(error => {
-                        showGoCartLoading(false);
-                        console.log('get Vendor Detail', error)
-                        alerts.error(translate('restaurant_details.we_are_sorry'), extractErrorMessage(error));
-                    })
-            }
-        }
-    }
-
-    const onShare = async () => {
-        const shareOptions = {
-            title: 'Snapfood Vendor',
-            message:
-                Platform.OS === 'android'
-                    ? `https://snapfood.al/restaurant/${props.vendorData['hash_id']}/${props.vendorData['slug']}`
-                    : '',
-            url: `https://snapfood.al/restaurant/${props.vendorData['hash_id']}/${props.vendorData['slug']}`,
-            subject: 'Link for Snapfood',
-        };
-        await Share.share(shareOptions);
-    };
-
-    const onProductFavChange = (data) => {
-        const { categories } = props.vendorData
-        if (categories && categories.length && categories.length > 0) {
-            let tmp = categories.slice(0, categories.length)
-            let cat_index = tmp.findIndex(i => i.id == data.category_id)
-            if (cat_index != -1) {
-                if (tmp[cat_index].products && tmp[cat_index].products.length && tmp[cat_index].products.length > 0) {
-                    let product_index = tmp[cat_index].products.findIndex(i => i.id == data.id)
-                    if (product_index != -1) {
-                        tmp[cat_index].products[product_index].isFav = data.isFav
-
-                        props.setVendorCart({ ...props.vendorData, categories: tmp })
-                    }
-                }
+                alerts.error('警告', '出了些問題');
             }
         }
     }
 
     const _renderHeader = () => {
-        return <View style={[Theme.styles.row_center, styles.header,
-        { backgroundColor: isShowHeaderTitle ? '#fff' : 'transparent' }
-        ]}>
-            <RoundIconBtn style={{ ...styles.headerBtn, borderWidth: isShowHeaderTitle ? 0 : 1, marginLeft: isShowHeaderTitle ? -8 : 0 }} icon={<Feather name='chevron-left' size={22} color={Theme.colors.text} />} onPress={() => {
-                props.navigation.goBack()
-            }} />
-            {
-                isShowHeaderTitle && <View style={[Theme.styles.row_center_start,]}>
-                    <RoundIconBtn style={{ ...Theme.styles.col_center, ...styles.topLogoView }}
-                        icon={
-                            <FastImage source={{ uri: Config.IMG_BASE_URL + props.vendorData.logo_thumbnail_path }} style={styles.topLogo} resizeMode={FastImage.resizeMode.contain} />
-                        }
-                        onPress={() => { }} />
-                    <Text style={styles.topLogoText} numberOfLines={1}>{props.vendorData.title}</Text>
-                </View>
-            }
-            <View style={{ flex: 1, }} />
-            {
-                <View style={[Theme.styles.row_center_end, { alignItems: 'flex-end', }]}>
-                    <RoundIconBtn style={styles.headerBtn} icon={<Entypo name='share' size={20} color={Theme.colors.text} />} onPress={onShare} />
-                    <View style={{ width: 33, height: 48, marginLeft: 10, justifyContent: 'flex-end', }}>
-                        <RoundIconBtn
-                            diabled={props.cartItems != null && props.cartItems.length == 0}
-                            style={styles.headerBtn}
-                            icon={<FontAwesome5 name='shopping-bag' size={20} color={Theme.colors.text} />}
-                            onPress={goCart} />
-                        {(props.cartItems != null && props.cartItems.length > 0) && <View style={styles.cartBadge} />}
-                    </View>
-                    {
-                        props.isLoggedIn &&
-                        <RoundIconBtn style={{ width: 33, height: 33, borderRadius: 8, backgroundColor: '#fff', marginLeft: 10, paddingTop: 3 }}
-                            icon={<Entypo name='heart' size={24} color={props.vendorData.isFav == 1 ? Theme.colors.cyan2 : Theme.colors.gray5} />}
-                            onPress={() => onPressFav()} />
-                    }
-                </View>
-            }
-        </View>
-    }
-
-    const _renderOperationTabs = () => {
-        return <View style={[Theme.styles.row_center, styles.operationTab,]}>
-            <SwitchTab
-                items={tabs}
-                curitem={curTab}
-                onSelect={(item) => setCurTab(item)}
-                style={{ width: '100%', paddingLeft: 0, paddingRight: 0, }}
-            />
-        </View>
-    }
-
-    const _renderHandover = () => {
-        return <View style={[Theme.styles.col_center, styles.handoverView]}>
-            <View style={styles.divider} />
-            <SwitchTab
-                items={order_methods}
-                curitem={handover_method}
-                onSelect={(item) => {
-                    setHandoverMethod(item)
-                    loadVendorDetails(props.vendorData.id, item, false);
-                }}
-                style={styles.orderMethodTabstyle}
-                active_style={styles.activeTab_style}
-                inactive_style={styles.inactiveTab_style}
-                inactivetxt_style={styles.inactiveTabtxt_style}
-                activetxt_style={styles.activeTabtxt_style}
-            />
-        </View>
-    }
-
-    const getDelta = () => {
-        let delta = 170;
-        if (props.vendorData.order_method != 'Delivery' && order_methods.length > 0) {
-            delta = delta + 55;
-        }
-        if (props.isLoggedIn && past_orders.length > 0) {
-            delta = delta + 55;
-        }
-        return delta;
-    }
-
-    const renderCategoriesMenu = () => {
         return (
-            <View
-                style={[Theme.styles.col_center, styles.categList,]}>
-                <ScrollableHorizontalMenu
-                    selectedItem={horizontalScrollMenuIndex}
-                    onItemSelected={(index) => {
-                        if (!scrollView.current) {
-                            return;
-                        }
-                        if (!productsListDimensions.current) {
-                            return;
-                        }
-                        currentCatIndex.current = index;
-
-                        setTimeout(() => {
-                            scrollOnLayout.current = true;
-
-                            let delta = getDelta() + 70;
-                            if (index >= productsListDimensions.current.length) {
-                                scrollView.current.scrollTo({ y: (delta + swiperHeight), animated: true });
-                                return;
-                            }
-                            else {
-                                const offset = productsListDimensions.current[index];
-                                if (offset == null) { return; }
-                                let scrollOffset;
-                                if (index === 0) {
-                                    scrollOffset = delta;
-                                } else {
-                                    scrollOffset = offset.y + delta;
-                                }
-
-                                scrollToValue.current = scrollOffset;
-                                scrollView.current.scrollTo({ y: scrollOffset, animated: true });
-                            }
-                        }, 400)
+            <View style={[Theme.styles.row_center, styles.header]}>
+                <RoundIconBtn
+                    style={styles.headerBtn}
+                    icon={<Feather name='chevron-left' size={22} color={Theme.colors.text} />}
+                    onPress={() => {
+                        props.navigation.goBack();
                     }}
-                    items={props.vendorData.categories || []}
                 />
-                <View style={Theme.styles.row_center}>
-                    <View style={styles.scrollviewHider} />
+                <View style={[Theme.styles.row_center_end, { flex: 1, alignItems: 'flex-end' }]}>
                 </View>
             </View>
         );
     };
-
-    const getCartCnt = (food_data) => {
-        let foundIndex = props.cartItems.findIndex(i => i.id == food_data.id)
-        if (foundIndex != -1) {
-            return props.cartItems[foundIndex].quantity;
-        }
-        return 0;
-    }
-
-    const _renderOffers = (title, list) => {
-        return <View style={[Theme.styles.col_center_start, styles.foodList]}>
-            <Text style={styles.subjectTitleOffer}>{title}</Text>
-            {
-                (list.length == null || list.length == 0) && title == translate('vendor_profile.latest_offers') &&
-                <Text style={styles.NoOffer}>{translate('vendor_profile.no_latest_offer')}{props.vendorData.title}</Text>
-            }
-            {
-                (list.length == null || list.length == 0) && title == translate('vendor_profile.all_offers') &&
-                <Text style={styles.NoOffer}>{translate('vendor_profile.no_all_offer')}{props.vendorData.title}</Text>
-            }
-            {
-                list.length > 0 && <ScrollView
-                    style={{ width: '100%', }}
-                >
-                    {
-                        list.map((item, index) =>
-                            <VendorFoodItem
-                                key={index}
-                                type='offer'
-                                cartEnabled={true}
-                                food_id={item.id}
-                                isFav={item.isFav}
-                                cartCnt={getCartCnt(item)}
-                                data={item}
-                                onFavChange={onProductFavChange}
-                                onSelect={(data) => goFoodDetail(data)}
-                            />
-                        )
-                    }
-                </ScrollView>
-            }
-        </View>
-    }
-
-    console.log('vendor screen')
     return (
         <React.Fragment>
-            <Spinner visible={goCartLoading} />
-            <View style={[Theme.styles.flex_1, { width: '100%', height: '100%', }, styles.forgroundView]}>
-                <Animated.View
-                    style={[Theme.styles.col_center, {
-                        width: '100%',
-                        backgroundColor: '#fff',
-                        transform: [
-                            { translateY: v_transY }
-                        ],
-                    },
-                    ]}>
-                    <FastImage source={{ uri: `${Config.IMG_BASE_URL}${props.vendorData.profile_path}?w=600&h=600` }} style={styles.topBannerImg} />
-                    <View style={styles.photoTransWrap} />
-                </Animated.View>
-            </View>
-            <Animated.ScrollView
-                ref={scrollView}
-                bounces={false}
-                alwaysBounceVertical={false}
-                alwaysBounceHorizontal={false}
-                style={{ flex: 1, marginTop: 80, width: '100%', }}
-                stickyHeaderIndices={[1,]}
-                onScroll={Animated.event(
-                    [
+            <Spinner visible={isCreatingChannel} />
+            <KeyboardAwareScrollView style={[{ flex: 1, backgroundColor: '#fff' }]} keyboardShouldPersistTaps='handled'>
+                <View style={[Theme.styles.col_center_start, Theme.styles.background, { padding: 0 }]}>
+                    <TouchableOpacity activeOpacity={1} style={[styles.img]} onPress={()=>{
+                        ShowGalleryModal(true)
+                    }}>
+                        <FastImage
+                            source={{ uri: props.vendorData.photo }}
+                            style={[styles.img]}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
+                    </TouchableOpacity> 
+                    <View style={{ padding: 20, width: '100%' }}>
+                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                            <AppText style={[styles.title]}>{props.vendorData.title}</AppText>
+                        </View>
+                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
+                            <AppText style={[styles.text]}>
+                                {props.vendorData.area} {props.vendorData.street} {props.vendorData.building} {props.vendorData.floor}
+                            </AppText>
+                        </View>
+                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
+                            <AppText style={[styles.size]}>實用面積 : {props.vendorData.size}</AppText>
+                        </View>
                         {
-                            nativeEvent: {
-                                contentOffset: {
-                                    y: scrollX
-                                }
-                            }
+                            props.vendorData.isSell == true &&
+                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
+                                <View style={styles.tag}>
+                                    <AppText style={[styles.tag_txt]}>售</AppText>
+                                </View>
+                                <AppText style={[styles.price]}>${props.vendorData.price}</AppText>
+                            </View>
                         }
-                    ],
-                    {
-                        useNativeDriver: true,
-                        listener: (event) => {
-                            const scrollY = event.nativeEvent.contentOffset.y;
-                            // console.log('Scroll y', scrollY)
-                            // setScrollY(scrollY)
-                            if (scrollY > 100) {
-                                if (isShowHeaderTitle == false) {
-                                    setShowHeaderTitle(true);
-                                }
-                            }
-                            else {
-                                if (isShowHeaderTitle == true) {
-                                    setShowHeaderTitle(false);
-                                }
-                            }
-
-                            if (scrollToValue.current == null && productsListDimensions.current) {
-                                let delta = getDelta();
-
-                                let { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-                                let index = 0;
-                                for (let i = 0; i < productsListDimensions.current.length; i++) {
-                                    if (productsListDimensions.current[i] != null && scrollY > productsListDimensions.current[i].y + delta) {
-                                        index = i;
-                                    }
-                                }
-                                if (layoutMeasurement.height + contentOffset.y >= contentSize.height) {
-                                    index = productsListDimensions.current.length - 1;
-                                }
-                                setHorizontalScrollMenuIndex(index);
-                            }
+                        {
+                            props.vendorData.isRent == true &&
+                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
+                                <View style={styles.tag}>
+                                    <AppText style={[styles.tag_txt]}>租</AppText>
+                                </View>
+                                <AppText style={[styles.price]}>${props.vendorData.price}</AppText>
+                            </View>
                         }
-                    }
-                )}
-                onTouchStart={() => {
-                    scrollToValue.current = null;
-                }}
-            >
-                {<View style={{ width: '100%' }}>
-                    <ShopInfoView data={props.vendorData} handover_method={handover_method} />
-                    {props.vendorData.order_method != 'Delivery' && order_methods.length > 0 && _renderHandover()}
-                    {
-                        curTab == 'Menu' &&
-                        <View style={[Theme.styles.col_center, { width: '100%', backgroundColor: Theme.colors.white, }]}>
-                            <View style={[Theme.styles.col_center, { width: '100%', paddingHorizontal: 20, }]}>
-                                {_renderOperationTabs()}
-                                {props.isLoggedIn && !isLoading && past_orders.length > 0 && <PastorderView onPress={() => goPastOrder()} />}
+                        <View style={[Theme.styles.col_center, { width: '100%', marginTop: 24 }]}>
+                            <AppText style={styles.size}>間隔</AppText>
+                            <View style={[Theme.styles.row_center, styles.infoView]}>
+                                <AppText style={styles.title}>{props.vendorData.living_rooms}廳</AppText>
+                                <Svg_divider />
+                                <AppText style={styles.title}>{props.vendorData.rooms}房</AppText>
+                                <Svg_divider />
+                                <AppText style={styles.title}>{props.vendorData.toilets}廁</AppText>
+                                <Svg_divider />
+                                <AppText style={styles.title}>{props.vendorData.room_toilets} 套廁</AppText>
+                                <Svg_divider />
+                                <AppText style={styles.title}>{props.vendorData.helper_rooms} 工人房</AppText>
                             </View>
                         </View>
-                    }
-                </View>
-                }
-                {
-                    curTab != 'Menu' && <View style={[Theme.styles.col_center_start, { backgroundColor: Theme.colors.white, width: '100%', paddingHorizontal: 20, }]}>
-                        {_renderOperationTabs()}
+                        <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 12 }]}>
+                            <AppText style={[styles.size]}>單位資訊 : </AppText>
+                            {
+                                !isEmpty(props.vendorData.other) &&
+                                <AppText style={[styles.size, { marginTop: 4 }]}>{props.vendorData.other}</AppText>
+                            }
+                        </View>
+                        <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 20 }]}>
+                            <AppText style={[styles.size]}>物業類型 :  </AppText>
+                            <AppText style={[styles.size, { marginTop: 4 }]}>{props.vendorData.type_use == FOR_PERSONAL ? '私人住宅物業' : '商業用途'}</AppText>
+                        </View>
                     </View>
-                }
-                {!isLoading && curTab == 'Menu' && <View style={[Theme.styles.col_center, { width: '100%', backgroundColor: Theme.colors.white, paddingHorizontal: 20, }]}>
-                    {renderCategoriesMenu()}
-                </View>}
-                {
-                    !isLoading &&
-                    <Swiper
-                        onIndexChanged={(index) => { }}
-                        scrollEnabled={false}
-                        loop={false}
-                        index={curTab == 'Menu' ? 0 : (curTab == 'Offers' ? 1 : 2)}
-                        showsPagination={false}
-                        style={{ height: swiperHeight }}
-                    >
-                        <View style={{ width: '100%' }}>
-                            <VendorFoodList
-                                vendor_id={props.vendorData.id}
-                                scrollChanged={scrollChanged}
-                                navigation={props.navigation}
-                                onChangeDimensions={(dimentions) => {
-                                    if (dimentions != null) {
-                                        productsListDimensions.current = dimentions;
-                                    }
-                                    if (scrollOnLayout.current == true) {
-                                        if (!scrollView.current) {
-                                            return;
-                                        }
-                                        if (currentCatIndex.current >= dimentions.length) {
-                                            return;
-                                        }
-
-                                        let delta = getDelta() + 70;
-                                        const offset = dimentions[currentCatIndex.current];
-                                        if (offset == null) { return; }
-                                        let scrollOffset;
-                                        if (currentCatIndex.current === 0) {
-                                            scrollOffset = delta;
-                                        } else {
-                                            scrollOffset = offset.y + delta;
-                                        }
-                                        scrollView.current.scrollTo({ y: scrollOffset });
-                                    }
-                                }}
-                            />
-                        </View>
-                        <View style={[Theme.styles.col_center_start, { backgroundColor: Theme.colors.white, width: '100%' }]}>
-                            <View style={[Theme.styles.row_center,]}>
-                                {
-                                    _renderOffers(translate('vendor_profile.latest_offers'), latest_offers || [])
-                                }
-                            </View>
-                            <View style={[Theme.styles.row_center,]}>
-                                {
-                                    _renderOffers(translate('vendor_profile.all_offers'), all_offers || [])
-                                }
-                            </View>
-                        </View>
-                        <View style={[Theme.styles.col_center_start, { backgroundColor: Theme.colors.white, width: '100%', paddingHorizontal: 20 }]}>
-                            <VendorInfoLocItem
-                                data={props.vendorData}
-                                vendor_id={props.vendorData.id}
-                                style={{ marginTop: 12, }}
-                                onSelect={(latitude, longitude) => {
-                                    props.navigation.navigate(RouteNames.VendorLocationScreen,
-                                        {
-                                            address: { lat: latitude, lng: longitude },
-                                            info: {
-                                                title: props.vendorData.title,
-                                                is_open: props.vendorData.is_open,
-                                                logo: props.vendorData.logo_thumbnail_path,
-                                                distance: (parseFloat(props.vendorData.distance) / 1000).toFixed(1)
-                                            }
-                                        });
-                                }} />
-                            <VendorInfoItem data={props.vendorData} vendor_id={props.vendorData.id} />
-                        </View>
-                    </Swiper>
-                }
-                {(isLoading ||
-                    (productsListDimensions.current && props.vendorData.categories && (productsListDimensions.current.length < props.vendorData.categories.length)))
-                    && <BlockSpinner style={{ minHeight: 120 }} />}
-
-                {vendorCartItems.length > 0 && <View style={{ height: 100 }} />}
-            </Animated.ScrollView>
-            {vendorCartItems.length > 0 && <CartViewButton onPress={() => {
-                if (props.isLoggedIn) {
-                    props.navigation.navigate(RouteNames.CartScreen)
-                }
-                else {
-                    props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
-                }
-            }} diabled={props.vendorData.is_open != 1} cartItems={vendorCartItems} style={styles.cartview} />}
-
-            <VendorClosedModal
-                showModal={isClosedVendorModal}
-                title={closedVendorTitle}
-                goHome={() => {
-                    showClosedVendorModal(false)
-                    props.navigation.goBack()
-                }}
-                onClose={() => showClosedVendorModal(false)}
+                    {_renderHeader()}
+                </View>
+            </KeyboardAwareScrollView>
+            {
+                ownerData != null &&
+                <View style={[Theme.styles.row_center, styles.ownerInfo]}>
+                    <View style={[Theme.styles.col_center, styles.photoView]}>
+                        <FastImage
+                            source={
+                                isEmpty(ownerData.photo) ?
+                                    require('../../../common/assets/images/user-default.png')
+                                    :
+                                    { uri: ownerData.photo }
+                            }
+                            style={styles.avatarImg}
+                            resizeMode={FastImage.resizeMode.cover}
+                        />
+                    </View>
+                    <View style={[Theme.styles.flex_1, { marginLeft: 12 }]}>
+                        <Text style={styles.owner_name}>{ownerData.full_name}</Text>
+                    </View>
+                    <TouchableOpacity style={[Theme.styles.col_center, styles.chatBtn]} onPress={onEnterChannel}>
+                        <Text style={styles.size}>聯絡我們</Text>
+                    </TouchableOpacity>
+                </View>
+            }
+            <ImgGalleryModal
+                index={0}
+                images={[
+                    {
+                        source: { uri: props.vendorData.photo },
+                    }
+                ]}
+                showModal={isGalleryModal}
+                onClose={() => ShowGalleryModal(false)}
             />
-            {_renderHeader()}
         </React.Fragment>
     );
 }
 
+
 const styles = StyleSheet.create({
-    header: { position: 'absolute', top: 0, left: 0, height: 80, width: '100%', paddingBottom: 0, paddingHorizontal: 20, alignItems: 'flex-end' },
-    headerBtn: { width: 33, height: 33, borderRadius: 8, backgroundColor: Theme.colors.white, },
-    operationTab: { height: 62, width: '100%', borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
-    subjectTitle: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text, },
-    subjectTitleOffer: { marginBottom: 12, marginTop: 12, fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.gray7 },
-    NoOffer: { marginBottom: 24, marginTop: 24, paddingHorizontal: 18, textAlign: 'center', width: '100%', fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.gray7 },
-    divider: { width: '100%', height: 1, backgroundColor: Theme.colors.gray9, },
-    infoView: { width: '100%', backgroundColor: Theme.colors.white },
-    activeIndicator: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#f00' },
-    inactiveIndicator: { width: 7, height: 7, borderRadius: 4, color: Theme.colors.gray7 },
-    categList: { alignItems: 'flex-start', paddingTop: 10, width: '100%', backgroundColor: Theme.colors.white, },
-    scrollviewHider: { width: '100%', marginTop: -10, height: 12, backgroundColor: Theme.colors.white },
-
-    foodList: { width: '100%', paddingHorizontal: 18, backgroundColor: Theme.colors.white, alignItems: 'flex-start' },
-    sectionView: { width: '100%', backgroundColor: Theme.colors.white, alignItems: 'flex-start', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: Theme.colors.gray9 },
-
-    topLogoText: { maxWidth: 160, color: Theme.colors.text, fontSize: 18, fontFamily: Theme.fonts.bold, marginLeft: 10, },
-    topLogoView: { width: 33, height: 33, borderRadius: 8, backgroundColor: Theme.colors.white, },
-    topLogo: { width: 26, height: 26, },
-
-    photoTransWrap: { width: '100%', height: 200, backgroundColor: '#00000066', position: 'absolute', top: 0, left: 0, },
-    forgroundView: { width: '100%', backgroundColor: Theme.colors.white, position: 'absolute', top: 0, left: 0, },
-    topBannerImg: { width: '100%', height: 200, },
-    cartview: { position: 'absolute', bottom: 40, left: 0, },
-    cartBadge: { position: 'absolute', top: 11, right: -3, width: 11, height: 11, borderRadius: 5.5, backgroundColor: Theme.colors.red1 },
-
-    handoverView: { backgroundColor: Theme.colors.white, paddingHorizontal: 20, paddingTop: 7, paddingBottom: 14 },
-    orderMethodTabstyle: {
-        marginTop: 14,
-        paddingLeft: 0, paddingRight: 0, height: 40, borderRadius: 12,
-        backgroundColor: '#fff', elevation: 1, shadowOffset: { width: 1, height: 1 },
-        shadowColor: '#999',
-        shadowOpacity: 0.6,
-        borderWidth: 1, borderColor: Theme.colors.gray6,
+    header: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        right: 20,
+        height: 50,
+        width: width(100) - 40,
+        alignItems: 'flex-end',
     },
-    activeTab_style: { maxWidth: 108, height: 40, marginLeft: 0, marginRight: 0, borderRadius: 12, backgroundColor: Theme.colors.text },
-    inactiveTab_style: { maxWidth: 108, height: 36, marginLeft: 0, marginRight: 0, borderRadius: 12, backgroundColor: Theme.colors.white },
-    inactiveTabtxt_style: { fontSize: 14, lineHeight: 16, color: Theme.colors.text, fontFamily: Theme.fonts.semiBold, },
-    activeTabtxt_style: { fontSize: 14, lineHeight: 16, color: Theme.colors.white, fontFamily: Theme.fonts.semiBold, },
-})
-
+    headerBtn: { width: 33, height: 33, borderRadius: 8, backgroundColor: Theme.colors.white },
+    img: { width: '100%', height: 360, resizeMode: 'cover' },
+    title: { fontSize: 18, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
+    text: { fontSize: 12, color: Theme.colors.gray3, fontFamily: Theme.fonts.semiBold, },
+    size: { fontSize: 14, color: Theme.colors.text, fontFamily: Theme.fonts.medium, },
+    tag: { padding: 6, borderRadius: 6, backgroundColor: Theme.colors.yellow1 },
+    tag_txt: { fontSize: 16, color: Theme.colors.text, fontFamily: Theme.fonts.semiBold },
+    price: { marginLeft: 18, fontSize: 24, color: Theme.colors.text, fontFamily: Theme.fonts.bold, },
+    infoView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%', marginVertical: 12, paddingVertical: 16, borderTopColor: Theme.colors.gray4, borderTopWidth: 1, borderBottomColor: Theme.colors.gray4, borderBottomWidth: 1
+    },
+    ownerInfo: {
+        backgroundColor: '#F7F7F7',
+        paddingHorizontal: 20,
+        height: 70,
+        width: '100%',
+        shadowColor: Theme.colors.blackPrimary,
+        shadowOffset: {
+            width: 2,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 4
+    },
+    owner_name: { fontSize: 16, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
+    chatBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, backgroundColor: Theme.colors.yellow1 },
+    photoView: { height: 50, width: 50, borderRadius: 25, },
+    avatarImg: { width: 50, height: 50, borderRadius: 25, },
+});
 
 const mapStateToProps = ({ app, shop }) => ({
-    language: app.language,
-    coordinates: app.coordinates,
-    tmpFoodData: app.tmpFoodData,
-    cartItems: shop.items,
+    user: app.user,
     vendorData: shop.vendorData,
     isLoggedIn: app.isLoggedIn,
 });
 
 export default connect(mapStateToProps, {
-    setVendorCart, toggleFavourite, setTmpFood, AddProduct2Cart, updateCartItems, getDiscount,
 })(VendorScreen);

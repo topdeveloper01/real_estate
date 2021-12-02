@@ -98,7 +98,7 @@ class RegisterScreen extends React.PureComponent {
 	onRegisterUserData = async (id) => {  
         if (id == null) return;
         const { full_name, phone, email, password } = this.state;
-		let logged_user_data = await this.props.register({id, full_name, email, phone });
+		let logged_user_data = await this.props.register({id, full_name, email, phone, admin : false });
 		if (logged_user_data != null) { 
 			this.props.setAsLoggedIn();
 		} 

@@ -68,6 +68,9 @@ import LocationPickupScreen from '../modules/chat/screens/LocationPickupScreen';
 import LocationMsgScreen from '../modules/chat/screens/LocationMsgScreen';
 
 import AddListingScreen from '../modules/profile/screens/AddListingScreen';
+import PolicyScreen from '../modules/profile/screens/PolicyScreen';
+import TermsScreen from '../modules/profile/screens/TermsScreen';
+import NotificationsScreen from '../modules/profile/screens/NotificationsScreen';
 
 const OnboardStack = createStackNavigator();
 const GuestStack = createStackNavigator();
@@ -267,7 +270,9 @@ function MemberRoute() {
 
 				{/* admin route */}
 				<MemberStack.Screen name={RouteNames.AddListingScreen} component={AddListingScreen} />
-				
+				<MemberStack.Screen name={RouteNames.PrivacyPolicyScreen} component={PolicyScreen} />
+				<MemberStack.Screen name={RouteNames.TermsScreen} component={TermsScreen} />
+				<MemberStack.Screen name={RouteNames.NotificationsScreen} component={NotificationsScreen} />
 			</MemberStack.Navigator>
 		</NavigationContainer>
 	);

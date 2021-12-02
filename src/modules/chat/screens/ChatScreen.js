@@ -4,12 +4,7 @@ import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import FastImage from "react-native-fast-image";
-import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
-} from 'react-native-popup-menu';
+import { height } from 'react-native-dimension'; 
 import { sendMessage, setMessagesSeen, setAllChannels } from '../../../store/actions/chat';
 import RouteNames from '../../../routes/names';
 import NewConvOptionModal from "../../../common/components/modals/NewConvOptionModal";
@@ -22,15 +17,9 @@ import apiFactory from '../../../common/services/apiFactory';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import Theme from "../../../theme";
 import { CALL_HISTORY, } from "../../../config/constants";
-import NoChats from '../components/NoChats';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'
 import Header1 from '../../../common/components/Header1';
-// svgs
-import Svg_newcall from '../../../common/assets/svgs/btn_new_call.svg'
-import Svg_newmsg from '../../../common/assets/svgs/btn_new_chat.svg'
-import Svg_more from '../../../common/assets/svgs/btn_more.svg'
-import Svg_outgoingcall from '../../../common/assets/svgs/ic_outgoingcall.svg'
-import Svg_incomingcall from '../../../common/assets/svgs/ic_incomingcall.svg'
-import Svg_missedcall from '../../../common/assets/svgs/ic_missedcall.svg'
+import { channelCollection } from '../../../common/services/firebase';
 
 class ChatScreen extends React.Component {
     _isMounted = false
@@ -48,12 +37,6 @@ class ChatScreen extends React.Component {
 
     componentDidMount = () => {
         this._isMounted = true;
-        this.removefocusListener = this.props.navigation.addListener('focus', () => {
-            console.log('focus listener : get new invites')
-            this.getNewInvites()
-        });
-        this.getNewInvites()
-
         this.getChatChannelsListner(this.props.user.id)
     }
 
@@ -103,7 +86,7 @@ class ChatScreen extends React.Component {
             this.chatchannel_listener()
         }
         this.setState({ isLoadingChat: true })
-        this.chatchannel_listener = channel_collection.where('users', 'array-contains', user_id).orderBy('last_msg.createdAt', 'desc').onSnapshot((snapshots) => {
+        this.chatchannel_listener = channelCollection.where('users', 'array-contains', user_id).orderBy('last_msg.createdAt', 'desc').onSnapshot((snapshots) => {
             var tmp_channels = [];
             snapshots.forEach((doc) => {
                 tmp_channels.push(doc.data());
@@ -117,21 +100,6 @@ class ChatScreen extends React.Component {
                 console.log('chat channel listener error', error)
             });
     }
-
-    getNewInvites = async () => {
-        apiFactory.get(`users/invitations?seen=0`).then(({ data }) => {
-            const res_invitations = data['invitations'];
-            if (this._isMounted) {
-                this.setState({
-                    new_invites: res_invitations
-                });
-            }
-        },
-            (error) => {
-                const message = error.message || translate('generic_error');
-                alerts.error(translate('alerts.error'), message);
-            });
-    };
 
     renderTab() {
         const { isChatList } = this.state;
@@ -167,7 +135,7 @@ class ChatScreen extends React.Component {
                 renderItem={(item, index) => this.renderChatItem(item)}
                 ItemSeparatorComponent={() => <View style={styles.spaceCol} />}
                 ListFooterComponent={() => <View style={styles.spaceCol} />}
-                ListEmptyComponent={() => this.state.isLoadingChat == false && <NoChats />}
+                ListEmptyComponent={() => this.state.isLoadingChat == false && <NoRestaurants style={{marginTop: height(30)}}/> }
             />);
     }
 
@@ -252,8 +220,8 @@ class ChatScreen extends React.Component {
         }
         const getTime = () => {
             if (item.last_msg != null && item.last_msg.createdAt != null) {
-                let msg_moment = appMoment(convertTimestamp2Date(item.last_msg.createdAt));
-                let cur_moment = appMoment();
+                let msg_moment = moment(convertTimestamp2Date(item.last_msg.createdAt));
+                let cur_moment = moment();
                 if (msg_moment.format('DD/MM/YYYY') == cur_moment.format('DD/MM/YYYY')) {
                     return moment(convertTimestamp2Date(item.last_msg.createdAt)).format('h:mm A');
                 }
@@ -273,40 +241,42 @@ class ChatScreen extends React.Component {
             return 0
         }
         return (
-            <TouchableOpacity style={styles.chatContainer} onPress={() => {
+            <TouchableOpacity style={[Theme.styles.row_center, styles.chatContainer]} onPress={() => {
                 this.props.navigation.navigate(RouteNames.MessagesScreen, { channelId: item.id })
             }}>
                 <FastImage
                     style={styles.avatar}
                     source={{ uri: getPhoto() }}
                     resizeMode={FastImage.resizeMode.cover} />
-                <View style={{ flex: 1 }}>
-                    <View style={[Theme.styles.col_center, {flex:1}]}>
-                        <Text style={styles.name}>
-                            {getName()}
-                        {
-                            getUnreadCnt() > 0 &&
-                            <View style={styles.unreadContainer}>
-                                <Text style={styles.unread}>{getUnreadCnt()}</Text>
-                            </View>
-                        }
-                        </Text>
+                <View style={[Theme.styles.row_center, { flex: 1 }]}>
+                    <View style={[Theme.styles.col_center, { alignItems: 'flex-start', flex: 1 }]}>
+                        <View style={[Theme.styles.row_center_start]}>
+                            <Text style={styles.name}>
+                                {getName()}
+                            </Text>
+                            {
+                                getUnreadCnt() > 0 &&
+                                <View style={styles.unreadContainer}>
+                                    <Text style={styles.unread}>{getUnreadCnt()}</Text>
+                                </View>
+                            }
+                        </View> 
                         <Text style={styles.message} numberOfLines={2} >{getLastMsg()}</Text>
-                    </View> 
+                    </View>
                     <Text style={styles.time}>{getTime()}</Text>
                 </View>
             </TouchableOpacity>
         );
     }
- 
+
 
     render() {
         const { isChatList } = this.state;
         return (
             <View style={styles.container}>
-                <Header1 
+                <Header1
                     left={<View />}
-                    style={{ paddingHorizontal: 20 }}
+                    style={{ paddingHorizontal: 20, marginBottom: 0 }}
                     title={'通訊'}
                 />
                 {
@@ -386,28 +356,25 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: Theme.fonts.semiBold
     },
-    chatContainer: {
-        flexDirection: 'row',
-        paddingVertical: 16,
+    chatContainer: { 
+        width: '100%',
         backgroundColor: Theme.colors.white,
+        paddingVertical: 16,
         borderBottomColor: '#808080aa',
         borderBottomWidth: 1
     },
     listContainer: {
         flex: 1,
         width: '100%',
-        paddingHorizontal: 20,
-        paddingVertical: 10
+        paddingHorizontal: 20, 
     },
     avatar: {
         width: 80,
         height: 80,
-        borderRadius: 40,
-        backgroundColor: 'red',
+        borderRadius: 40, 
         marginRight: 10
     },
-    name: {
-        flex: 1,
+    name: { 
         fontSize: 16,
         color: Theme.colors.text,
         fontFamily: Theme.fonts.semiBold
@@ -417,11 +384,11 @@ const styles = StyleSheet.create({
         color: Theme.colors.gray7,
         fontFamily: Theme.fonts.semiBold
     },
-    message: {
-        flex: 1,
+    message: { 
+        marginTop: 6,
         fontSize: 14,
         color: '#808080',
-        fontFamily: Theme.fonts.medium, 
+        fontFamily: Theme.fonts.medium,
     },
     unreadContainer: {
         marginLeft: 20,

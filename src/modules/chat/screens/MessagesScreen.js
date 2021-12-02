@@ -18,8 +18,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import GetLocation from 'react-native-get-location'
 import { connect } from 'react-redux';
 import { convertTimestamp2Date } from '../../../common/services/utility';
-import {
-	channel_collection,
+import { 
 	getChannelData,
 	sendMessage,
 	uploadImage,
@@ -27,11 +26,12 @@ import {
 	deleteGroupChannel,
 	exitGroupChannel,
 } from '../../../common/services/chat';
+import { channelCollection } from '../../../common/services/firebase';
 import { goActiveScreenFromPush } from '../../../store/actions/app';
 import { translate } from '../../../common/services/translate';
 import Theme from '../../../theme';
 import alerts from '../../../common/services/alerts';
-import RouteNames from '../../../routes/names';
+import RouteNames from '../../../routes/names'; 
 import EmojiBoard from '../../../common/components/react-native-emoji-board';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 import ImgGalleryModal from '../../../common/components/modals/ImgGalleryModal';
@@ -89,7 +89,7 @@ const MessagesScreen = (props) => {
 			msgs_unlistener.current();
 		}
 		loadChannelData();
-		const messages_coll = channel_collection
+		const messages_coll = channelCollection
 			.doc(props.route.params.channelId)
 			.collection('messages')
 			.limit(PerPage)
@@ -135,7 +135,7 @@ const MessagesScreen = (props) => {
 			return;
 		}
 		console.log('loadPrevMessage');
-		const messages_coll = channel_collection
+		const messages_coll = channelCollection
 			.doc(props.route.params.channelId)
 			.collection('messages')
 			.orderBy('created_time', 'desc')
@@ -435,10 +435,10 @@ const MessagesScreen = (props) => {
 	};
 
 	const onLongPressMessage = (currentMessage) => {
-		if (currentMessage && currentMessage.text) {
-			// const options = ['Copy Text', 'Quote Message', 'Cancel'];;
-			setQuoteMsg(currentMessage);
-		}
+		// if (currentMessage && currentMessage.text) {
+		// 	// const options = ['Copy Text', 'Quote Message', 'Cancel'];;
+		// 	setQuoteMsg(currentMessage);
+		// }
 	};
 
 	const onPressMsg = (currentMessage) => {
@@ -510,11 +510,11 @@ const MessagesScreen = (props) => {
 				user={{
 					_id: props.user.id,
 					full_name: props.user.full_name,
-					photo: props.user.photo,
+					photo: props.user.photo || '',
 					phone: props.user.phone,
 					email: props.user.email,
 				}}
-				minInputToolbarHeight={100}
+				minInputToolbarHeight={70}
 				alwaysShowSend={true}
 				showUserAvatar={false}
 				renderUsernameOnMessage={true}
@@ -527,7 +527,7 @@ const MessagesScreen = (props) => {
 				listViewProps={{
 					ListFooterComponent: (
 						<View style={[Theme.styles.col_center]}>
-							<View style={{ height: 100, backgroundColor: '#fff' }} />
+							<View style={{ height: 70, backgroundColor: '#fff' }} />
 							{prevLoading && (
 								<View style={{ justifyContent: 'flex-end', alignItems: 'center' }}>
 									<ActivityIndicator
