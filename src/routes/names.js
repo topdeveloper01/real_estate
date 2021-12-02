@@ -83,7 +83,8 @@ export default {
     BugReportScreen : 'BugReportScreen',
     AppVersionScreen : 'AppVersionScreen',
     AddListingScreen : 'AddListingScreen',
-    NotificationsScreen : 'NotificationsScreen'
+    NotificationsScreen : 'NotificationsScreen',
+    MyListingsScreen : 'MyListingsScreen'
 };
 
 export const headerLessRoutes = [

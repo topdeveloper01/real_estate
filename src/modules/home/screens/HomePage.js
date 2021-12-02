@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Spinner from 'react-native-loading-spinner-overlay';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { width, height } from 'react-native-dimension';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -22,14 +23,12 @@ import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
 const vertPerPage = 10;
 
 const HomePage = (props) => {
-
-    const featureLoaded = useRef(false);
-    const vendorsLoaded = useRef(false);
+ 
 
     const [featuredBlocks, setFeaturedBlocks] = useState([])
     const [allvendors, setAllVendors] = useState([])
 
-    const [vertLoading, setVertLoading] = useState(false)
+    const [vertLoading, setVertLoading] = useState(null)
     const [isRefreshing, setRefreshing] = useState(false)
 
     const filterCategories = [
@@ -116,6 +115,7 @@ const HomePage = (props) => {
 
     const loadVendors = async () => {
         try {
+            setVertLoading(true);
             let filterKeys = getFilers();
             let vendorsData = await getAllListings(filterKeys);
             setAllVendors(vendorsData)
@@ -140,9 +140,8 @@ const HomePage = (props) => {
         }
     };
 
-    const isEmptyData = () => {
-        let featured_cnt = 0;
-        return (featured_cnt == 0 && allvendors.length == 0)
+    const isEmptyData = () => { 
+        return (featuredBlocks.length == 0 && allvendors.length == 0)
     }
 
     const goVendorDetail = (vendor) => {
@@ -204,6 +203,7 @@ const HomePage = (props) => {
 
     return (
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
+            <Spinner visible={vertLoading}/>
             <View style={[Theme.styles.row_center_start, styles.header]}>
                 <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
                 <TouchableOpacity onPress={()=>{

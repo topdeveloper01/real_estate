@@ -151,7 +151,7 @@ const VendorScreen = (props) => {
                 </View>
             </KeyboardAwareScrollView>
             {
-                ownerData != null &&
+                ownerData != null && props.user.id != ownerData.id &&
                 <View style={[Theme.styles.row_center, styles.ownerInfo]}>
                     <View style={[Theme.styles.col_center, styles.photoView]}>
                         <FastImage

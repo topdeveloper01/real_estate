@@ -71,6 +71,7 @@ import AddListingScreen from '../modules/profile/screens/AddListingScreen';
 import PolicyScreen from '../modules/profile/screens/PolicyScreen';
 import TermsScreen from '../modules/profile/screens/TermsScreen';
 import NotificationsScreen from '../modules/profile/screens/NotificationsScreen';
+import MyListingsScreen from '../modules/home/screens/MyListingsScreen';
 
 const OnboardStack = createStackNavigator();
 const GuestStack = createStackNavigator();
@@ -273,6 +274,8 @@ function MemberRoute() {
 				<MemberStack.Screen name={RouteNames.PrivacyPolicyScreen} component={PolicyScreen} />
 				<MemberStack.Screen name={RouteNames.TermsScreen} component={TermsScreen} />
 				<MemberStack.Screen name={RouteNames.NotificationsScreen} component={NotificationsScreen} />
+				<MemberStack.Screen name={RouteNames.MyListingsScreen} component={MyListingsScreen} />
+				
 			</MemberStack.Navigator>
 		</NavigationContainer>
 	);

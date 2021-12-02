@@ -116,7 +116,7 @@ const ProfileScreen = (props) => {
 							delayPressIn={100}
 							style={[Theme.styles.row_center, styles.itemView]}
 							onPress={() => {
-								props.rootStackNav.navigate(item.link);
+								props.rootStackNav.navigate(RouteNames.MyListingsScreen);
 							}}
 						>
 							<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄</Text>

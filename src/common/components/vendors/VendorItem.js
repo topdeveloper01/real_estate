@@ -15,20 +15,26 @@ import { toggleFavourite } from '../../../store/actions/vendors';
 import Svg_euro from '../../../common/assets/svgs/ic_euro.svg'
 
 const VendorItem = (props) => {
-    const { data, onSelect, style } = props
+    const { data, can_delete, onSelect, onDelete, style } = props
 
     return <TouchableOpacity onPress={() => onSelect()}
         style={[Theme.styles.row_center, styles.container, style,]}>
         <View style={[Theme.styles.col_center, styles.imgView]}>
             <FastImage
-                source={{ uri: data.photo}}
+                source={{ uri: data.photo }}
                 style={styles.img}
                 resizeMode={FastImage.resizeMode.cover}
             />
         </View>
-        <View style={{ flex: 1, height: '100%', paddingVertical:4, paddingLeft: 12, flexDirection: 'column', justifyContent: 'space-between' }}>
+        <View style={{ flex: 1, height: '100%', paddingVertical: 4, paddingLeft: 12, flexDirection: 'column', justifyContent: 'space-between' }}>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <AppText style={[styles.title]}>{data.title}</AppText>
+                {
+                    can_delete == true &&
+                    <TouchableOpacity style={{ paddingHorizontal: 4 }} onPress={onDelete ? onDelete : ()=>{}}>
+                        <AppText style={styles.deleteBtnTxt}>刪除</AppText>
+                    </TouchableOpacity>
+                } 
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <AppText style={[styles.text]} numberOfLines={1}>{data.area} {data.street} {data.building} {data.floor}</AppText>
@@ -38,7 +44,7 @@ const VendorItem = (props) => {
                     data.isSell == true &&
                     <View style={styles.tag}>
                         <AppText style={[styles.tag_txt]}>售</AppText>
-                    </View> 
+                    </View>
                 }
                 {
                     data.isRent == true &&
@@ -46,7 +52,7 @@ const VendorItem = (props) => {
                         <AppText style={[styles.tag_txt]}>租</AppText>
                     </View>
                 }
-                <View style={{flex: 1}}/>
+                <View style={{ flex: 1 }} />
                 <AppText style={[styles.price]}>${data.price}</AppText>
             </View>
         </View>
@@ -60,11 +66,12 @@ const styles = StyleSheet.create({
     },
     imgView: { width: 150, height: 88, backgroundColor: '#F6F6F9' },
     img: { width: 150, height: 88, },
-    title: { fontSize: 14, color: Theme.colors.text, fontFamily: Theme.fonts.bold, marginRight: 6 },
+    title: { flex: 1, fontSize: 14, color: Theme.colors.text, fontFamily: Theme.fonts.bold, marginRight: 6 },
     text: { fontSize: 12, color: Theme.colors.gray3, fontFamily: Theme.fonts.semiBold, },
-    tag: { padding: 6, borderRadius: 6, backgroundColor: Theme.colors.yellow1 },
+    tag: { marginRight: 6, padding: 6, borderRadius: 6, backgroundColor: Theme.colors.yellow1 },
     tag_txt: { fontSize: 16, color: Theme.colors.text, fontFamily: Theme.fonts.semiBold },
     price: { fontSize: 16, color: Theme.colors.text, fontFamily: Theme.fonts.bold, },
+    deleteBtnTxt: { fontSize: 14, color: Theme.colors.red, fontFamily: Theme.fonts.semiBold, },
 })
 
 function arePropsEqual(prevProps, nextProps) {

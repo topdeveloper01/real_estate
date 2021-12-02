@@ -172,7 +172,7 @@ const AddListingScreen = (props) => {
 			alerts.error('', '填寫所有字段');
 			return false
 		}
-		if (state.isSell == false && state.isRent == false) {
+		if (state.isSell != true && state.isRent != true) {
 			alerts.error('', '填寫所有字段');
 			return false
 		}
@@ -466,17 +466,17 @@ const AddListingScreen = (props) => {
 							checked={state.isSell == true}
 							onPress={() => {
 								Keyboard.dismiss()
-								setState({ ...state, isSell: !state.isSell })
+								setState({ ...state, isSell: (state.isSell == true ? false : true) })
 							}}
 							text='售'
 							style={{ marginRight: '30%' }}
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
 						/>
 						<RadioBtn
-							checked={state.isRent == false}
+							checked={state.isRent == true}
 							onPress={() => {
 								Keyboard.dismiss()
-								setState({ ...state, isRent: !state.isRent })
+								setState({ ...state, isRent: (state.isRent == true ? false : true) })
 							}}
 							text='租'
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}

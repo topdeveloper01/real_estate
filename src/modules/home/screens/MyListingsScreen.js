@@ -1,31 +1,32 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { width, height } from 'react-native-dimension';
+import { width, height } from 'react-native-dimension'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { connect } from 'react-redux';
-import {
-	setHomeVendorFilter, setHomeVendorSort
-} from '../../../store/actions/app';
-import { getAllListings } from '../../../store/actions/listings';
-import { setVendorCart } from '../../../store/actions/shop';
+import { connect } from 'react-redux'; 
+import { getMyListings, deleteListing } from '../../../store/actions/listings'; 
 import Theme from '../../../theme';
-import RouteNames from '../../../routes/names';
-import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
+import { setVendorCart } from '../../../store/actions/shop';
+import RouteNames from '../../../routes/names'; 
+import { VendorItem } from '../../../common/components';
+import Header1 from '../../../common/components/Header1';
+import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
+ 
 
-const vertPerPage = 10;
-
-const SearchScreen = (props) => {
-
+const MyListingsScreen = (props) => {
+  
 	const [allvendors, setAllVendors] = useState([])
 
 	const [vertLoading, setVertLoading] = useState(null)
 	const [isRefreshing, setRefreshing] = useState(false)
+
+	const [deleteListingItem, setDeleteListingItem] = useState(null)
+	const [isDeleteConfirmModal, ShowDeleteModal] = useState(false)
+	const [deleteLoading, setDeleteLoading] = useState(false)
+	
 
 	const filterCategories = [
 		{
@@ -81,27 +82,18 @@ const SearchScreen = (props) => {
 	]
 
 	useEffect(() => {
-		loadVendors(true);
-	}, [])
-
-	const goRootStackScreen = (name, params) => {
-		if (params) {
-			props.rootStackNav.navigate(name, params)
-		}
-		else {
-			props.rootStackNav.navigate(name)
-		}
-	}
+		loadVendors(); 
+	}, []) 
 
 	const getFilers = () => {
 		return {}
 	}
 
-	const loadVendors = async (forceLoading) => {
+	const loadVendors = async () => {
 		try {
-			setVertLoading(forceLoading);
+			setVertLoading(true);
 			let filterKeys = getFilers();
-			let vendorsData = await getAllListings(filterKeys);
+			let vendorsData = await getMyListings(props.user.id);
 			setAllVendors(vendorsData)
 			setVertLoading(false);
 		}
@@ -111,13 +103,29 @@ const SearchScreen = (props) => {
 		}
 	}
  
-	const isEmptyData = () => {
+
+	const isEmptyData = () => { 
 		return allvendors.length == 0
 	}
 
 	const goVendorDetail = (vendor) => {
 		props.setVendorCart(vendor)
-		goRootStackScreen(RouteNames.VendorScreen)
+		props.navigation.navigate(RouteNames.VendorScreen)
+	}
+
+	const onDelete=()=>{
+		ShowDeleteModal(false)
+		if (deleteListingItem == null) {
+			return
+		}
+		setDeleteLoading(true);
+		deleteListing(deleteListingItem.id).then((res) => {
+			loadVendors()
+			setDeleteLoading(false);
+		})
+		.catch(error => {
+			setDeleteLoading(false);
+		})
 	}
 
 	const _renderCategories = () => {
@@ -155,8 +163,13 @@ const SearchScreen = (props) => {
 						<VendorItem
 							data={vendor}
 							vendor_id={vendor.id}
+							can_delete={true}
 							style={{ width: '100%', marginRight: 0, }}
 							onSelect={() => goVendorDetail(vendor)}
+							onDelete={()=> {
+								setDeleteListingItem(vendor);
+								ShowDeleteModal(true)
+							}}
 						/>
 					</View>
 				)
@@ -172,37 +185,17 @@ const SearchScreen = (props) => {
 		return contentOffset.y == 0;
 	}
 
+	console.log('vertLoading ', vertLoading)
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-			<Spinner visible={vertLoading}/>
-			<View style={[Theme.styles.row_center_start, styles.header]}>
-				<Text style={styles.headerTitle}>滙槿地產有限公司</Text>
-				<TouchableOpacity onPress={() => {
-					goRootStackScreen(RouteNames.NotificationsScreen)
-				}}>
-					<MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
-				</TouchableOpacity>
-			</View>
-			<View style={{ width: '100%', marginTop: 10, paddingHorizontal: 20, }}>
-				<AuthInput
-					placeholder={'關鍵字/地區/標籤'}
-					underlineColorAndroid={'transparent'}
-					autoCapitalize={'none'}
-					returnKeyType={'done'}
-					isSearch={true}
-					value={props.home_vendor_filter.searchTerm}
-					onChangeText={(searchTerm) => {
-					}}
-					backgroundColor={Theme.colors.gray4}
-					style={{ borderWidth: 0, backgroundColor: Theme.colors.gray4 }}
-					rightComp={props.home_vendor_filter.searchTerm !== '' ? (
-						<TouchableOpacity onPress={() => {
-						}}>
-							<Entypo name={'circle-with-cross'} color={'#878E97'} size={18} />
-						</TouchableOpacity>
-					) : null}
-				/>
-			</View>
+			<Spinner visible={deleteLoading || vertLoading}/>
+			 <Header1
+				onLeft={() => {
+					props.navigation.goBack();
+				}}
+				style={{ paddingHorizontal: 20, marginBottom: 0 }}
+				title={'已上傳單位記錄'}
+			/>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
 				{_renderCategories()}
 			</View>
@@ -217,17 +210,25 @@ const SearchScreen = (props) => {
 							<RefreshControl
 								refreshing={isRefreshing}
 								onRefresh={() => {
-									loadVendors();
+									loadVendors(); 
 								}}
 							/>
 						}
 						extraHeight={50}
-					>
+					> 
 						{
 							_renderVertVendors()
 						}
 					</KeyboardAwareScrollView>
 			}
+			<ConfirmModal
+				showModal={isDeleteConfirmModal}
+				title={'確認刪除？'}
+				yes={'刪除'}
+				no={'取消'}
+				onYes={onDelete}
+				onClose={() => ShowDeleteModal(false)}
+			/>
 		</View>
 	);
 }
@@ -254,15 +255,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app, shop }) => ({
 	user: app.user || {},
-	isLoggedIn: app.isLoggedIn,
-	coordinates: app.coordinates,
-	address: app.address || {},
-	language: app.language,
-	home_vendor_filter: app.home_vendor_filter,
-	home_vendor_sort: app.home_vendor_sort,
+	isLoggedIn: app.isLoggedIn, 
 	vendorData: shop.vendorData,
 });
 
-export default connect(mapStateToProps, {
-	setHomeVendorFilter, setHomeVendorSort, setVendorCart,
-})(SearchScreen);
+export default connect(mapStateToProps, { 
+	setVendorCart,
+})(MyListingsScreen);
