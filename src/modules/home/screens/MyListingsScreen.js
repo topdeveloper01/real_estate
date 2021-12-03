@@ -119,7 +119,7 @@ const MyListingsScreen = (props) => {
 				onLeft={() => {
 					props.navigation.goBack();
 				}}
-				style={{ paddingHorizontal: 20, marginBottom: 0 }}
+				style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
 				title={'已上傳單位記錄'}
 			/>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>

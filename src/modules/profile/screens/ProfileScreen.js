@@ -60,7 +60,7 @@ const ProfileScreen = (props) => {
 
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-			<Header1 title='帳戶設定' left={<View />} />
+			<Header1 title='帳戶設定' style={{height: 90, marginBottom: 0}} left={<View />} />
 			<ScrollView style={[Theme.styles.flex_1, styles.scrollview]}>
 				<View style={Theme.styles.flex_1}>
 					<ProfileAvatarView
@@ -170,7 +170,7 @@ const ProfileScreen = (props) => {
 }
 
 const styles = StyleSheet.create({
-	scrollview: { width: '100%', paddingHorizontal: 24, },
+	scrollview: { width: '100%', paddingHorizontal: 24, paddingTop: 20 },
 	subjectTitle: { marginTop: 32, marginBottom: 18, fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
 	name: { marginRight: 4, paddingBottom: 4, fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	listContainer: { flex: 1, width: '100%', marginTop: 48, paddingHorizontal: 20, backgroundColor: Theme.colors.white },

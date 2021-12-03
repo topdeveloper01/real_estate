@@ -276,7 +276,7 @@ class ChatScreen extends React.Component {
             <View style={styles.container}>
                 <Header1
                     left={<View />}
-                    style={{ paddingHorizontal: 20, marginBottom: 0 }}
+                    style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
                     title={'通訊'}
                 />
                 {

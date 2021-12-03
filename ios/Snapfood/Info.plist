@@ -76,6 +76,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow to access your camera to take photos so you can use those photos in the chat or profile section.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Share articles through WhatsApp</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -84,8 +86,6 @@
 	<string>Allow to get your location to display the restaurants near you.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow to get your location to display the restaurants near you.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Allow to access your camera to take photos so you can use those photos in the chat or profile section.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow to access your microphone so that you can record/hear voice messages for the chat.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

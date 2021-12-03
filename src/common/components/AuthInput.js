@@ -25,6 +25,7 @@ const AuthInput = (props) => {
                 fontFamily: props.fontFamily ? props.fontFamily : Theme.fonts.medium,
                 marginLeft: !!props.icon ? Theme.sizes.xTiny : 0,
                 flex: 1,
+                minHeight: 45,
                 color: Theme.colors.text,
                 backgroundColor : props.backgroundColor ? props.backgroundColor : Theme.colors.white
             }]} 

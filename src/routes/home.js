@@ -190,7 +190,7 @@ const HomeTabs=(props)=>{
 const styles = StyleSheet.create({
     labelStyle: { fontSize: 12, fontFamily: Theme.fonts.semiBold, textAlign: 'center', marginTop: 5, },
     barStyle: {
-        flexDirection: 'row', height: 60, paddingBottom: Config.isAndroid ? 13 : 21, paddingTop: 13,
+        flexDirection: 'row', height: 72, paddingBottom: Config.isAndroid ? 13 : 21, paddingTop: 13,
         backgroundColor: Theme.colors.gray1, borderTopWidth: 1, borderTopColor: Theme.colors.gray6,
     }
 });

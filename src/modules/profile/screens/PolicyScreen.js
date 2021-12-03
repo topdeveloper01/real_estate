@@ -16,7 +16,7 @@ const PolicyScreen = (props) => {
 				onLeft={() => {
 					props.navigation.goBack();
 				}}
-				style={{ paddingHorizontal: 20 }}
+				style={{ paddingHorizontal: 20, height: 90 }}
 				title={'私隱政策'}
 			/>
 			<View style={styles.formView}>

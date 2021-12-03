@@ -18,7 +18,7 @@ const NotificationsScreen = (props) => {
 				onLeft={() => {
 					props.navigation.goBack();
 				}}
-				style={{ paddingHorizontal: 20 }}
+				style={{ paddingHorizontal: 20, height :90 }}
 				title={'通知'}
 			/>
 			<View style={styles.formView}>

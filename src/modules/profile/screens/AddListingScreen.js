@@ -227,7 +227,7 @@ const AddListingScreen = (props) => {
 				onLeft={() => {
 					props.navigation.goBack();
 				}}
-				style={{ paddingHorizontal: 20, marginBottom: 0 }}
+				style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
 				title={'新增單位'}
 			/>
 			<View style={styles.formView}>
