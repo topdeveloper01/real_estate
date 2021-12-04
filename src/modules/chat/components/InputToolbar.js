@@ -71,7 +71,7 @@ export const renderActions = (props) => (
 const CustomComposer = ({ props, onPressEmoji, onPressLocation, onImageUpload, onCapture }) => {
     const [textInput, setTextInput] = useState(true)
 
-    return <View style={[Theme.styles.row_center, {flex: 1} ]}>
+    return <View style={[Theme.styles.row_center, {flex: 1, paddingVertical: 4, backgroundColor: '#F7F7F7'} ]}>
         <Composer
             {...props}
             placeholder={'發送消息'}

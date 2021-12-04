@@ -25,6 +25,7 @@ import { uploadPhoto } from '../../../common/services/fbstorage';
 // Svg
 import Svg_addphoto from '../../../common/assets/svgs/admin/add_a_photo.svg';
 
+
 const AddListingScreen = (props) => {
 	const [isLoading, ShowLoading] = useState(false);
 	const [showPickerModal, setShowPickerModal] = useState(false);
@@ -203,11 +204,11 @@ const AddListingScreen = (props) => {
 				let newListingData = {
 					...state,
 					photo: photoUrl,
-					is_featured : false,
-					owner_id : props.user.id
+					is_featured: false,
+					owner_id: props.user.id
 				}
 				await createListing(newListingData);
-				 
+
 				ShowLoading(false);
 				alerts.info('', '您已成功創建列表').then((res) => {
 					props.navigation.goBack();
@@ -246,7 +247,7 @@ const AddListingScreen = (props) => {
 								}
 								<TouchableOpacity
 									onPress={() => setShowPickerModal(true)}
-									style={[Theme.styles.col_center, {padding: 20}]}
+									style={[Theme.styles.col_center, { padding: 20 }]}
 								>
 									<Svg_addphoto />
 								</TouchableOpacity>
@@ -279,7 +280,7 @@ const AddListingScreen = (props) => {
 						style={{
 							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 100
 						}}
-						onPress={()=>{
+						onPress={() => {
 							Keyboard.dismiss()
 						}}
 					/>
@@ -343,101 +344,116 @@ const AddListingScreen = (props) => {
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
-					<DropDownPicker
-						open={open2}
-						setOpen={setOpen2}
-						onOpen={onOpen2}
-						value={value2}
-						setValue={setValue2}
-						placeholder={'多少廳'}
-						items={living_rooms}
-						setItems={setLivingRooms}
-						onChangeValue={(living_rooms) => {
-							setState({ ...state, living_rooms })
-						}}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 99
-						}}
-						onPress={()=>{
-							Keyboard.dismiss()
-						}}
-					/>
-					<DropDownPicker
-						open={open3}
-						setOpen={setOpen3}
-						onOpen={onOpen3}
-						value={value3}
-						setValue={setValue3}
-						placeholder={'多少房'}
-						items={rooms}
-						setItems={setRooms}
-						onChangeValue={(rooms) => {
-							setState({ ...state, rooms })
-						}}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 98
-						}}
-						onPress={()=>{
-							Keyboard.dismiss()
-						}}
-					/>
-					<DropDownPicker
-						open={open4}
-						setOpen={setOpen4}
-						onOpen={onOpen4}
-						value={value4}
-						setValue={setValue4}
-						placeholder={'多少廁'}
-						items={toilets}
-						setItems={setToilets}
-						onChangeValue={(toilets) => {
-							setState({ ...state, toilets })
-						}}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 97
-						}}
-						onPress={()=>{
-							Keyboard.dismiss()
-						}}
-					/>
-					<DropDownPicker
-						open={open5}
-						setOpen={setOpen5}
-						onOpen={onOpen5}
-						value={value5}
-						setValue={setValue5}
-						placeholder={'多少套廁'}
-						items={room_toilets}
-						setItems={setRoomToilets}
-						onChangeValue={(room_toilets) => {
-							setState({ ...state, room_toilets })
-						}}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 96
-						}}
-						onPress={()=>{
-							Keyboard.dismiss()
-						}}
-					/>
-					<DropDownPicker
-						open={open6}
-						setOpen={setOpen6}
-						onOpen={onOpen6}
-						value={value6}
-						setValue={setValue6}
-						placeholder={'多少工人房'}
-						items={helper_rooms}
-						setItems={setHelperRooms}
-						onChangeValue={(helper_rooms) => {
-							setState({ ...state, helper_rooms })
-						}}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 95
-						}}
-						onPress={()=>{
-							Keyboard.dismiss()
-						}}
-					/>
+					<View style={{ zIndex: 99 }}>
+						<DropDownPicker
+							open={open2}
+							setOpen={setOpen2}
+							onOpen={onOpen2}
+							value={value2}
+							setValue={setValue2}
+							placeholder={'多少廳'}
+							items={living_rooms}
+							setItems={setLivingRooms}
+							onChangeValue={(living_rooms) => {
+								setState({ ...state, living_rooms })
+							}}
+							style={{
+								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 99
+							}}
+							onPress={() => {
+								Keyboard.dismiss()
+							}}
+							dropDownDirection="BOTTOM"
+						/>
+					</View>
+					<View style={{ zIndex: 98 }}>
+						<DropDownPicker
+							open={open3}
+							setOpen={setOpen3}
+							onOpen={onOpen3}
+							value={value3}
+							setValue={setValue3}
+							placeholder={'多少房'}
+							items={rooms}
+							setItems={setRooms}
+							onChangeValue={(rooms) => {
+								setState({ ...state, rooms })
+							}}
+							style={{
+								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 98
+							}}
+							onPress={() => {
+								Keyboard.dismiss()
+							}}
+							dropDownDirection="BOTTOM"
+						/>
+					</View>
+					<View style={{ zIndex: 97 }}>
+						<DropDownPicker
+							open={open4}
+							setOpen={setOpen4}
+							onOpen={onOpen4}
+							value={value4}
+							setValue={setValue4}
+							placeholder={'多少廁'}
+							items={toilets}
+							setItems={setToilets}
+							onChangeValue={(toilets) => {
+								setState({ ...state, toilets })
+							}}
+							style={{
+								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 97
+							}}
+							onPress={() => {
+								Keyboard.dismiss()
+							}}
+							dropDownDirection="BOTTOM"
+						/>
+					</View>
+					<View style={{ zIndex: 96 }}>
+						<DropDownPicker
+							open={open5}
+							setOpen={setOpen5}
+							onOpen={onOpen5}
+							value={value5}
+							setValue={setValue5}
+							placeholder={'多少套廁'}
+							items={room_toilets}
+							setItems={setRoomToilets}
+							onChangeValue={(room_toilets) => {
+								setState({ ...state, room_toilets })
+							}}
+							style={{
+								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 96
+							}}
+							onPress={() => {
+								Keyboard.dismiss()
+							}}
+							dropDownDirection="BOTTOM"
+						/>
+					</View>
+					<View style={{ zIndex: 95 }}>
+						<DropDownPicker
+							open={open6}
+							setOpen={setOpen6}
+							onOpen={onOpen6}
+							value={value6}
+							setValue={setValue6}
+							placeholder={'多少工人房'}
+							items={helper_rooms}
+							setItems={setHelperRooms}
+							onChangeValue={(helper_rooms) => {
+								setState({ ...state, helper_rooms })
+							}}
+							style={{
+								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 95
+							}}
+							onPress={() => {
+								Keyboard.dismiss()
+							}}
+							dropDownDirection="BOTTOM"
+						/>
+					</View>
 					<AuthInput
 						placeholder={'售價錢'}
 						underlineColorAndroid={'transparent'}
@@ -496,7 +512,7 @@ const AddListingScreen = (props) => {
 						textAlignVertical={'top'}
 						numberOfLines={4}
 						multiline={true}
-						style={{ marginBottom: 12 }}
+						style={{ marginBottom: 12 , minHeight: 70}}
 					/>
 					<View style={{ height: 20 }}></View>
 				</KeyboardAwareScrollView>
@@ -504,7 +520,7 @@ const AddListingScreen = (props) => {
 					<MainBtn
 						disabled={isLoading}
 						loading={isLoading}
-						style={{ borderRadius: 0 }}
+						style={{ borderRadius: 0, height: 70 }}
 						title={'確認新增'}
 						onPress={onSave}
 					/>

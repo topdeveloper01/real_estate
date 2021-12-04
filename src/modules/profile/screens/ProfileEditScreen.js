@@ -88,7 +88,7 @@ const ProfileEditScreen = (props) => {
 				onLeft={() => {
 					props.navigation.goBack();
 				}}  
-				style={{paddingHorizontal: 20}}
+				style={{paddingHorizontal: 20, height: 90}}
 				title={'更改帳戶資料'}
 			/>
 			<View style={styles.formView}>
