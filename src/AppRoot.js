@@ -101,50 +101,7 @@ class AppRoot extends React.Component {
 
 		console.log('onNotificationOpened', notification);
 		if (notification && notification.data) {
-			switch (notification.data.type) {
-				case 'order_status_change': {
-					await vm.props.goActiveScreenFromPush({
-						isOrderSummVisible: true,
-						order: {
-							id: notification.data['order_id'],
-							status: notification.data['status']
-						},
-					});
-					break;
-				}
-				case 'user_category_change': {
-					try {
-						await vm.props.goActiveScreenFromPush({
-							isWalletVisible: true,
-						});
-					} catch (error) {
-						console.log('user_category_change', error);
-					}
-					break;
-				}
-				case 'friend_request_notification': {
-					try {
-						console.log('isInvitationVisible');
-						await vm.props.goActiveScreenFromPush({
-							isInvitationVisible: true,
-						});
-					} catch (error) {
-						console.log('friend_request_notification', error);
-					}
-					break;
-				}
-				case 'group_chat_invite_notification': {
-					try {
-						await vm.props.goActiveScreenFromPush({
-							isChatVisible: true,
-							pushConversationId: notification.data.conversation_id,
-							pushChatMsgTime: new Date().getTime(),
-						});
-					} catch (error) {
-						console.log('friend_request_notification', error);
-					}
-					break;
-				}
+			switch (notification.data.type) { 
 				case 'chat_notification': {
 					try {
 						await vm.props.goActiveScreenFromPush({
@@ -156,28 +113,7 @@ class AppRoot extends React.Component {
 						console.log('friend_request_notification', error);
 					}
 					break;
-				}
-				case 'vendor_notification': {
-					setTimeout(() => {
-						try {
-							EventRegister.emit(PUSH_NOTIFICATION_NEW_VENDOR, notification.data);
-						} catch (e) {
-							console.log(e);
-						}
-					}, 100);
-					break;
-				}
-				case 'blog_notification': {
-					try {
-						await vm.props.goActiveScreenFromPush({
-							isBlogVisible: true,
-							pushBlogId: notification.data.blog_id,
-						});
-					} catch (error) {
-						console.log('blog_notification', error);
-					}
-					break;
-				}
+				} 
 				default: {
 					//GOT NOTHING TO DO xD
 				}

@@ -124,4 +124,8 @@ export const APP = {
     SET_LANG : 'SET_LANG',
     SET_PROFILE_BLOG_FILTER : 'SET_PROFILE_BLOG_FILTER',
     SET_BLOG_CATEGORIES : 'SET_BLOG_CATEGORIES',
+
+    SET_CITY_1_List : 'SET_CITY_1_List',
+    SET_CITY_2_List : 'SET_CITY_2_List',
+    SET_CITY_3_List : 'SET_CITY_3_List',
 };

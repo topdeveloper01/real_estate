@@ -26,6 +26,11 @@ const MyListingsScreen = (props) => {
 	const [isDeleteConfirmModal, ShowDeleteModal] = useState(false)
 	const [deleteLoading, setDeleteLoading] = useState(false)
 
+	
+	const [filter_city_1, setFilterCity1] = useState(null)
+    const [filter_city_2, setFilterCity2] = useState(null)
+    const [filter_city_3, setFilterCity3] = useState(null)
+ 
 	const [filter_type, setFilterType] = useState(-1)
 	const [filter_price, setFilterPrice] = useState(-1)
 	const [filter_size, setFilterSize] = useState(-1)
@@ -34,11 +39,11 @@ const MyListingsScreen = (props) => {
 	useEffect(() => {
 		loadVendors();
 	}, [
-		filter_type, filter_price, filter_size, filter_rooms
+		filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3
 	])
 
 	const getFilers = () => {
-		return { searchTerm: '', filter_type, filter_price, filter_size, filter_rooms }
+		return { searchTerm: '', filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 }
 	}
 
 	const loadVendors = async () => {
@@ -123,7 +128,11 @@ const MyListingsScreen = (props) => {
 			/>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
 				<FilterBar
-					onChangeArea={(value) => { }}
+					onChangeArea={(value) => {  
+                        setFilterCity1(value.city1)
+                        setFilterCity2(value.city2)
+                        setFilterCity3(value.city3)
+                    }}
 					onChangeType={(value) => { setFilterType(value) }}
 					onChangePrice={(value) => { setFilterPrice(value) }}
 					onChangeSize={(value) => { setFilterSize(value) }}

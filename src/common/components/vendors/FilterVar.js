@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, ScrollView, View, Text, StyleSheet, Image } from 'react-native'; 
-import AppText from '../AppText'; 
-import Theme from '../../../theme'; 
+import { TouchableOpacity, ScrollView, View, Text, StyleSheet, Image } from 'react-native';
+import AppText from '../AppText';
+import Theme from '../../../theme';
 import FilterModal from '../modals/FilterModal';
 import Svg_divider from '../../assets/svgs/cat-divider.svg';
+import AreaFilterModal from '../modals/AreaFilterModal';
 
 const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, onChangeRooms }) => {
+
+    const [isAreaFilterModal, setAreaFilterModal] = useState(false)
+    const [filter_area, setFilterArea] = useState({
+        city1 : null,
+        city2 : null,
+        city3 : null
+    })
 
     const [isTypeFilterModal, setTypeFilterModal] = useState(false)
     const [filter_type, setFilterType] = useState(0)
@@ -47,22 +55,38 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
         { label: '5房以上', value: 5 }
     ]
 
+    const filterAreaDesc=()=>{
+        if(filter_area.city1 == null && filter_area.city2 == null && filter_area.city3 == null) {
+            return '任何';
+        }
+        let desc = filter_area.city1;
+        if (filter_area.city2 != null ) {
+            desc = desc + ', ' + filter_area.city2;
+        }
+        if (filter_area.city3 != null ) {
+            desc = desc + ', ' + filter_area.city3;
+        }
+        return desc;
+    }
+
     return <View style={[Theme.styles.col_center, styles.filterview]}>
         <ScrollView
             horizontal={true}
             style={{ width: '100%', paddingBottom: 12 }}
         >
             <View style={[Theme.styles.row_center]}>
-                <TouchableOpacity style={[Theme.styles.col_center]} onPress={()=>{ }}>
+                <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setAreaFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>地區</AppText>
-                    <AppText style={styles.filterValue}>任何</AppText>
+                    <AppText style={styles.filterValue}>
+                        {filterAreaDesc()}
+                    </AppText>
                 </TouchableOpacity>
                 <View style={{ paddingHorizontal: 24 }}>
                     <Svg_divider />
                 </View>
             </View>
             <View style={[Theme.styles.row_center]}>
-                <TouchableOpacity style={[Theme.styles.col_center]} onPress={()=>{setTypeFilterModal(true)}}>
+                <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setTypeFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>形式</AppText>
                     <AppText style={styles.filterValue}>{filterTypes[filter_type].label}</AppText>
                 </TouchableOpacity>
@@ -71,7 +95,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 </View>
             </View>
             <View style={[Theme.styles.row_center]}>
-                <TouchableOpacity style={[Theme.styles.col_center]} onPress={()=>{setPriceFilterModal(true)}}>
+                <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setPriceFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>價格</AppText>
                     <AppText style={styles.filterValue}>{filterPrices[filter_price].label}</AppText>
                 </TouchableOpacity>
@@ -80,7 +104,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 </View>
             </View>
             <View style={[Theme.styles.row_center]}>
-                <TouchableOpacity style={[Theme.styles.col_center]} onPress={()=>{setSizeFilterModal(true)}}>
+                <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setSizeFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>實用面積</AppText>
                     <AppText style={styles.filterValue}>{filterSizes[filter_size].label}</AppText>
                 </TouchableOpacity>
@@ -89,13 +113,28 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 </View>
             </View>
             <View style={[Theme.styles.row_center]}>
-                <TouchableOpacity style={[Theme.styles.col_center]} onPress={()=>{setRoomsFilterModal(true)}}>
+                <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setRoomsFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>房數</AppText>
                     <AppText style={styles.filterValue}>{filterRooms[filter_rooms].label}</AppText>
-                </TouchableOpacity> 
+                </TouchableOpacity>
             </View>
         </ScrollView>
         <View style={styles.scrollviewHider} />
+        <AreaFilterModal
+            showModal={isAreaFilterModal}
+            title='地區'
+            _city1={filter_area.city1}
+            _city2={filter_area.city2}
+            _city3={filter_area.city3}
+            onSave={(value) => {
+                setAreaFilterModal(false);
+                setFilterArea(value);
+                onChangeArea(value);
+            }}
+            onClose={() => {
+                setAreaFilterModal(false)
+            }}
+        />
         <FilterModal
             showModal={isTypeFilterModal}
             title='形式'
@@ -106,7 +145,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 setFilterType(value + 1);
                 onChangeType(value);
             }}
-            onClose={()=>{
+            onClose={() => {
                 setTypeFilterModal(false)
             }}
         />
@@ -120,7 +159,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 setFilterPrice(value + 1);
                 onChangePrice(value);
             }}
-            onClose={()=>{
+            onClose={() => {
                 setPriceFilterModal(false)
             }}
         />
@@ -134,7 +173,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 setFilterSize(value + 1);
                 onChangeSize(value);
             }}
-            onClose={()=>{
+            onClose={() => {
                 setSizeFilterModal(false)
             }}
         />
@@ -148,7 +187,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 setFilterRooms(value + 1);
                 onChangeRooms(value);
             }}
-            onClose={()=>{
+            onClose={() => {
                 setRoomsFilterModal(false)
             }}
         />
@@ -161,5 +200,6 @@ const styles = StyleSheet.create({
     filterValue: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: '#344655', marginTop: 4 },
     scrollviewHider: { width: '100%', marginTop: -12, height: 15, backgroundColor: Theme.colors.white },
 })
+
 
 export default FilterBar;

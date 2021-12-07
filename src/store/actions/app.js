@@ -41,6 +41,18 @@ export const setAllChannels=(payload)=>{
     return {type : APP.SET_CHANNELS, payload : payload}
 }
  
+export const setAllCity_1=(payload)=>{
+    return {type : APP.SET_CITY_1_List, payload : payload}
+}
+
+export const setAllCity_2=(payload)=>{
+    return {type : APP.SET_CITY_2_List, payload : payload}
+}
+
+export const setAllCity_3=(payload)=>{
+    return {type : APP.SET_CITY_3_List, payload : payload}
+}
+
 
 export const sendPushNotification = (notice) => {
     return new Promise((resolve, reject) => {

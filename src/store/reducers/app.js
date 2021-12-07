@@ -13,6 +13,9 @@ const INITIAL_STATE = {
     vendorData: {},  
     chat_channels : [],
     language: getLanguage() || 'sq', 
+    city1_list : [],
+    city2_list : [],
+    city3_list : [],
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -47,7 +50,26 @@ export default (state = INITIAL_STATE, action) => {
         case APP.SET_CHANNELS : {
             return {
                 ...state,
-                chat_channels : action.payload
+                chat_channels : action.payload || []
+            };
+        }
+
+        case APP.SET_CITY_1_List : {
+            return {
+                ...state,
+                city1_list : action.payload || []
+            };
+        }
+        case APP.SET_CITY_2_List : {
+            return {
+                ...state,
+                city2_list : action.payload || []
+            };
+        }
+        case APP.SET_CITY_3_List : {
+            return {
+                ...state,
+                city3_list : action.payload || []
             };
         }
 

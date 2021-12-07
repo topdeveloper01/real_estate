@@ -38,6 +38,11 @@ const AddListingScreen = (props) => {
 	const [value5, setValue5] = useState(null);
 	const [value6, setValue6] = useState(null);
 
+	const [value_city1, setValue_city1] = useState(null);
+	const [value_city2, setValue_city2] = useState(null);
+	const [value_city3, setValue_city3] = useState(null);
+
+
 	const [open1, setOpen1] = useState(false);
 	const [open2, setOpen2] = useState(false);
 	const [open3, setOpen3] = useState(false);
@@ -45,12 +50,20 @@ const AddListingScreen = (props) => {
 	const [open5, setOpen5] = useState(false);
 	const [open6, setOpen6] = useState(false);
 
+	const [open_city1, setOpen_city1] = useState(false);
+	const [open_city2, setOpen_city2] = useState(false);
+	const [open_city3, setOpen_city3] = useState(false);
+
 	const onOpen1 = useCallback(() => {
 		setOpen2(false);
 		setOpen3(false);
 		setOpen4(false);
 		setOpen5(false);
 		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
 	}, []);
 	const onOpen2 = useCallback(() => {
 		setOpen1(false);
@@ -58,6 +71,10 @@ const AddListingScreen = (props) => {
 		setOpen4(false);
 		setOpen5(false);
 		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
 	}, []);
 	const onOpen3 = useCallback(() => {
 		setOpen1(false);
@@ -65,6 +82,10 @@ const AddListingScreen = (props) => {
 		setOpen4(false);
 		setOpen5(false);
 		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
 	}, []);
 	const onOpen4 = useCallback(() => {
 		setOpen1(false);
@@ -72,6 +93,10 @@ const AddListingScreen = (props) => {
 		setOpen3(false);
 		setOpen5(false);
 		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
 	}, []);
 	const onOpen5 = useCallback(() => {
 		setOpen1(false);
@@ -79,6 +104,10 @@ const AddListingScreen = (props) => {
 		setOpen3(false);
 		setOpen4(false);
 		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
 	}, []);
 	const onOpen6 = useCallback(() => {
 		setOpen1(false);
@@ -86,6 +115,45 @@ const AddListingScreen = (props) => {
 		setOpen3(false);
 		setOpen4(false);
 		setOpen5(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
+		setOpen_city3(false);
+	}, []);
+
+
+	const onOpen_city1 = useCallback(() => {
+		setOpen1(false);
+		setOpen2(false);
+		setOpen3(false);
+		setOpen4(false);
+		setOpen5(false);
+		setOpen6(false);
+
+		setOpen_city2(false);
+		setOpen_city3(false);
+	}, []);
+	const onOpen_city2 = useCallback(() => {
+		setOpen1(false);
+		setOpen2(false);
+		setOpen3(false);
+		setOpen4(false);
+		setOpen5(false);
+		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city3(false);
+	}, []);
+	const onOpen_city3 = useCallback(() => {
+		setOpen1(false);
+		setOpen2(false);
+		setOpen3(false);
+		setOpen4(false);
+		setOpen5(false);
+		setOpen6(false);
+
+		setOpen_city1(false);
+		setOpen_city2(false);
 	}, []);
 
 
@@ -131,10 +199,65 @@ const AddListingScreen = (props) => {
 		{ label: '3工人房以上', value: 3 }
 	]);
 
+	const [cities1, setCities1] = useState([]);
+	const [cities2, setCities2] = useState([]);
+	const [cities3, setCities3] = useState([]);
 
 	const [state, setState] = useState({})
 
-	useEffect(() => { }, []);
+	useEffect(() => {
+		let tmp = [];
+		props.city1_list.map(item => {
+			tmp.push({ label: item.name, value: item.name })
+		})
+		setCities1(tmp);
+	}, [props.city1_list, props.city2_list, props.city3_list])
+
+	useEffect(() => {
+		onChangeCity1(value_city1)
+	}, [value_city1])
+
+	useEffect(() => {
+		onChangeCity2(value_city2)
+	}, [value_city2])
+
+
+	const onChangeCity1 = (_city_1) => {
+		let index = props.city1_list.findIndex(item => item.name == _city_1)
+		if (index != -1) {
+			let tmp = [];
+			props.city2_list.filter(item => item.city_1 == props.city1_list[index].id).map(item => {
+				tmp.push({ label: item.name, value: item.name })
+			})
+			setCities2(tmp) 
+			setValue_city2(null)
+
+			setCities3([])
+			setValue_city3(null)
+		}
+		else {
+			setCities2([])
+			setValue_city2(null)
+			setCities3([])
+			setValue_city3(null)
+		}
+	}
+
+	const onChangeCity2 = (_city_2) => {
+		let index = props.city2_list.findIndex(item => item.name == _city_2)
+		if (index != -1) {
+			let tmp = [];
+			props.city3_list.filter(item => item.city_2 == props.city2_list[index].id).map(item => {
+				tmp.push({ label: item.name, value: item.name })
+			})
+			setCities3(tmp)
+			setValue_city3(null)
+		}
+		else {
+			setCities3([])
+			setValue_city3(null)
+		}
+	}
 
 	const onImageUpload = () => {
 		ImagePicker.openPicker({
@@ -161,8 +284,8 @@ const AddListingScreen = (props) => {
 			alerts.error('', '選擇一張照片');
 			return false;
 		}
-		if (isEmpty(state.title) || isEmpty(state.type_use) || isEmpty(state.area) ||
-			isEmpty(state.street) || isEmpty(state.building) || isEmpty(state.floor) ||
+		if (isEmpty(state.title) || isEmpty(state.type_use) || isEmpty(value_city1) ||
+			isEmpty(value_city2) || isEmpty(value_city3) || isEmpty(state.floor) ||
 			isEmpty(state.size) || isEmpty(state.living_rooms) || isEmpty(state.rooms) ||
 			isEmpty(state.toilets) || isEmpty(state.room_toilets) || isEmpty(state.helper_rooms)) {
 			alerts.error('', '填寫所有字段');
@@ -202,10 +325,14 @@ const AddListingScreen = (props) => {
 				}
 				let newListingData = {
 					...state,
+					area: value_city1,
+					street : value_city2,
+					building : value_city3,
 					photo: photoUrl,
 					is_featured: false,
 					owner_id: props.user.id
 				}
+				
 				await createListing(newListingData);
 
 				ShowLoading(false);
@@ -219,7 +346,7 @@ const AddListingScreen = (props) => {
 			}
 		}
 	};
-
+	console.log('newListingData ', value_city1, value_city2, value_city3 )
 
 	return (
 		<View style={styles.container}>
@@ -266,59 +393,175 @@ const AddListingScreen = (props) => {
 						secure={false}
 						style={{ marginTop: 25, marginBottom: 12 }}
 					/>
-					<DropDownPicker
-						open={open1}
-						setOpen={setOpen1}
-						onOpen={onOpen1}
-						value={value1}
-						setValue={setValue1}
-						placeholder={'物業類型 '}
-						items={type_use_items}
-						setItems={setTypeUseItems}
-						onChangeValue={(type_use) => setState({ ...state, type_use })}
-						style={{
-							borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 100
-						}}
-						onPress={() => {
-							Keyboard.dismiss()
-						}}
-					/>
-					<AuthInput
-						placeholder={'地區 '}
-						underlineColorAndroid={'transparent'}
-						keyboardType={'default'}
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(area) => setState({ ...state, area })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.area}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
-					<AuthInput
-						placeholder={'街道 '}
-						underlineColorAndroid={'transparent'}
-						keyboardType={'default'}
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(street) => setState({ ...state, street })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.street}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
-					<AuthInput
-						placeholder={'大廈 / 屋苑 '}
-						underlineColorAndroid={'transparent'}
-						keyboardType={'default'}
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(building) => setState({ ...state, building })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.building}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
+
+					{
+						Platform.OS == 'android' ?
+							<React.Fragment>
+								<DropDownPicker
+									open={open1}
+									setOpen={setOpen1}
+									onOpen={onOpen1}
+									value={value1}
+									setValue={setValue1}
+									placeholder={'物業類型 '}
+									items={type_use_items}
+									setItems={setTypeUseItems}
+									onChangeValue={(type_use) => setState({ ...state, type_use })}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 103
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+								/>
+								<DropDownPicker
+									open={open_city1}
+									setOpen={setOpen_city1}
+									onOpen={onOpen_city1}
+									value={value_city1}
+									setValue={setValue_city1}
+									placeholder={'地區'}
+									items={cities1}
+									setItems={setCities1} 
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 102
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+									ListEmptyComponent={() => <View />}
+								/>
+								<DropDownPicker
+									open={open_city2}
+									setOpen={setOpen_city2}
+									onOpen={onOpen_city2}
+									value={value_city2}
+									setValue={setValue_city2}
+									placeholder={'街道'}
+									items={cities2}
+									setItems={setCities2} 
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 101
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+									ListEmptyComponent={() => <View />}
+								/>
+								<DropDownPicker
+									open={open_city3}
+									setOpen={setOpen_city3}
+									onOpen={onOpen_city3}
+									value={value_city3}
+									setValue={setValue_city3}
+									placeholder={'大廈 / 屋苑'}
+									items={cities3}
+									setItems={setCities3} 
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 100
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+									ListEmptyComponent={() => <View />}
+								/>
+							</React.Fragment>
+							:
+							<React.Fragment>
+								<View style={{ zIndex: 103 }}>
+									<DropDownPicker
+										open={open1}
+										setOpen={setOpen1}
+										onOpen={onOpen1}
+										value={value1}
+										setValue={setValue1}
+										placeholder={'物業類型 '}
+										items={type_use_items}
+										setItems={setTypeUseItems}
+										onChangeValue={(type_use) => setState({ ...state, type_use })}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 103
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+									/>
+								</View>
+								<View style={{ zIndex: 102 }}>
+									<DropDownPicker
+										open={open_city1}
+										setOpen={setOpen_city1}
+										onOpen={onOpen_city1}
+										value={value_city1}
+										setValue={setValue_city1}
+										placeholder={'地區'}
+										items={cities1}
+										setItems={setCities1}
+										onChangeValue={(area) => {
+											setState({ ...state, area })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 102
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+										ListEmptyComponent={() => <View />}
+									/>
+								</View>
+								<View style={{ zIndex: 101 }}>
+									<DropDownPicker
+										open={open_city2}
+										setOpen={setOpen_city2}
+										onOpen={onOpen_city2}
+										value={value_city2}
+										setValue={setValue_city2}
+										placeholder={'街道'}
+										items={cities2}
+										setItems={setCities2}
+										onChangeValue={(street) => {
+											setState({ ...state, street })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 101
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+										ListEmptyComponent={() => <View />}
+									/>
+								</View>
+								<View style={{ zIndex: 100 }}>
+									<DropDownPicker
+										open={open_city3}
+										setOpen={setOpen_city3}
+										onOpen={onOpen_city3}
+										value={value_city3}
+										setValue={setValue_city3}
+										placeholder={'大廈 / 屋苑'}
+										items={cities3}
+										setItems={setCities3}
+										onChangeValue={(building) => {
+											setState({ ...state, building })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 100
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+										ListEmptyComponent={() => <View />}
+									/>
+								</View>
+							</React.Fragment>
+					}
+
 					<AuthInput
 						placeholder={'樓層 / 房號 '}
 						underlineColorAndroid={'transparent'}
@@ -725,7 +968,9 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app }) => ({
 	user: app.user,
-	home_orders_filter: app.home_orders_filter,
+	city1_list: app.city1_list,
+	city2_list: app.city2_list,
+	city3_list: app.city3_list,
 });
 
 export default connect(mapStateToProps, {

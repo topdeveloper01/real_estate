@@ -8,7 +8,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from 'react-redux'; 
 import { updateProfileDetails } from '../../../store/actions/auth';
 import { getAllListings } from '../../../store/actions/listings';
-import { setVendorCart } from '../../../store/actions/app';
+import { setVendorCart, getAllCities, setAllCity_1, setAllCity_2, setAllCity_3 } from '../../../store/actions/app';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import { AuthInput, VendorItem, } from '../../../common/components';
@@ -27,7 +27,15 @@ const HomePage = (props) => {
     const [vertLoading, setVertLoading] = useState(null)
     const [isRefreshing, setRefreshing] = useState(false)
 
+    
+    const [cityLoading, setCityLoading] = useState(false)
+
     const [searchTerm, setSearchTerm] = useState('')
+ 
+
+    const [filter_city_1, setFilterCity1] = useState(null)
+    const [filter_city_2, setFilterCity2] = useState(null)
+    const [filter_city_3, setFilterCity3] = useState(null)
 
     const [filter_type, setFilterType] = useState(-1)
     const [filter_price, setFilterPrice] = useState(-1)
@@ -36,13 +44,14 @@ const HomePage = (props) => {
 
     useEffect(()=>{
         updateUserToken()
+        loadCitiesData()
     }, [])
 
     useEffect(() => {
         loadVendors();
         loadFeaturedBlocks();
     }, [
-        searchTerm, filter_type, filter_price, filter_size, filter_rooms
+        searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3
     ])
 
     const goRootStackScreen = (name, params) => {
@@ -74,9 +83,27 @@ const HomePage = (props) => {
 		}
 	}
 
+    const loadCitiesData = async () => {
+		try { 
+            setCityLoading(true);
+			let city1_items = await getAllCities(1);
+            let city2_items = await getAllCities(2);
+            let city3_items = await getAllCities(3);
+
+            props.setAllCity_1(city1_items);
+            props.setAllCity_2(city2_items);
+            props.setAllCity_3(city3_items);  
+            setCityLoading(false);
+		}
+		catch (error) { 
+            setCityLoading(false);
+			console.log('loadCitiesData ', error);
+		}
+	}
+
 
     const getFilers = () => {
-        return { searchTerm, filter_type, filter_price, filter_size, filter_rooms }
+        return { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 }
     }
 
     const loadVendors = async () => {
@@ -133,7 +160,7 @@ const HomePage = (props) => {
 
     return (
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-            {/* <Spinner visible={vertLoading} /> */}
+            <Spinner visible={cityLoading} />
             <View style={[Theme.styles.row_center_start, styles.header]}>
                 <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
                 <TouchableOpacity onPress={() => {
@@ -166,7 +193,11 @@ const HomePage = (props) => {
             </View>
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
                 <FilterBar
-                    onChangeArea={(value) => { }}
+                    onChangeArea={(value) => {  
+                        setFilterCity1(value.city1)
+                        setFilterCity2(value.city2)
+                        setFilterCity3(value.city3)
+                    }}
                     onChangeType={(value) => { setFilterType(value) }}
                     onChangePrice={(value) => { setFilterPrice(value) }}
                     onChangeSize={(value) => { setFilterSize(value) }}
@@ -238,5 +269,5 @@ const mapStateToProps = ({ app  }) => ({
 });
 
 export default connect(mapStateToProps, {
-     setVendorCart, updateProfileDetails
+     setVendorCart, updateProfileDetails, setAllCity_1, setAllCity_2, setAllCity_3
 })(HomePage);

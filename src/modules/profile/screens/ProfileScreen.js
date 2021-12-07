@@ -144,7 +144,7 @@ const ProfileScreen = (props) => {
 								delayPressIn={100}
 								style={[Theme.styles.row_center, styles.itemView]}
 								onPress={() => {
-									props.rootStackNav.navigate(RouteNames.MyListingsScreen);
+									props.rootStackNav.navigate(RouteNames.City1Screen);
 								}}
 							>
 								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>地區</Text>

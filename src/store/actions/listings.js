@@ -19,12 +19,23 @@ export const getListingData = (id) => {
 export const getMyListings = (user_id, filterKeys) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms } = filterKeys;
+            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 } = filterKeys;
             console.log('filterKeys ', filterKeys)
             let coll_ref = listingCollection.where('owner_id', '==', user_id);
             if (filterKeys.is_featured == true) {
                 coll_ref = coll_ref.where('is_featured', '==', true);
             }
+            
+            if (!isEmpty(filter_city_1)) {
+                coll_ref = coll_ref.where('area', '==', filter_city_1);
+            }
+            if (!isEmpty(filter_city_2)) {
+                coll_ref = coll_ref.where('street', '==', filter_city_2);
+            }
+            if (!isEmpty(filter_city_3)) {
+                coll_ref = coll_ref.where('building', '==', filter_city_3);
+            }
+            
             if (!isEmpty(searchTerm)) {
                 coll_ref = coll_ref.where('title', '>=', searchTerm).where('title', '<=', searchTerm + '~');
             }
@@ -89,11 +100,20 @@ export const getMyListings = (user_id, filterKeys) => {
 export const getAllListings = (filterKeys) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms } = filterKeys;
+            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3  } = filterKeys;
             console.log('filterKeys ', filterKeys)
             let coll_ref = listingCollection;
             if (filterKeys.is_featured == true) {
                 coll_ref = coll_ref.where('is_featured', '==', true);
+            }
+            if (!isEmpty(filter_city_1)) {
+                coll_ref = coll_ref.where('area', '==', filter_city_1);
+            }
+            if (!isEmpty(filter_city_2)) {
+                coll_ref = coll_ref.where('street', '==', filter_city_2);
+            }
+            if (!isEmpty(filter_city_3)) {
+                coll_ref = coll_ref.where('building', '==', filter_city_3);
             }
             if (!isEmpty(searchTerm)) {
                 coll_ref = coll_ref.where('title', '>=', searchTerm).where('title', '<=', searchTerm + '~');

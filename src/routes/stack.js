@@ -18,6 +18,9 @@ import PolicyScreen from '../modules/profile/screens/PolicyScreen';
 import TermsScreen from '../modules/profile/screens/TermsScreen';
 import NotificationsScreen from '../modules/profile/screens/NotificationsScreen';
 import SendNotification from '../modules/profile/screens/SendNotification';
+import City1Screen from '../modules/profile/screens/City1Screen';
+import City2Screen from '../modules/profile/screens/City2Screen';
+import City3Screen from '../modules/profile/screens/City3Screen';
 // chat  
 import MessagesScreen from '../modules/chat/screens/MessagesScreen'; 
  
@@ -77,6 +80,9 @@ function MemberRoute() {
 				<MemberStack.Screen name={RouteNames.NotificationsScreen} component={NotificationsScreen} />
 				<MemberStack.Screen name={RouteNames.MyListingsScreen} component={MyListingsScreen} />
 				<MemberStack.Screen name={RouteNames.SendNotification} component={SendNotification} />
+				<MemberStack.Screen name={RouteNames.City1Screen} component={City1Screen} />
+				<MemberStack.Screen name={RouteNames.City2Screen} component={City2Screen} />
+				<MemberStack.Screen name={RouteNames.City3Screen} component={City3Screen} />
 				
 			</MemberStack.Navigator>
 		</NavigationContainer>

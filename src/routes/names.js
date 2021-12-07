@@ -30,5 +30,8 @@ export default {
     AddListingScreen: 'AddListingScreen',
     NotificationsScreen: 'NotificationsScreen',
     MyListingsScreen: 'MyListingsScreen',
-    SendNotification : 'SendNotification'
+    SendNotification : 'SendNotification',
+    City1Screen : 'City1Screen',
+    City2Screen : 'City2Screen',
+    City3Screen : 'City3Screen'
 };
