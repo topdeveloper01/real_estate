@@ -31,13 +31,10 @@ import { goActiveScreenFromPush } from '../../../store/actions/app';
 import { translate } from '../../../common/services/translate';
 import Theme from '../../../theme';
 import alerts from '../../../common/services/alerts';
-import RouteNames from '../../../routes/names'; 
-import EmojiBoard from '../../../common/components/react-native-emoji-board';
+import RouteNames from '../../../routes/names';  
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
-import ImgGalleryModal from '../../../common/components/modals/ImgGalleryModal';
-import LocationMsgOptionModal from '../../../common/components/modals/LocationMsgOptionModal';
-import MessagesHeader from '../components/MessagesHeader';
-import AudioInputView from '../components/AudioInputView';
+import ImgGalleryModal from '../../../common/components/modals/ImgGalleryModal'; 
+import MessagesHeader from '../components/MessagesHeader'; 
 import { renderInputToolbar, renderComposer, renderSend } from '../components/InputToolbar';
 import { renderBubble, renderMessage } from '../components/MessageContainer';
 import {
@@ -470,22 +467,11 @@ const MessagesScreen = (props) => {
 	const renderEmptyInputToolbar = () => (
 		<Text style={styles.noMemberTxt}>{translate('social.chat.no_longer_member')}</Text>
 	);
-
-	const recordingInputToolbar = () => (
-		<AudioInputView
-			onRemove={() => {
-				setRecording(false);
-			}}
-			onSend={onSendAudio}
-		/>
-	);
-
+ 
 	const renderBottomInputbar = (giftchat_props) => {
 		if (channelData != null && channelData.users.findIndex((i) => i == props.user.id) == -1) {
 			return renderEmptyInputToolbar();
-		} else if (isRecording) {
-			return recordingInputToolbar();
-		}
+		} 
 
 		return renderInputToolbar(giftchat_props, quote_msg, images, onCancelQuote, onRemoveImage);
 	};
@@ -603,56 +589,20 @@ const MessagesScreen = (props) => {
 				onBack={() => {
 					props.navigation.goBack();
 				}}
-				onCall={() => {
-					if (channelData != null) {
-						props.navigation.navigate(RouteNames.CallScreen, { user: channelData.partner });
-					}
+				onCall={() => { 
 				}}
-				onDelete={() => {
-					ShowDeleteGroupModal(true);
+				onDelete={() => { 
 				}}
-				onExit={() => {
-					ShowExitGroupModal(true);
+				onExit={() => { 
 				}}
-				onMute={() => {
-					SetMuteGroup(!isMuted);
+				onMute={() => { 
 				}}
 				onGallery={() => {
 					props.navigation.goBack();
 				}}
-				onPressName={() => {
-					if (channelData == null) {
-						return;
-					}
-					let user_id = props.user.id;
-					if (channelData.channel_type == 'single') {
-						if (user_id == channelData.creator.id) {
-							props.navigation.navigate(RouteNames.SnapfooderScreen, {
-								user: channelData.partner,
-							});
-						} else if (user_id == channelData.partner.id) {
-							props.navigation.navigate(RouteNames.SnapfooderScreen, {
-								user: channelData.creator,
-							});
-						}
-					} else {
-						// group
-					}
+				onPressName={() => { 
 				}}
-			/>
-			<EmojiBoard
-				showBoard={showEmoji}
-				tabBarPosition='top'
-				tabBarStyle={{ height: 50, paddingTop: 12 }}
-				onRemove={() => setShowEMoji(false)}
-				onClick={onSelectEmoji}
-			/>
-			<LocationMsgOptionModal
-				showModal={showShareLocModal}
-				addCurrentLocation={addCurrentLocation}
-				goFindLocation={goFindLocation}
-				onClose={() => ShowShareModal(false)}
-			/>
+			/>  
 			<ConfirmModal
 				showModal={isDeleteGroupModal}
 				title={translate('group_related.confirm_del_group')}

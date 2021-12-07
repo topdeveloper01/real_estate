@@ -20,73 +20,7 @@ export const getLoggedInUserData = (user_id) => {
         }
     });
 };
-
-export const legacyLogin = token => async dispatch => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const device = {
-                token: await messaging().getToken(),
-            };
-            console.log('legacy login fcm token : ', device.token)
-            apiFactory.post('login/legacy', { device }, {
-                headers: {
-                    Authorization: token,
-                },
-            }).then(async (response) => {
-                const { token, verified_by_mobile } = response.data;
-                await setStorageKey(KEYS.TOKEN, token);
-                const user = await getLoggedInUserData();
-
-                dispatch({
-                    type: APP.SET_USER_DATA,
-                    payload: user,
-                });
-                dispatch({
-                    type: APP.SET_HAS_VERIFIED_PHONE,
-                    payload: !!verified_by_mobile,
-                });
-
-                resolve(user);
-            }, async (e) => {
-                reject(e);
-            });
-        } catch (e) {
-            reject(e);
-        }
-    });
-};
-
-export const login = ({ email, password }) => async dispatch => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const device = {
-                token: await messaging().getToken(),
-            };
-            console.log(device);
-            apiFactory.post('login', { email, password, device }).then(async (response) => {
-                const { token, verified_by_mobile } = response.data;
-                await setStorageKey(KEYS.TOKEN, token);
-                const user = await getLoggedInUserData();
-
-                dispatch({
-                    type: APP.SET_USER_DATA,
-                    payload: user,
-                });
-                dispatch({
-                    type: APP.SET_HAS_VERIFIED_PHONE,
-                    payload: !!verified_by_mobile,
-                });
-
-                resolve(user);
-
-            }, async (e) => {
-                reject(e);
-            });
-        } catch (e) {
-            reject(e);
-        }
-    });
-};
+ 
 
 export const register = (user) => async dispatch => {
     return new Promise(async (resolve, reject) => {
@@ -178,56 +112,7 @@ export const googleLogin = (id_token) => async dispatch => {
         }
     });
 };
-
-export const appleLogin = ({ user, identityToken, email, fullName }) => async dispatch => {
-
-    return new Promise(async (resolve, reject) => {
-
-        try {
-            const device = { token: await messaging().getToken(), };
-
-            if (!email) { email = ""; }
-
-            if (!fullName.nickName) { fullName = "" }
-            else { fullName = fullName.nickName; }
-
-
-            apiFactory.post('login/apple',
-                {
-                    apple_id: user,
-                    apple_identity_token: identityToken,
-                    email: email,
-                    name: fullName,
-                    device
-                }).then(async (response) => {
-
-                    const { token, verified_by_mobile } = response.data;
-                    await setStorageKey(KEYS.TOKEN, token);
-                    const user = await getLoggedInUserData();
-
-                    dispatch({
-                        type: APP.SET_USER_DATA,
-                        payload: user,
-                    });
-
-                    dispatch({
-                        type: APP.SET_HAS_VERIFIED_PHONE,
-                        payload: !!verified_by_mobile,
-                    });
-
-                    resolve(user);
-
-                }, async (e) => {
-                    reject(e);
-                });
-
-        } catch (e) {
-            reject(e);
-        }
-
-    });
-
-};
+ 
 
 export const setAsLoggedIn = () => async dispatch => {
     return new Promise(async (resolve, reject) => {
@@ -242,20 +127,7 @@ export const setAsLoggedIn = () => async dispatch => {
         }
     });
 };
-
-export const setAsSeenOnboard = () => async dispatch => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            await dispatch({
-                type: APP.SEEN_ONBOARD,
-                payload: true,
-            });
-            resolve();
-        } catch (e) {
-            reject(e);
-        }
-    });
-};
+ 
 
 export const logout = () => async dispatch => {
     return new Promise(async (resolve) => {
@@ -268,15 +140,7 @@ export const logout = () => async dispatch => {
             await dispatch({
                 type: APP.USER_LOGGED_OUT,
                 payload: false,
-            });
-            dispatch({
-                type: APP.SET_ADDRESSES,
-                payload: [],
-            });
-            dispatch({
-                type: APP.SET_ADDRESS,
-                payload: {},
-            });
+            }); 
             resolve();
         } catch (e) {
             resolve();
@@ -286,10 +150,14 @@ export const logout = () => async dispatch => {
 
 export const updateProfileDetails = (user) => async dispatch => {
     return new Promise(async (resolve, reject) => { 
-        userCollection.doc(user.id).update(user).then(() => {
+        let fcm_token = await messaging().getToken();
+        let userData={
+            ...user, token: fcm_token
+        }
+        userCollection.doc(userData.id).update(userData).then(() => {
             dispatch({
                 type: APP.SET_USER_DATA,
-                payload: user,
+                payload: userData,
             });
             resolve(user)
         })
@@ -298,15 +166,7 @@ export const updateProfileDetails = (user) => async dispatch => {
         }) 
     });
 };
-
-export const changePassword = (old_password, password) => async dispatch => {
-    return new Promise(async (resolve, reject) => {
-        apiFactory.put('users', {
-            old_password: old_password,
-            password: password,
-        }).then(resolve, reject);
-    });
-};
+ 
 
 export const setHasVerifiedPhone = (value) => async dispatch => {
     dispatch({

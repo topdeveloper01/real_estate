@@ -4,8 +4,7 @@ import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import auth from '@react-native-firebase/auth';
-import AuthInput from '../../../common/components/AuthInput';
-import Authpage from '../../../common/components/Authpage';
+import AuthInput from '../../../common/components/AuthInput'; 
 import MainBtn from "../../../common/components/buttons/main_button";
 import LoadingModal from '../../../common/components/modals/LoadingModal';
 import { BackButton } from '../../../common/components';
@@ -16,8 +15,7 @@ import Theme from '../../../theme';
 import apiFactory from '../../../common/services/apiFactory';
 import alerts from '../../../common/services/alerts';
 import { extractErrorMessage, isEmpty } from '../../../common/services/utility';
-import { setHasVerifiedPhone } from '../../../store/actions/auth';
-import styles from './styles';
+import { setHasVerifiedPhone } from '../../../store/actions/auth'; 
 
 
 class PhoneVerificationScreen extends React.Component {
@@ -221,6 +219,12 @@ class PhoneVerificationScreen extends React.Component {
         );
     }
 }
+
+const styles = StyleSheet.create({ 
+    title: { fontSize: 32, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
+	sub_title: { fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
+	notiTxt: { marginTop: 12, fontSize: 15, color: Theme.colors.text, },
+})
 
 function mapStateToProps({ app }) {
     return {

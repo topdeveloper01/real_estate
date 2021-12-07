@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, ImageBackground, View, Text, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { connect } from 'react-redux';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AppText from '../AppText';
-import { translate } from '../../../common/services/translate';
-import Theme from '../../../theme';
-import Config from '../../../config';
-import { OrderType_Delivery, OrderType_Pickup, OrderType_Reserve } from '../../../config/constants'
-import { toggleFavourite } from '../../../store/actions/vendors';
-// svgs
-import Svg_euro from '../../../common/assets/svgs/ic_euro.svg'
+import { connect } from 'react-redux'; 
+import AppText from '../AppText'; 
+import Theme from '../../../theme'; 
 
 const VendorItem = (props) => {
     const { data, can_delete, onSelect, onDelete, style } = props
@@ -81,4 +72,4 @@ function arePropsEqual(prevProps, nextProps) {
 const mapStateToProps = ({ app, shop }) => ({
     isLoggedIn: app.isLoggedIn,
 });
-export default connect(mapStateToProps, { toggleFavourite })(React.memo(VendorItem, arePropsEqual));
+export default connect(mapStateToProps, {   })(React.memo(VendorItem, arePropsEqual));

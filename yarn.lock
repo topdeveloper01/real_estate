@@ -1518,11 +1518,6 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/auth/-/auth-13.0.1.tgz#cc93c7705aac28af4bf9fe676e900e11cf7b12ac"
   integrity sha512-oZ0KqAjjbqT6It7/zAVIbQu+M4t1noKkAgZ76G12GHHo1mtVCjBTGDpej+J2oqbaEDDDuBAxq8lAhRxf8T+R4g==
 
-"@react-native-firebase/firestore@^13.0.1":
-  version "13.0.1"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/firestore/-/firestore-13.0.1.tgz#76463fadb4ac63aa0127a5ae3957bb68108fe3b6"
-  integrity sha512-kOkoQvdYU5W9iAZX9SAN7aoNvZpZZ3CywzoQer0uHp2gFwm02TCeOeEGOVhsbuh+D4uRdD3k5My/zV97OWTlFw==
-
 "@react-native-firebase/messaging@^12.0.0":
   version "12.9.3"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-12.9.3.tgz#d89cb95c1e90ccdf6eeac8a9b7e895bee2aa9a36"
@@ -7293,11 +7288,6 @@ react-native-communications@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-native-communications/-/react-native-communications-2.2.1.tgz#7883b56b20a002eeb790c113f8616ea8692ca795"
   integrity sha1-eIO1ayCgAu63kMET+GFuqGksp5U=
-
-react-native-date-picker@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-date-picker/-/react-native-date-picker-4.0.0.tgz#bc05e80b61d67e178653091a0a9220012e406fe3"
-  integrity sha512-KbGn6rfR6vlxKwts4n9YPAdRd8RoVTlxTRv9wKFe4amPgGN7ddv/GfyMrp3UbKDy6xWNrtnzkbBWja5neg8URg==
 
 react-native-device-info@^6.0.2:
   version "6.2.1"

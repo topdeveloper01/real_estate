@@ -231,9 +231,9 @@ const styles = StyleSheet.create({
     avatarImg: { width: 50, height: 50, borderRadius: 25, },
 });
 
-const mapStateToProps = ({ app, shop }) => ({
+const mapStateToProps = ({ app  }) => ({
     user: app.user,
-    vendorData: shop.vendorData,
+    vendorData: app.vendorData,
     isLoggedIn: app.isLoggedIn,
 });
 

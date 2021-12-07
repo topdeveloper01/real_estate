@@ -1,12 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Keyboard, ViewPropTypes, ScrollView, } from 'react-native';
-import { Composer, Send, Actions } from 'react-native-gifted-chat';
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import FastImage from 'react-native-fast-image';
-import Theme from '../../../theme';
-// svgs
-import Svg_rmvImg from '../../../common/assets/svgs/msg/remove_image.svg'
+import { Composer, Send, Actions } from 'react-native-gifted-chat'; 
+import Theme from '../../../theme'; 
 
 const styles = StyleSheet.create({
     container: {
@@ -94,48 +90,7 @@ export default class MessageInputToolbar extends React.Component {
             styles.container,
             this.props.containerStyle,
             { position: this.state.position },
-        ]}>
-            {/* {
-                this.props.quote_msg != null &&
-                <View style={[Theme.styles.row_center, { alignItems: 'flex-start', marginBottom: 6, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: Theme.colors.cyan2 }]}>
-                    <View style={[Theme.styles.col_center, { flex: 1, alignItems: 'flex-start', }]}>
-                        <Text style={styles.quote_name}>{this.props.quote_msg.user.full_name}</Text>
-                        <Text numberOfLines={1} style={styles.quote_text}>{this.props.quote_msg.text}</Text>
-                    </View>
-                    <TouchableOpacity style={{ marginLeft: 8 }} onPress={this.props.onCancelQuote ? this.props.onCancelQuote : () => { }}>
-                        <AntDesign name='close' size={20} color={Theme.colors.text} />
-                    </TouchableOpacity>
-                </View>
-            } */}
-            {/* {
-                this.props.images != null &&
-                <View style={[Theme.styles.row_center, { alignItems: 'flex-start', marginBottom: 6, }]}>
-                    {
-                        <ScrollView horizontal={true} style={[{}]}>
-                            {
-                                this.props.images.map((img, index) =>
-                                    <View key={index} style={{ width: 73, height: 73, marginRight : 12}}>
-                                        <FastImage
-                                            style={[{
-                                                width: '100%',
-                                                height: '100%',
-                                                borderRadius: 8,
-                                                resizeMode: 'cover',
-                                            }]}
-                                            resizeMode={FastImage.resizeMode.cover}
-                                            source={{ uri: img.path }}
-                                        />
-                                        <TouchableOpacity style={{ position: 'absolute', top: 8, right: 8, }} onPress={this.props.onRemoveImage ? () => this.props.onRemoveImage(img) : () => { }}>
-                                            <Svg_rmvImg />
-                                        </TouchableOpacity>
-                                    </View>
-
-                                )
-                            }
-                        </ScrollView>
-                    }
-                </View> 
-            } */}
+        ]}> 
             <View style={[styles.primary, this.props.primaryStyle]}>
                 {this.renderActions()}
                 {this.renderComposer()}

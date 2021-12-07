@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Image } from 'react-native';
-import { connect } from 'react-redux'; 
-import { updateProfileDetails } from '../../../store/actions/auth';  
+import { connect } from 'react-redux';  
 import Theme from '../../../theme'; 
 import Header1 from '../../../common/components/Header1'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; 

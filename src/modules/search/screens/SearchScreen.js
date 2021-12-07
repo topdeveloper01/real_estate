@@ -11,13 +11,12 @@ import {
 	setHomeVendorFilter, setHomeVendorSort
 } from '../../../store/actions/app';
 import { getAllListings } from '../../../store/actions/listings';
-import { setVendorCart } from '../../../store/actions/shop';
+import { setVendorCart } from '../../../store/actions/app';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import FilterBar from '../../../common/components/vendors/FilterVar';
-import { AuthInput, AppBadge, MainBtn, RoundIconBtn, ImageCarousel, VendorItem, SwitchTab } from '../../../common/components';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
-import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
+import { AuthInput,  VendorItem,   } from '../../../common/components';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
 
 const vertPerPage = 10;
 
@@ -191,15 +190,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app, shop }) => ({
 	user: app.user || {},
-	isLoggedIn: app.isLoggedIn,
-	coordinates: app.coordinates,
-	address: app.address || {},
-	language: app.language,
-	home_vendor_filter: app.home_vendor_filter,
-	home_vendor_sort: app.home_vendor_sort,
-	vendorData: shop.vendorData,
+	isLoggedIn: app.isLoggedIn, 
+	language: app.language, 
+	vendorData: app.vendorData,
 });
 
 export default connect(mapStateToProps, {
-	setHomeVendorFilter, setHomeVendorSort, setVendorCart,
+   setVendorCart,
 })(SearchScreen);

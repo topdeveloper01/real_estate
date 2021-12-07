@@ -5,17 +5,8 @@ import { TextInput, Text, Image, View, TouchableOpacity, } from 'react-native';
 import { InputToolbar, Actions, Composer, Send } from 'react-native-gifted-chat';
 import Theme from '../../../theme';
 import MessageInputToolbar from './MessageInputToolbar';
-import MessageSend from './MessageSend';
-// svgs
-import Svg_voicenote from '../../../common/assets/svgs/msg/voicenote.svg'
-import Svg_emoji from '../../../common/assets/svgs/msg/emoji.svg'
-import Svg_add from '../../../common/assets/svgs/msg/add.svg'
-import Svg_close from '../../../common/assets/svgs/msg/close.svg'
-import Svg_location from '../../../common/assets/svgs/msg/location.svg'
-import Svg_image from '../../../common/assets/svgs/msg/image.svg'
-import Svg_camera from '../../../common/assets/svgs/msg/camera.svg'
-import Svg_send from '../../../common/assets/svgs/msg/send.svg'
-import { translate } from '../../../common/services/translate';
+import MessageSend from './MessageSend'; 
+import Svg_send from '../../../common/assets/svgs/msg/send.svg' 
 
 export const renderInputToolbar = (props, quote_msg, images, onCancelQuote, onRemoveImage) => (
     <MessageInputToolbar
@@ -93,12 +84,7 @@ export const renderComposer = (props, onPressEmoji, onPressLocation, onImageUplo
     <CustomComposer props={props} onPressEmoji={onPressEmoji} onPressLocation={onPressLocation} onImageUpload={onImageUpload} onCapture={onCapture} />
 );
 
-export const renderSend = (props, active, onRecord, onSend) =>
-    // active == false ?
-    //     <TouchableOpacity style={{ marginLeft: 15, }} onPress={() => onRecord()}>
-    //         <Svg_voicenote width={40} height={40} />
-    //     </TouchableOpacity>
-    //     :
+export const renderSend = (props, active, onRecord, onSend) => 
     <MessageSend
         {...props}
         containerStyle={{

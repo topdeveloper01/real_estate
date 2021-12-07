@@ -1,24 +1,21 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
+import { Image, ActivityIndicator, Platform, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { width, height } from 'react-native-dimension';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { connect } from 'react-redux';
-import {
-    setHomeVendorFilter, setHomeVendorSort
-} from '../../../store/actions/app';
+import { connect } from 'react-redux'; 
+import { updateProfileDetails } from '../../../store/actions/auth';
 import { getAllListings } from '../../../store/actions/listings';
-import { setVendorCart } from '../../../store/actions/shop';
+import { setVendorCart } from '../../../store/actions/app';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import { AuthInput, VendorItem, } from '../../../common/components';
 import FeatureList from '../components/FeatureList';
 import FilterBar from '../../../common/components/vendors/FilterVar';
 import BlockSpinner from '../../../common/components/BlockSpinner';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
-import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
 
 const vertPerPage = 10;
 
@@ -37,6 +34,10 @@ const HomePage = (props) => {
     const [filter_size, setFilterSize] = useState(-1)
     const [filter_rooms, setFilterRooms] = useState(-1)
 
+    useEffect(()=>{
+        updateUserToken()
+    }, [])
+
     useEffect(() => {
         loadVendors();
         loadFeaturedBlocks();
@@ -52,6 +53,27 @@ const HomePage = (props) => {
             props.rootStackNav.navigate(name)
         }
     }
+
+    const updateUserToken = async () => {
+		let platform = "iOS";
+		if (Platform.OS === 'android') {
+			platform = "Android"
+		}
+
+		try { 
+			let newUserData = {
+				...props.user, 
+				platform: platform
+			}
+			const updated_user = await props.updateProfileDetails(newUserData);
+
+			console.log('updated_user', updated_user); 
+		}
+		catch (error) { 
+			console.log('updateUserToken ', error); 
+		}
+	}
+
 
     const getFilers = () => {
         return { searchTerm, filter_type, filter_price, filter_size, filter_rooms }
@@ -208,17 +230,13 @@ const styles = StyleSheet.create({
 })
 
 
-const mapStateToProps = ({ app, shop }) => ({
+const mapStateToProps = ({ app  }) => ({
     user: app.user || {},
-    isLoggedIn: app.isLoggedIn,
-    coordinates: app.coordinates,
-    address: app.address || {},
-    language: app.language,
-    home_vendor_filter: app.home_vendor_filter,
-    home_vendor_sort: app.home_vendor_sort,
-    vendorData: shop.vendorData,
+    isLoggedIn: app.isLoggedIn, 
+    language: app.language, 
+    vendorData: app.vendorData,
 });
 
 export default connect(mapStateToProps, {
-    setHomeVendorFilter, setHomeVendorSort, setVendorCart,
+     setVendorCart, updateProfileDetails
 })(HomePage);

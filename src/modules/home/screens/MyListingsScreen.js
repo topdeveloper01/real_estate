@@ -7,13 +7,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { connect } from 'react-redux';
 import { getMyListings, deleteListing } from '../../../store/actions/listings';
 import Theme from '../../../theme';
-import { setVendorCart } from '../../../store/actions/shop';
+import { setVendorCart } from '../../../store/actions/app';
 import RouteNames from '../../../routes/names';
 import { VendorItem } from '../../../common/components';
 import Header1 from '../../../common/components/Header1';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
-import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
 import FilterBar from '../../../common/components/vendors/FilterVar';
 
 const MyListingsScreen = (props) => {
@@ -185,10 +184,10 @@ const styles = StyleSheet.create({
 })
 
 
-const mapStateToProps = ({ app, shop }) => ({
+const mapStateToProps = ({ app,   }) => ({
 	user: app.user || {},
 	isLoggedIn: app.isLoggedIn,
-	vendorData: shop.vendorData,
+	vendorData: app.vendorData,
 });
 
 export default connect(mapStateToProps, {

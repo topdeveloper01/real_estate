@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Keyboard, StatusBar, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Keyboard, Platform, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import Spinner from 'react-native-loading-spinner-overlay';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Modal from 'react-native-modal';
 import ImagePicker from 'react-native-image-crop-picker';
-import DatePicker from 'react-native-date-picker';
 import { updateProfileDetails } from '../../../store/actions/auth';
 import { MainBtn } from '../../../common/components';
 import { translate } from '../../../common/services/translate';
@@ -23,7 +22,7 @@ import { FOR_PERSONAL, FOR_BUSINESS } from '../../../config/constants';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uploadPhoto } from '../../../common/services/fbstorage';
 // Svg
-import Svg_addphoto from '../../../common/assets/svgs/admin/add_a_photo.svg';
+import Svg_addphoto from '../../../common/assets/svgs/add_a_photo.svg';
 
 
 const AddListingScreen = (props) => {
@@ -344,116 +343,225 @@ const AddListingScreen = (props) => {
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
-					<View style={{ zIndex: 99 }}>
-						<DropDownPicker
-							open={open2}
-							setOpen={setOpen2}
-							onOpen={onOpen2}
-							value={value2}
-							setValue={setValue2}
-							placeholder={'多少廳'}
-							items={living_rooms}
-							setItems={setLivingRooms}
-							onChangeValue={(living_rooms) => {
-								setState({ ...state, living_rooms })
-							}}
-							style={{
-								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 99
-							}}
-							onPress={() => {
-								Keyboard.dismiss()
-							}}
-							dropDownDirection="BOTTOM"
-						/>
-					</View>
-					<View style={{ zIndex: 98 }}>
-						<DropDownPicker
-							open={open3}
-							setOpen={setOpen3}
-							onOpen={onOpen3}
-							value={value3}
-							setValue={setValue3}
-							placeholder={'多少房'}
-							items={rooms}
-							setItems={setRooms}
-							onChangeValue={(rooms) => {
-								setState({ ...state, rooms })
-							}}
-							style={{
-								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 98
-							}}
-							onPress={() => {
-								Keyboard.dismiss()
-							}}
-							dropDownDirection="BOTTOM"
-						/>
-					</View>
-					<View style={{ zIndex: 97 }}>
-						<DropDownPicker
-							open={open4}
-							setOpen={setOpen4}
-							onOpen={onOpen4}
-							value={value4}
-							setValue={setValue4}
-							placeholder={'多少廁'}
-							items={toilets}
-							setItems={setToilets}
-							onChangeValue={(toilets) => {
-								setState({ ...state, toilets })
-							}}
-							style={{
-								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 97
-							}}
-							onPress={() => {
-								Keyboard.dismiss()
-							}}
-							dropDownDirection="BOTTOM"
-						/>
-					</View>
-					<View style={{ zIndex: 96 }}>
-						<DropDownPicker
-							open={open5}
-							setOpen={setOpen5}
-							onOpen={onOpen5}
-							value={value5}
-							setValue={setValue5}
-							placeholder={'多少套廁'}
-							items={room_toilets}
-							setItems={setRoomToilets}
-							onChangeValue={(room_toilets) => {
-								setState({ ...state, room_toilets })
-							}}
-							style={{
-								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 96
-							}}
-							onPress={() => {
-								Keyboard.dismiss()
-							}}
-							dropDownDirection="BOTTOM"
-						/>
-					</View>
-					<View style={{ zIndex: 95 }}>
-						<DropDownPicker
-							open={open6}
-							setOpen={setOpen6}
-							onOpen={onOpen6}
-							value={value6}
-							setValue={setValue6}
-							placeholder={'多少工人房'}
-							items={helper_rooms}
-							setItems={setHelperRooms}
-							onChangeValue={(helper_rooms) => {
-								setState({ ...state, helper_rooms })
-							}}
-							style={{
-								borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 95
-							}}
-							onPress={() => {
-								Keyboard.dismiss()
-							}}
-							dropDownDirection="BOTTOM"
-						/>
-					</View>
+					{
+						Platform.OS == 'android' ?
+							<React.Fragment>
+								<DropDownPicker
+									open={open2}
+									setOpen={setOpen2}
+									onOpen={onOpen2}
+									value={value2}
+									setValue={setValue2}
+									placeholder={'多少廳'}
+									items={living_rooms}
+									setItems={setLivingRooms}
+									onChangeValue={(living_rooms) => {
+										setState({ ...state, living_rooms })
+									}}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 99
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+								/>
+								<DropDownPicker
+									open={open3}
+									setOpen={setOpen3}
+									onOpen={onOpen3}
+									value={value3}
+									setValue={setValue3}
+									placeholder={'多少房'}
+									items={rooms}
+									setItems={setRooms}
+									onChangeValue={(rooms) => {
+										setState({ ...state, rooms })
+									}}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 98
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+								/>
+								<DropDownPicker
+									open={open4}
+									setOpen={setOpen4}
+									onOpen={onOpen4}
+									value={value4}
+									setValue={setValue4}
+									placeholder={'多少廁'}
+									items={toilets}
+									setItems={setToilets}
+									onChangeValue={(toilets) => {
+										setState({ ...state, toilets })
+									}}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 97
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+								/>
+								<DropDownPicker
+									open={open5}
+									setOpen={setOpen5}
+									onOpen={onOpen5}
+									value={value5}
+									setValue={setValue5}
+									placeholder={'多少套廁'}
+									items={room_toilets}
+									setItems={setRoomToilets}
+									onChangeValue={(room_toilets) => {
+										setState({ ...state, room_toilets })
+									}}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 96
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+								/>
+								<DropDownPicker
+									open={open6}
+									setOpen={setOpen6}
+									onOpen={onOpen6}
+									value={value6}
+									setValue={setValue6}
+									placeholder={'多少工人房'}
+									items={helper_rooms}
+									setItems={setHelperRooms}
+									onChangeValue={(helper_rooms) => {
+										setState({ ...state, helper_rooms })
+									}}
+									style={{
+										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 95
+									}}
+									onPress={() => {
+										Keyboard.dismiss()
+									}}
+									dropDownDirection="BOTTOM"
+								/>
+							</React.Fragment>
+							:
+							<React.Fragment>
+								<View style={{ zIndex: 99 }}>
+									<DropDownPicker
+										open={open2}
+										setOpen={setOpen2}
+										onOpen={onOpen2}
+										value={value2}
+										setValue={setValue2}
+										placeholder={'多少廳'}
+										items={living_rooms}
+										setItems={setLivingRooms}
+										onChangeValue={(living_rooms) => {
+											setState({ ...state, living_rooms })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 99
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+									/>
+								</View>
+								<View style={{ zIndex: 98 }}>
+									<DropDownPicker
+										open={open3}
+										setOpen={setOpen3}
+										onOpen={onOpen3}
+										value={value3}
+										setValue={setValue3}
+										placeholder={'多少房'}
+										items={rooms}
+										setItems={setRooms}
+										onChangeValue={(rooms) => {
+											setState({ ...state, rooms })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 98
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+									/>
+								</View>
+								<View style={{ zIndex: 97 }}>
+									<DropDownPicker
+										open={open4}
+										setOpen={setOpen4}
+										onOpen={onOpen4}
+										value={value4}
+										setValue={setValue4}
+										placeholder={'多少廁'}
+										items={toilets}
+										setItems={setToilets}
+										onChangeValue={(toilets) => {
+											setState({ ...state, toilets })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 97
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+									/>
+								</View>
+								<View style={{ zIndex: 96 }}>
+									<DropDownPicker
+										open={open5}
+										setOpen={setOpen5}
+										onOpen={onOpen5}
+										value={value5}
+										setValue={setValue5}
+										placeholder={'多少套廁'}
+										items={room_toilets}
+										setItems={setRoomToilets}
+										onChangeValue={(room_toilets) => {
+											setState({ ...state, room_toilets })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 96
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+									/>
+								</View>
+								<View style={{ zIndex: 95 }}>
+									<DropDownPicker
+										open={open6}
+										setOpen={setOpen6}
+										onOpen={onOpen6}
+										value={value6}
+										setValue={setValue6}
+										placeholder={'多少工人房'}
+										items={helper_rooms}
+										setItems={setHelperRooms}
+										onChangeValue={(helper_rooms) => {
+											setState({ ...state, helper_rooms })
+										}}
+										style={{
+											borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 95
+										}}
+										onPress={() => {
+											Keyboard.dismiss()
+										}}
+										dropDownDirection="BOTTOM"
+									/>
+								</View>
+							</React.Fragment>
+					}
+
 					<AuthInput
 						placeholder={'售價錢'}
 						underlineColorAndroid={'transparent'}
@@ -512,7 +620,7 @@ const AddListingScreen = (props) => {
 						textAlignVertical={'top'}
 						numberOfLines={4}
 						multiline={true}
-						style={{ marginBottom: 12 , minHeight: 70}}
+						style={{ marginBottom: 12, minHeight: 70 }}
 					/>
 					<View style={{ height: 20 }}></View>
 				</KeyboardAwareScrollView>

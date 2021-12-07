@@ -11,8 +11,7 @@ import AuthInput from '../../../common/components/AuthInput';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
 import RouteNames from '../../../routes/names';
 import { facebookLogin, login, PHONE_NOT_VERIFIED, register, appleLogin, setAsLoggedIn } from '../../../store/actions/auth';
-import { extractErrorMessage, validateUserData } from '../../../common/services/utility';
-import { getAddresses } from '../../../store/actions/app';
+import { extractErrorMessage, validateUserData } from '../../../common/services/utility'; 
 import alerts from '../../../common/services/alerts';
 
 
@@ -247,8 +246,7 @@ export default connect(
     {
         register,
         login,
-        facebookLogin,
-        getAddresses,
+        facebookLogin, 
         setAsLoggedIn,
         appleLogin
     },

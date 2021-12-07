@@ -1,13 +1,7 @@
 import {combineReducers} from 'redux';
 
-import app from './app';
-import chat from './chat';
-import shop from './shop';
-import vendors from './vendors';
+import app from './app';  
 
 export default combineReducers({
-    app,
-    chat,
-    shop,
-    vendors,
+    app, 
 });

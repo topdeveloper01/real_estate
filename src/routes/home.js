@@ -5,29 +5,14 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
- 
-
-   
-
+  
 import { connect } from 'react-redux'
 // custom input
 import RouteNames from './names';
 import Theme from '../theme';
 import Config from '../config';
 import { translate } from '../common/services/translate';
-import HomeTabRoute, { SearchTabRoute, ChatTabRoute, OrdersTabRoute, ProfileTabRoute } from './index';
-import OrderStatusModal from '../common/components/modals/OrderStatusModal';
-// svgs
-import Home_active from '../common/assets/svgs/home_active.svg';
-import Home_inactive from '../common/assets/svgs/home_inactive.svg';
-import Search_active from '../common/assets/svgs/search_active.svg';
-import Search_inactive from '../common/assets/svgs/search_inactive.svg';
-import Chat_active from '../common/assets/svgs/chat_active.svg';
-import Chat_inactive from '../common/assets/svgs/chat_inactive.svg';
-import Orders_active from '../common/assets/svgs/orders_active.svg';
-import Orders_inactive from '../common/assets/svgs/orders_inactive.svg';
-import Profile_active from '../common/assets/svgs/profile_active.svg';
-import Profile_inactive from '../common/assets/svgs/profile_inactive.svg';
+import HomeTabRoute, { SearchTabRoute, ChatTabRoute,  ProfileTabRoute } from './index'; 
 
 
 const Tab = createBottomTabNavigator();
@@ -103,29 +88,13 @@ function MyTabBar({ state, descriptors, navigation, props }) {
 }
 
 const HomeTabs=(props)=>{
-    useEffect(()=>{
-
-        if (props.isOrderSummVisible == true && props.pushOrderDetails != null) { 
-            props.navigation.navigate(RouteNames.OrderSummScreen, { isnew: false, fromPush : true,  order_id: props.pushOrderDetails.id, order_status : props.pushOrderDetails.status });
-        } 
-        if (props.isWalletVisible == true) {
-            props.navigation.navigate(RouteNames.WalletScreen, { fromPush : true });
-        }
-        if (props.isInvitationVisible == true) {
-            props.navigation.navigate(RouteNames.InvitationsScreen, { fromPush : true });
-        }
+    useEffect(()=>{ 
         if (props.isChatVisible == true && props.pushConversationId != null) { 
             props.navigation.navigate(RouteNames.MessagesScreen, { fromPush : true, channelId: props.pushConversationId, pushChatMsgTime : props.pushChatMsgTime })
-        }
-        if (props.isBlogVisible == true && props.pushBlogId != null) { 
-            props.navigation.navigate(RouteNames.BlogDetailsScreen, { fromPush : true, blog: {id : props.pushBlogId} })
-        }
+        } 
 
-    }, [props.isOrderSummVisible, props.pushOrderDetails, props.isWalletVisible, 
-        props.isInvitationVisible, props.isChatVisible, props.pushConversationId, 
-        props.isBlogVisible, props.pushBlogId, props.pushChatMsgTime])
-
-
+    }, [props.isChatVisible, props.pushConversationId, ])
+ 
     return (
         <React.Fragment>
             <Tab.Navigator
@@ -197,19 +166,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app }) => ({
     isLoggedIn: app.isLoggedIn,
-    language: app.language,
-    hometabs_init_tabname: app.hometabs_init_tabname,
-
-    pushOrderDetails : app.pushOrderDetails,
-    pushConversationId : app.pushConversationId,
-    isOrderSummVisible: app.isOrderSummVisible,
-    isWalletVisible : app.isWalletVisible,
-    isInvitationVisible : app.isInvitationVisible,
-    isChatVisible : app.isChatVisible,
-    isBlogVisible : app.isBlogVisible,
-    pushBlogId : app.pushBlogId,
-    pushChatMsgTime : app.pushChatMsgTime,
-    
+    language: app.language, 
+ 
+    pushConversationId : app.pushConversationId, 
+    isChatVisible : app.isChatVisible,  
 });
 
 export default connect(mapStateToProps, {

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Switch,ScrollView, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { Switch, ScrollView, TouchableOpacity, Text, View, StyleSheet, Platform } from 'react-native';
 import { connect } from 'react-redux'
+import Spinner from 'react-native-loading-spinner-overlay';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LoginManager } from 'react-native-fbsdk';
-import { logout,  } from '../../../store/actions/auth';
+import { updateProfileDetails } from '../../../store/actions/auth';
+import { logout, } from '../../../store/actions/auth';
 import auth from '@react-native-firebase/auth';
 import Config from '../../../config';
 import alerts from '../../../common/services/alerts';
@@ -14,12 +16,14 @@ import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import ProfileAvatarView from '../components/ProfileAvatarView';
 import ProfileInfoItem from '../components/ProfileInfoItem';
-import Header1 from '../../../common/components/Header1';  
+import Header1 from '../../../common/components/Header1';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 // svgs
 import Svg_add from '../../../common/assets/svgs/btn-add.svg';
 
 const ProfileScreen = (props) => {
+	const [isLoading, setLoading] = useState(false);
+	const [isActiveSwitch, setActiveSwitch] = useState(false);
 	const [isLogoutModal, ShowLogoutModal] = useState(false);
 
 	const about_links = [
@@ -27,17 +31,9 @@ const ProfileScreen = (props) => {
 		{ name: '條款及細則', link: RouteNames.TermsScreen },
 	]
 
-	const op_btns = [
-		{ name: 'For Matched Properties' },
-		{ name: 'For New Launched Properties' },
-		{ name: 'For Property News' },
-	]
-
-	const app_links = [
-		{ name: '報告錯誤', link: RouteNames.BugReportScreen },
-		{ name: '版本', link: RouteNames.AppVersionScreen },
-	]
-
+	useEffect(() => {
+		setActiveSwitch(props.user.enable_notification == true)
+	}, [props.user.enable_notification])
 
 	const onLogout = async () => {
 		ShowLogoutModal(false);
@@ -51,16 +47,38 @@ const ProfileScreen = (props) => {
 			await props.logout();
 		} catch (e) {
 			console.log('logout', e)
-		} 
+		}
 	};
 
-	const toggleSwitch = (name, value) => {
+	const toggleSwitch = async (value) => {
+		let platform = "iOS";
+		if (Platform.OS === 'android') {
+			platform = "Android"
+		}
 
+		try {
+			setLoading(true);
+			let newUserData = {
+				...props.user,
+				enable_notification: value,
+				platform: platform
+			}
+			const updated_user = await props.updateProfileDetails(newUserData);
+
+			console.log('updated_user', updated_user);
+			setLoading(false);
+		}
+		catch (error) {
+			setLoading(false);
+			console.log('on toggleSwitch', error);
+			alerts.error('警告', '出了些問題');
+		}
 	}
 
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
-			<Header1 title='帳戶設定' style={{height: 90, marginBottom: 0}} left={<View />} />
+			<Spinner visible={isLoading} />
+			<Header1 title='帳戶設定' style={{ height: 90, marginBottom: 0 }} left={<View />} />
 			<ScrollView style={[Theme.styles.flex_1, styles.scrollview]}>
 				<View style={Theme.styles.flex_1}>
 					<ProfileAvatarView
@@ -90,53 +108,59 @@ const ProfileScreen = (props) => {
 						)
 					}
 					<Text style={styles.subjectTitle}>帳戶操作</Text>
-					{
-						op_btns.map(item =>
-							<View
-								key={item.name}
-								style={[Theme.styles.row_center, styles.itemView]}
-							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>{item.name}</Text>
-								<Switch
-									trackColor={{ false: Theme.colors.gray4, true: Theme.colors.gray4 }}
-									thumbColor={true ? "#FCD724" : "#f4f3f4"}
-									ios_backgroundColor="#3e3e3e"
-									onValueChange={(value) => {
-										toggleSwitch(item.name, value)
-									}}
-									value={true}
-								/>
-							</View>
-						)
-					}
-					<Text style={styles.subjectTitle}>APP</Text>
-					{
-						props.user.admin == true &&
-						<TouchableOpacity 
-							delayPressIn={100}
-							style={[Theme.styles.row_center, styles.itemView]}
-							onPress={() => {
-								props.rootStackNav.navigate(RouteNames.MyListingsScreen);
+					<View
+						style={[Theme.styles.row_center, styles.itemView]}
+					>
+						<Text style={[styles.itemTxt, Theme.styles.flex_1]}>允許推送通知系統</Text>
+						<TouchableOpacity
+							onPress={()=>{
+								toggleSwitch(props.user.enable_notification == true ? false : true)
 							}}
 						>
-							<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄</Text>
-							<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+							<Switch
+								trackColor={{ false: Theme.colors.gray4, true: Theme.colors.gray4 }}
+								thumbColor={true ? "#FCD724" : "#f4f3f4"}
+								ios_backgroundColor="#3e3e3e" 
+								disabled={true}
+								value={props.user.enable_notification == true}
+							/>
 						</TouchableOpacity>
-					}
+					</View>
 					{
-						app_links.map(item =>
+						props.user.admin == true &&
+						<React.Fragment>
+							<Text style={styles.subjectTitle}>APP</Text>
 							<TouchableOpacity
-								key={item.name}
 								delayPressIn={100}
 								style={[Theme.styles.row_center, styles.itemView]}
 								onPress={() => {
-									props.rootStackNav.navigate(item.link);
+									props.rootStackNav.navigate(RouteNames.MyListingsScreen);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>{item.name}</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
-						)
+							<TouchableOpacity
+								delayPressIn={100}
+								style={[Theme.styles.row_center, styles.itemView]}
+								onPress={() => {
+									props.rootStackNav.navigate(RouteNames.MyListingsScreen);
+								}}
+							>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>地區</Text>
+								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+							</TouchableOpacity>
+							<TouchableOpacity
+								delayPressIn={100}
+								style={[Theme.styles.row_center, styles.itemView]}
+								onPress={() => {
+									props.rootStackNav.navigate(RouteNames.SendNotification);
+								}}
+							>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>推送通知系統</Text>
+								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+							</TouchableOpacity>
+						</React.Fragment>
 					}
 
 					<TouchableOpacity
@@ -149,14 +173,14 @@ const ProfileScreen = (props) => {
 				</View>
 			</ScrollView>
 			{
-				props.user.admin == true && 
+				props.user.admin == true &&
 				<TouchableOpacity style={styles.addlistingBtn} onPress={() => {
 					props.rootStackNav.navigate(RouteNames.AddListingScreen);
 				}}>
 					<Svg_add />
 				</TouchableOpacity>
 			}
-			
+
 			<ConfirmModal
 				showModal={isLogoutModal}
 				title={'確認登出？'}
@@ -189,5 +213,5 @@ const mapStateToProps = ({ app }) => ({
 });
 
 export default connect(mapStateToProps, {
-	logout,  
+	logout, updateProfileDetails
 })(ProfileScreen);

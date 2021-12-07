@@ -35,35 +35,7 @@ export const getMyListings = (user_id, filterKeys) => {
                 else if (filter_type == 1) { // rent
                     coll_ref = coll_ref.where('isRent', '==', true);
                 }
-            }
-            if (filter_price != -1) {
-                if (filter_price == 0) {
-                    coll_ref = coll_ref.where('price', '<=', 3999999)
-                }
-                else if (filter_price == 1) {
-                    coll_ref = coll_ref.where('price', '>=', 4000000).where('price', '<=', 9999999)
-                }
-                else if (filter_price == 2) {
-                    coll_ref = coll_ref.where('price', '>=', 10000000).where('price', '<=', 49999999)
-                }
-                else if (filter_price == 3) {
-                    coll_ref = coll_ref.where('price', '>=', 50000000)
-                }
-            }
-            if (filter_size != -1) {
-                if (filter_size == 0) {
-                    coll_ref = coll_ref.where('size', '<=', 299)
-                }
-                else if (filter_size == 1) {
-                    coll_ref = coll_ref.where('size', '>=', 300).where('price', '<=', 799)
-                }
-                else if (filter_size == 2) {
-                    coll_ref = coll_ref.where('size', '>=', 800).where('price', '<=', 1499)
-                }
-                else if (filter_size == 3) {
-                    coll_ref = coll_ref.where('size', '>=', 1500)
-                }
-            }
+            } 
             if (filter_rooms != -1) {
                 coll_ref = coll_ref.where('rooms', '==', filter_rooms)
             }
@@ -73,6 +45,36 @@ export const getMyListings = (user_id, filterKeys) => {
                 res.docs.forEach(doc => {
                     list.push(doc.data())
                 })
+
+                if (filter_price != -1) {
+                    if (filter_price == 0) { 
+                        list = list.filter(item => item.price <= 3999999)
+                    }
+                    else if (filter_price == 1) {
+                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999 ) 
+                    }
+                    else if (filter_price == 2) {
+                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999 ) 
+                    }
+                    else if (filter_price == 3) {
+                        list = list.filter(item => item.price >= 50000000) 
+                    }
+                }
+                
+                if (filter_size != -1) {
+                    if (filter_size == 0) {
+                        list = list.filter(item => item.size <= 299) 
+                    }
+                    else if (filter_size == 1) {
+                        list = list.filter(item => item.size >= 300 && item.size <= 799 )  
+                    }
+                    else if (filter_size == 2) {
+                        list = list.filter(item => item.size >= 800 && item.size <= 1499 )  
+                    }
+                    else if (filter_size == 3) {
+                        list = list.filter(item => item.size >= 1500) 
+                    }
+                }
                 resolve(list);
             })
                 .catch(err => {
@@ -104,34 +106,7 @@ export const getAllListings = (filterKeys) => {
                     coll_ref = coll_ref.where('isRent', '==', true);
                 }
             }
-            if (filter_price != -1) {
-                if (filter_price == 0) {
-                    coll_ref = coll_ref.where('price', '<=', 3999999)
-                }
-                else if (filter_price == 1) {
-                    coll_ref = coll_ref.where('price', '>=', 4000000).where('price', '<=', 9999999)
-                }
-                else if (filter_price == 2) {
-                    coll_ref = coll_ref.where('price', '>=', 10000000).where('price', '<=', 49999999)
-                }
-                else if (filter_price == 3) {
-                    coll_ref = coll_ref.where('price', '>=', 50000000)
-                }
-            }
-            if (filter_size != -1) {
-                if (filter_size == 0) {
-                    coll_ref = coll_ref.where('size', '<=', 299)
-                }
-                else if (filter_size == 1) {
-                    coll_ref = coll_ref.where('size', '>=', 300).where('price', '<=', 799)
-                }
-                else if (filter_size == 2) {
-                    coll_ref = coll_ref.where('size', '>=', 800).where('price', '<=', 1499)
-                }
-                else if (filter_size == 3) {
-                    coll_ref = coll_ref.where('size', '>=', 1500)
-                }
-            }
+             
             if (filter_rooms != -1) {
                 coll_ref = coll_ref.where('rooms', '==', filter_rooms)
             }
@@ -142,6 +117,37 @@ export const getAllListings = (filterKeys) => {
                 res.docs.forEach(doc => {
                     list.push(doc.data())
                 })
+
+                if (filter_price != -1) {
+                    if (filter_price == 0) { 
+                        list = list.filter(item => item.price <= 3999999)
+                    }
+                    else if (filter_price == 1) {
+                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999 ) 
+                    }
+                    else if (filter_price == 2) {
+                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999 ) 
+                    }
+                    else if (filter_price == 3) {
+                        list = list.filter(item => item.price >= 50000000) 
+                    }
+                }
+                
+                if (filter_size != -1) {
+                    if (filter_size == 0) {
+                        list = list.filter(item => item.size <= 299) 
+                    }
+                    else if (filter_size == 1) {
+                        list = list.filter(item => item.size >= 300 && item.size <= 799 )  
+                    }
+                    else if (filter_size == 2) {
+                        list = list.filter(item => item.size >= 800 && item.size <= 1499 )  
+                    }
+                    else if (filter_size == 3) {
+                        list = list.filter(item => item.size >= 1500) 
+                    }
+                }
+
                 resolve(list);
             })
                 .catch(err => {

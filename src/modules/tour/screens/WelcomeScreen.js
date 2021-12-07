@@ -30,8 +30,7 @@ import {
 	appleLogin,
 	setUserNeedLogin,
 	updateProfileDetails,
-} from '../../../store/actions/auth';
-import { getAddresses, setAddress, addDefaultAddress } from '../../../store/actions/app';
+} from '../../../store/actions/auth'; 
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
 import Svg_facebook from '../../../common/assets/svgs/auth/facebook.svg'
@@ -151,6 +150,7 @@ const WelcomeScreen = (props) => {
 	};
 
 	const _renderSocialBtns = () => {
+		return null;
 		if (loading) {
 			return (
 				<View style={styles.loadingWrapper}>
@@ -274,14 +274,10 @@ function mapStateToProps({ app }) {
 
 export default connect(mapStateToProps, {
 	facebookLogin,
-	googleLogin,
-	appleLogin,
+	googleLogin, 
 
 	setAsLoggedIn,
 	setUserNeedLogin,
-	getLoggedInUser,
-	setAddress,
-	getAddresses,
-	updateProfileDetails,
-	addDefaultAddress,
+	getLoggedInUser, 
+	updateProfileDetails, 
 })(WelcomeScreen);

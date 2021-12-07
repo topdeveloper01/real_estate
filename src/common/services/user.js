@@ -53,8 +53,7 @@ export const loadUserSetting = async (props, logged_user_data) => {
             }
         }
 
-        if (logged_user_data != null) {
-            props.getAddresses();
+        if (logged_user_data != null) { 
             props.setAsLoggedIn();
         }
 

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import moment from 'moment';
-import { isEmpty, getImageFullURL } from '../../../common/services/utility';
-import { findZodiacSign } from '../../../common/components/ZodiacSign';
+import { isEmpty, getImageFullURL } from '../../../common/services/utility'; 
 import Theme from '../../../theme';
 // svgs
 import Svg_edit from '../../../common/assets/svgs/btn-edit.svg';

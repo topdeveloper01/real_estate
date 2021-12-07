@@ -6,21 +6,13 @@ import SplashScreen from 'react-native-splash-screen';
 import messaging from '@react-native-firebase/messaging';
 import auth from '@react-native-firebase/auth';
 import { connect } from 'react-redux';
-import { getLoggedInUser, legacyLogin, setAsLoggedIn, setAsSeenOnboard, setUserNeedLogin } from './store/actions/auth';
+import { getLoggedInUser ,setAsLoggedIn,  setUserNeedLogin } from './store/actions/auth';
 import * as RNLocalize from 'react-native-localize';
-import {
-	closeRatingModal,
-	getAddresses,
-	getLastUnReviewedOrder,
-	setAddress,
-	setSafeAreaData,
-	loadAppLang,
-	addDefaultAddress,
+import { 
+	loadAppLang, 
 	goActiveScreenFromPush,
-} from './store/actions/app';
-import { updateCartItems } from './store/actions/shop';
-import { updateProfileDetails } from './store/actions/auth';
-import { loadUserSetting } from './common/services/user';
+} from './store/actions/app';  
+import { updateProfileDetails } from './store/actions/auth'; 
 import {
 	PUSH_NOTIFICATION_NEW_BLOG,
 	PUSH_NOTIFICATION_NEW_VENDOR,
@@ -219,25 +211,7 @@ class AppRoot extends React.Component {
 			console.log(e);
 		}
 	}
-
-	loadSettings = async () => {
-		this.loadDimCarts();
-
-		try {
-			await this.props.loadAppLang();
-		} catch (e) {
-			console.log('loadAppLang err', e);
-		}
-
-		try {
-			const seenOnboard = await getStorageKey(KEYS.SEEN_ONBOARD);
-			if (seenOnboard == true) {
-				await this.props.setAsSeenOnboard();
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	};
+ 
 
 	loadLoginInfo = async (user) => { 
 		let logged_user_data = null;
@@ -273,27 +247,15 @@ class AppRoot extends React.Component {
 	}
 }
 
-const mapStateToProps = ({ app }) => ({
-	isReviewModalVisible: app.isReviewModalVisible,
-	reviewModalData: app.reviewModalData,
+const mapStateToProps = ({ app }) => ({  
 });
 
-export default connect(mapStateToProps, {
-	setAsSeenOnboard,
-	updateCartItems,
-
-	setSafeAreaData,
-	getLastUnReviewedOrder,
-	closeRatingModal,
-	legacyLogin,
+export default connect(mapStateToProps, { 
 	loadAppLang,
 
 	setAsLoggedIn,
 	setUserNeedLogin,
-	getLoggedInUser,
-	setAddress,
-	getAddresses,
-	updateProfileDetails,
-	addDefaultAddress,
+	getLoggedInUser, 
+	updateProfileDetails, 
 	goActiveScreenFromPush,
 })(AppRoot);

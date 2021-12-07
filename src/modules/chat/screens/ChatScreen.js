@@ -5,18 +5,12 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import FastImage from "react-native-fast-image";
 import { height } from 'react-native-dimension'; 
-import { sendMessage, setMessagesSeen, setAllChannels } from '../../../store/actions/chat';
-import RouteNames from '../../../routes/names';
-import NewConvOptionModal from "../../../common/components/modals/NewConvOptionModal";
-import SearchBox from "../../../common/components/social/search/SearchBox";
-import { translate } from '../../../common/services/translate';
-import { appMoment } from '../../../common/services/translate';
-import alerts from '../../../common/services/alerts';
-import { isEmpty, convertTimestamp2Date, getImageFullURL, checkInSameWeek } from '../../../common/services/utility';
-import apiFactory from '../../../common/services/apiFactory';
+import { setAllChannels } from '../../../store/actions/app';
+import RouteNames from '../../../routes/names'; 
+import { translate } from '../../../common/services/translate'; 
+import { isEmpty, convertTimestamp2Date, getImageFullURL, checkInSameWeek } from '../../../common/services/utility'; 
 import BlockSpinner from '../../../common/components/BlockSpinner';
-import Theme from "../../../theme";
-import { CALL_HISTORY, } from "../../../config/constants";
+import Theme from "../../../theme"; 
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'
 import Header1 from '../../../common/components/Header1';
 import { channelCollection } from '../../../common/services/firebase';
@@ -282,17 +276,7 @@ class ChatScreen extends React.Component {
                 {
                     this.state.isLoadingChat ? <BlockSpinner /> :
                         this.renderChatHistory()
-                }
-                <NewConvOptionModal showModal={this.state.showConvModal}
-                    goChat={() => {
-                        this.setState({ showConvModal: false })
-                        this.props.navigation.push(RouteNames.NewChatScreen);
-                    }}
-                    goGroupChat={() => {
-                        this.setState({ showConvModal: false })
-                        this.props.navigation.navigate(RouteNames.NewGroupScreen)
-                    }}
-                    onClose={() => this.setState({ showConvModal: false })} />
+                } 
             </View>
         );
     }
@@ -426,14 +410,12 @@ const mapStateToProps = ({ app, chat }) => ({
     isLoggedIn: app.isLoggedIn,
     language: app.language,
     user: app.user,
-    chat_channels: chat.chat_channels || []
+    chat_channels: app.chat_channels || []
 });
 
 export default connect(
     mapStateToProps,
-    {
-        setMessagesSeen,
-        sendMessage,
+    {  
         setAllChannels,
     },
 )(withNavigation(ChatScreen));

@@ -1,26 +1,8 @@
 import React, { memo } from 'react';
-import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
-import { BlurView } from '@react-native-community/blur';
-import Feather from 'react-native-vector-icons/Feather';
-import FastImage from 'react-native-fast-image';
-import { width, height } from 'react-native-dimension';
-import {
-    Menu,
-    MenuOptions,
-    MenuOption,
-    MenuTrigger,
-} from 'react-native-popup-menu';
+import { TouchableOpacity, StyleSheet, View, Text } from 'react-native'; 
+import Feather from 'react-native-vector-icons/Feather'; 
 import Theme from "../../../theme";
-import { isEmpty, getImageFullURL } from '../../../common/services/utility';
-// svgs
-import Svg_call from '../../../common/assets/svgs/btn_call.svg'
-import Svg_more from '../../../common/assets/svgs/btn_more.svg'
-import Svg_delete from '../../../common/assets/svgs/msg/delete.svg'
-import Svg_mute from '../../../common/assets/svgs/msg/mute.svg'
-import Svg_gallery from '../../../common/assets/svgs/msg/gallery.svg'
-import Svg_exit from '../../../common/assets/svgs/msg/exit.svg'
-import Svg_muted from '../../../common/assets/svgs/msg/muted.svg'
-import { translate } from '../../../common/services/translate';
+import { isEmpty, getImageFullURL } from '../../../common/services/utility'; 
 
 const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName, onBack, onCall, onDelete, onExit, onMute, onGallery }) => {
     const getMembers = () => {
@@ -121,20 +103,16 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
                 <Feather name="chevron-left" size={24} color={Theme.colors.text} />
             </TouchableOpacity>
             <Text style={styles.name}>{getName()}</Text>
-            <View style={{width: 35}} />
-            {/* <TouchableOpacity style={{ marginRight: 15, }} onPress={onCall ? onCall : () => { }}>
-                <Svg_call width={30} height={30} />
-            </TouchableOpacity> */}
+            <View style={{width: 35}} /> 
             {/* <Menu>
-                <MenuTrigger>
-                    <Svg_more width={30} height={30} />
+                <MenuTrigger> 
                 </MenuTrigger>
                 <MenuOptions optionsContainerStyle={styles.popupContainer}>
                     {
                         canDeleteGroup() &&
                         <MenuOption onSelect={onDelete ? onDelete : () => { }}>
                             <View style={[Theme.styles.row_center, styles.popupBtn,]}>
-                                <Svg_delete />
+                                
                                 <Text style={styles.popupText}>{translate('social.chat.delete_group')}</Text>
                             </View>
                         </MenuOption>
@@ -143,7 +121,7 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
                         canMute() &&
                         <MenuOption onSelect={onMute ? onMute : () => { }} >
                             <View style={[Theme.styles.row_center, styles.popupBtn, data.channel_type != 'group' && { borderBottomWidth: 0 }]}>
-                                <Svg_mute />
+                                
                                 <Text style={styles.popupText}>{data.channel_type != 'single' ? translate('social.chat.mute_group') : translate('social.chat.mute')}</Text>
                             </View>
                         </MenuOption>
@@ -152,7 +130,7 @@ const MessagesHeader = ({ data, channel_id, user_id, style, isMuted, onPressName
                         canExitGroup() &&
                         <MenuOption onSelect={onExit ? onExit : () => { }}>
                             <View style={[Theme.styles.row_center, styles.popupBtn, { borderBottomWidth: 0 }]}>
-                                <Svg_exit />
+                               
                                 <Text style={styles.popupText}>{translate('social.chat.exit_group')}</Text>
                             </View>
                         </MenuOption>

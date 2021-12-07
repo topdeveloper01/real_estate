@@ -20,13 +20,10 @@ import {
 	MessageImage,
 	MessageText,
 } from 'react-native-gifted-chat';
-import { width, height } from 'react-native-dimension';
-import Lightbox from 'react-native-lightbox';
+import { width, height } from 'react-native-dimension'; 
 import FastImage from 'react-native-fast-image';
 import moment from 'moment';
-import Theme from '../../../theme';
-import Config from '../../../config';
-import AudioMsgItem from '../components/AudioMsgItem';
+import Theme from '../../../theme';  
 import { SocialMapScreenStyles } from '../../../config/constants';
 import { translate } from '../../../common/services/translate';
 
