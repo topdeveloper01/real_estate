@@ -29,7 +29,8 @@ export const register = (user) => async dispatch => {
             let userData={
                 ...user, token: fcm_token
             }
-            userCollection.doc(user.id).set(userData).then(() => {
+            userCollection.doc(user.id).set(userData).then(async () => {
+                await setStorageKey(KEYS.TOKEN, user.id);
                 dispatch({
                     type: APP.SET_USER_DATA,
                     payload: userData,
@@ -186,9 +187,12 @@ export const getLoggedInUser = (user_id) => dispatch => {
     return new Promise(async (resolve) => {
         try {
             const user = await getLoggedInUserData(user_id); 
+            if (user != null) {
+                await setStorageKey(KEYS.TOKEN, user_id);
+            }
             dispatch({
                 type: APP.SET_USER_DATA,
-                payload: user,
+                payload: user || {},
             });
             resolve(user);
         } catch (e) {

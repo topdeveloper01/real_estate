@@ -97,9 +97,7 @@ class RootStack extends React.Component {
  
 	render() {
 		const { user, isLoggedIn  } = this.props;
-
-		console.log(user.phone, isLoggedIn );
-
+  
 		if (!isLoggedIn) {
 			return <GuestRoute />;
 		}  

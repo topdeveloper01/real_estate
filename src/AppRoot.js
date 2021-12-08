@@ -143,19 +143,19 @@ class AppRoot extends React.Component {
 	}
  
 
-	loadLoginInfo = async () => { 
-		let logged_user_data = null;
+	loadLoginInfo = async () => {  
 		try {
-			let currentUser = auth().currentUser;
-			if (currentUser != null && currentUser.uid != null) {
-				logged_user_data = await this.props.getLoggedInUser(currentUser.uid);
+			let token = await getStorageKey(KEYS.TOKEN);
+			if (token) {
+				console.log('token', token); 
+				let logged_user_data = await this.props.getLoggedInUser(token);
 				if (logged_user_data != null) {
 					this.props.setAsLoggedIn();
 				} 
 			}
 		} catch (e) {
-			console.log('load Login Info error', e);
-		}  
+			console.log('loadLoginInfo error', e);
+		}
 		this.appLoaded();
 	};
 

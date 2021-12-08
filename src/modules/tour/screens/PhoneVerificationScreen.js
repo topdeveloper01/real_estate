@@ -37,15 +37,31 @@ class PhoneVerificationScreen extends React.Component {
             code6: ''
         };
     }
+
+    onAuthStateChanged = (user) => {
+		console.log('onAuthStateChanged ', user)
+        if (user != null && user.uid != null) {
+            this.props.onSuccess(user.uid);
+        }
+	}
+
+    componentWillUnmount() {
+		if (this.FbAuth_subscriber) {
+			this.FbAuth_subscriber();
+		}
+    }
  
+    async componentDidMount() {
+		this.FbAuth_subscriber = auth().onAuthStateChanged(this.onAuthStateChanged);
+    }
+
     verify = async () => {
         if (this.state.FbConfirm == null) { return; }
         const { code1, code2, code3, code4, code5, code6 } = this.state;
         await this.setState({ loading: true, confirmSuccess: false });
         try {
             await this.state.FbConfirm.confirm(code1 + code2 + code3 + code4 + code5 + code6);
-            this.setState({ loading: false, confirmSuccess: true });
-            this.props.onSuccess(auth().currentUser.uid);
+            this.setState({ loading: false, confirmSuccess: true }); 
         } catch (error) {
             this.setState({
                 loading: false,
