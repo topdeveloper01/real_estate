@@ -1,6 +1,7 @@
 import React from 'react';
 import { Keyboard, ScrollView, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import auth from '@react-native-firebase/auth';
 import { translate } from '../../../common/services/translate';
@@ -24,8 +25,7 @@ class RegisterScreen extends React.PureComponent {
             confirm: null,
             loaded: false,
             loading: false,
-            isKeyboadVisible: false,
-            loadingFacebook: false,
+            isKeyboadVisible: false, 
             full_name: '',
             phone: '',
             email: '',
@@ -85,10 +85,12 @@ class RegisterScreen extends React.PureComponent {
         let pass2 = password;
         validateUserData({ full_name, email, phone, password, pass2 }, true).then(async () => {
             try { 
+                this.setState({loading : true})
                 const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
-                this.setState({confirm: confirmation})
+                this.setState({loading : false, confirm: confirmation})
             }
             catch (error) {
+                this.setState({loading : false})
                 console.log('onsignin,', error)
             }
         });
@@ -122,6 +124,7 @@ class RegisterScreen extends React.PureComponent {
  
         return (
             <View style={{ flex: 1, backgroundColor: '#ffffff', }}>
+                <Spinner visible={loading} />
                 <KeyboardAwareScrollView style={[{ flex: 1, width: '100%', padding: 20 }]} keyboardShouldPersistTaps='handled'>
                     <View style={[styles.formview]}>
                         <View style={[Theme.styles.col_center, { width: '100%', alignItems: 'flex-start' }]}>
@@ -190,9 +193,7 @@ class RegisterScreen extends React.PureComponent {
                             style={{ marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
                             setRef={ref => ref && ref.setNativeProps({ style: { fontFamily: 'Yellix-Medium' } })}
                         />
-                        <MainBtn
-                            disabled={loading}
-                            loading={loading}
+                        <MainBtn 
                             title={'確認'}
                             onPress={() => this.register()}
                         />

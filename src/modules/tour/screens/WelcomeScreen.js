@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Fontisto from 'react-native-vector-icons/Fontisto';
-import FastImage from 'react-native-fast-image';
+import Spinner from 'react-native-loading-spinner-overlay';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { AccessToken, LoginManager } from 'react-native-fbsdk';
 import auth from '@react-native-firebase/auth';
@@ -141,10 +139,13 @@ const WelcomeScreen = (props) => {
 	const onSignin = async () => {
 		try {
 			if (phone.length == 0) return;
+			setLoading(true);
 			const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+			setLoading(false);
 			setConfirm(confirmation);
 		}
 		catch (error) {
+			setLoading(false);
 			console.log('onsignin,', error)
 		}
 	};
@@ -203,6 +204,7 @@ const WelcomeScreen = (props) => {
 
 	return (
 		<KeyboardAwareScrollView style={[{ width: '100%', backgroundColor: '#fff' }]} keyboardShouldPersistTaps='handled'>
+			<Spinner visible={loading} />
 			<View style={[Theme.styles.col_center, Theme.styles.background, { backgroundColor: '#ffffff', paddingTop: 60 }]}>
 				<View style={[Theme.styles.col_center, { width: '100%', alignItems: 'flex-start' }]}>
 					<Text style={styles.title}>歡迎光臨</Text>
