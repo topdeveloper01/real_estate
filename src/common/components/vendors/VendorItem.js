@@ -44,7 +44,7 @@ const VendorItem = (props) => {
                     </View>
                 }
                 <View style={{ flex: 1 }} />
-                <AppText style={[styles.price]}>${data.price}</AppText>
+                <AppText style={[styles.price]}>${data.isSell == true ? data.price : data.rent_price}</AppText>
             </View>
         </View>
     </TouchableOpacity>;

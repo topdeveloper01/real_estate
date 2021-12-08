@@ -181,8 +181,7 @@ const WelcomeScreen = (props) => {
 
 	const onLoadUserData = async (uid) => { 
 		let logged_user_data = await props.getLoggedInUser(uid);
-
-		console.log('onLoadUserData ', id, logged_user_data)
+ 
 		if (logged_user_data != null) { 
 			props.setAsLoggedIn();
 		} 

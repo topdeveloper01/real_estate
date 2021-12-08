@@ -22,7 +22,7 @@ const FilterModal = ({ showModal, items, value, title, onSave, onClose }) => {
             <Text style={styles.modalTitle}>{title}</Text>
             {
                 items.map(item =>
-                    <TouchableOpacity style={[Theme.styles.row_center, {width: '100%', paddingVertical: 12}]}
+                    <TouchableOpacity key={item.value} style={[Theme.styles.row_center, {width: '100%', paddingVertical: 12}]}
                         onPress={() => {
                             setCurValue(item.value)
                         }}>

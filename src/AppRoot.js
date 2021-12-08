@@ -35,12 +35,9 @@ class AppRoot extends React.Component {
 		};
 	}
 
-	onAuthStateChanged = (user) => {
-		this.loadLoginInfo(user);
-	}
 
 	async componentDidMount() {
-		this.FbAuth_subscriber = auth().onAuthStateChanged(this.onAuthStateChanged);
+		await this.loadLoginInfo();
 
 		RNLocalize.addEventListener('change', this.handleLocalizationChange);
 		this.setupNotificationListener();
@@ -65,9 +62,6 @@ class AppRoot extends React.Component {
 	}
 
 	componentWillUnmount() {
-		if (this.FbAuth_subscriber) {
-			this.FbAuth_subscriber();
-		}
 		if (this.unsubscribe) {
 			console.log('app route unmount');
 			this.unsubscribe();
@@ -149,11 +143,12 @@ class AppRoot extends React.Component {
 	}
  
 
-	loadLoginInfo = async (user) => { 
+	loadLoginInfo = async () => { 
 		let logged_user_data = null;
 		try {
-			if (user != null && user.uid != null) {
-				logged_user_data = await this.props.getLoggedInUser(user.uid);
+			let currentUser = auth().currentUser;
+			if (currentUser != null && currentUser.uid != null) {
+				logged_user_data = await this.props.getLoggedInUser(currentUser.uid);
 				if (logged_user_data != null) {
 					this.props.setAsLoggedIn();
 				} 

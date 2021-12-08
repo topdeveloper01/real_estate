@@ -16,7 +16,7 @@ import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionM
 import Header1 from '../../../common/components/Header1';
 import moment from 'moment';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; 
-import { uploadPhoto } from '../../../common/services/fbstorage';
+import { uploadPhoto } from '../../../common/services/firebase';
 
 const ProfileEditScreen = (props) => {
 	const [isLoading, ShowLoading] = useState(false);

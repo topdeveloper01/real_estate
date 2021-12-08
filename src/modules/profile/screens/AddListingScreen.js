@@ -20,7 +20,7 @@ import moment from 'moment';
 import { RadioBtn } from '../../../common/components';
 import { FOR_PERSONAL, FOR_BUSINESS } from '../../../config/constants';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { uploadPhoto } from '../../../common/services/fbstorage';
+import { uploadPhoto } from '../../../common/services/firebase';
 // Svg
 import Svg_addphoto from '../../../common/assets/svgs/add_a_photo.svg';
 
@@ -345,8 +345,7 @@ const AddListingScreen = (props) => {
 				alerts.error('警告', '出了些問題');
 			}
 		}
-	};
-	console.log('newListingData ', value_city1, value_city2, value_city3 )
+	}; 
 
 	return (
 		<View style={styles.container}>
