@@ -13,7 +13,7 @@
             <rect key="frame" x="0.0" y="0.0" width="523" height="923"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash.png" translatesAutoresizingMaskIntoConstraints="NO" id="cPG-HA-ZIX">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash_screen_img" translatesAutoresizingMaskIntoConstraints="NO" id="cPG-HA-ZIX">
                     <rect key="frame" x="0.0" y="0.0" width="523" height="923"/>
                 </imageView>
             </subviews>
@@ -30,6 +30,6 @@
         </view>
     </objects>
     <resources>
-        <image name="splash.png" width="1242" height="2208"/>
+        <image name="splash_screen_img" width="1000" height="2048"/>
     </resources>
 </document>
