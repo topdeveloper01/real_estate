@@ -82,6 +82,7 @@ class PhoneVerificationScreen extends React.Component {
         const { user } = this.props;
         await this.setState({ loadingResend: true });
         try {
+            console.log('user.phone ', user.phone)
             const confirmation = await auth().signInWithPhoneNumber('+852' + user.phone, true);
             this.setState({
                 loadingResend: false, 
@@ -214,7 +215,7 @@ class PhoneVerificationScreen extends React.Component {
                         }
                     </View>
 
-                    <View style={[Theme.styles.row_center_start, { width: '100%', justifyContent: 'flex-start', marginVertical: 80 }]}>
+                    {/* <View style={[Theme.styles.row_center_start, { width: '100%', justifyContent: 'flex-start', marginVertical: 80 }]}>
                         <Text style={styles.notiTxt}>沒有收到驗證碼?</Text>
                         <TransBtn
                             style={{ paddingTop: 10 }}
@@ -222,12 +223,12 @@ class PhoneVerificationScreen extends React.Component {
                             title={' 重發一次'}
                             onPress={this.resend}
                         />
-                    </View>
+                    </View> */}
 
                     <MainBtn
-                        title={'下一步'}
+                        title={'下一步 Next Step'}
                         onPress={this.verify}
-                        style={{ width: '100%', backgroundColor: Theme.colors.yellow1 }}
+                        style={{ width: '100%', marginTop: 100, backgroundColor: Theme.colors.yellow1 }}
                     />
                 </View>
                 <LoadingModal showModal={this.state.loading} title='請等待'/>

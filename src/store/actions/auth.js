@@ -20,6 +20,26 @@ export const getLoggedInUserData = (user_id) => {
         }
     });
 };
+
+export const checkSamePhoneNumber = (phone_number) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            userCollection.where('phone', '==', phone_number).get().then((res) => {
+                if (res.docs.length > 0 ) {
+                    resolve(true);
+                }
+                else {
+                    resolve(false);
+                } 
+            })
+                .catch(err => {
+                    reject(err);
+                });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
  
 
 export const register = (user) => async dispatch => {

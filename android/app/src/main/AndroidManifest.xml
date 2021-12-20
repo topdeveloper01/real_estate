@@ -48,7 +48,7 @@ xmlns:tools="http://schemas.android.com/tools"
   
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
         <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="AIzaSyAEe-vcJ-r8w9FQdVEskAozi1v9cWy6YAA"/>
+                   android:value="AIzaSyDogQ6uVTq1m6ZScGhcXj2BQAFi08WGpo4"/>
  
         <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService"/>
 

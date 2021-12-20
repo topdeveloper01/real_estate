@@ -5,17 +5,19 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { width, height } from 'react-native-dimension';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { connect } from 'react-redux'; 
+import { connect } from 'react-redux';
 import { updateProfileDetails } from '../../../store/actions/auth';
 import { getAllListings } from '../../../store/actions/listings';
 import { setVendorCart, getAllCities, setAllCity_1, setAllCity_2, setAllCity_3 } from '../../../store/actions/app';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import { AuthInput, VendorItem, } from '../../../common/components';
+import TabsTypeButton from '../../../common/components/buttons/tab_btn';
 import FeatureList from '../components/FeatureList';
 import FilterBar from '../../../common/components/vendors/FilterVar';
 import BlockSpinner from '../../../common/components/BlockSpinner';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
+import { FOR_RENT } from '../../../config/constants';
 
 const vertPerPage = 10;
 
@@ -27,22 +29,24 @@ const HomePage = (props) => {
     const [vertLoading, setVertLoading] = useState(null)
     const [isRefreshing, setRefreshing] = useState(false)
 
-    
+
     const [cityLoading, setCityLoading] = useState(false)
 
     const [searchTerm, setSearchTerm] = useState('')
- 
+
 
     const [filter_city_1, setFilterCity1] = useState(null)
     const [filter_city_2, setFilterCity2] = useState(null)
     const [filter_city_3, setFilterCity3] = useState(null)
 
-    const [filter_type, setFilterType] = useState(-1)
+    const [filter_type, setFilterType] = useState(FOR_RENT)
+    const [filter_use_format, setFilterUseFormat] = useState(-1)
     const [filter_price, setFilterPrice] = useState(-1)
     const [filter_size, setFilterSize] = useState(-1)
     const [filter_rooms, setFilterRooms] = useState(-1)
+    const [filter_outer, setFilterOuter] = useState(-1)
 
-    useEffect(()=>{
+    useEffect(() => {
         updateUserToken()
         loadCitiesData()
     }, [])
@@ -51,7 +55,7 @@ const HomePage = (props) => {
         loadVendors();
         loadFeaturedBlocks();
     }, [
-        searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3
+        searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3
     ])
 
     const goRootStackScreen = (name, params) => {
@@ -64,46 +68,46 @@ const HomePage = (props) => {
     }
 
     const updateUserToken = async () => {
-		let platform = "iOS";
-		if (Platform.OS === 'android') {
-			platform = "Android"
-		}
+        let platform = "iOS";
+        if (Platform.OS === 'android') {
+            platform = "Android"
+        }
 
-		try { 
-			let newUserData = {
-				...props.user, 
-				platform: platform
-			}
-			const updated_user = await props.updateProfileDetails(newUserData);
+        try {
+            let newUserData = {
+                ...props.user,
+                platform: platform
+            }
+            const updated_user = await props.updateProfileDetails(newUserData);
 
-			console.log('updated_user', updated_user); 
-		}
-		catch (error) { 
-			console.log('updateUserToken ', error); 
-		}
-	}
+            console.log('updated_user', updated_user);
+        }
+        catch (error) {
+            console.log('updateUserToken ', error);
+        }
+    }
 
     const loadCitiesData = async () => {
-		try { 
+        try {
             setCityLoading(true);
-			let city1_items = await getAllCities(1);
+            let city1_items = await getAllCities(1);
             let city2_items = await getAllCities(2);
             let city3_items = await getAllCities(3);
 
             props.setAllCity_1(city1_items);
             props.setAllCity_2(city2_items);
-            props.setAllCity_3(city3_items);  
+            props.setAllCity_3(city3_items);
             setCityLoading(false);
-		}
-		catch (error) { 
+        }
+        catch (error) {
             setCityLoading(false);
-			console.log('loadCitiesData ', error);
-		}
-	}
+            console.log('loadCitiesData ', error);
+        }
+    }
 
 
     const getFilers = () => {
-        return { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 }
+        return { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 }
     }
 
     const loadVendors = async () => {
@@ -162,16 +166,25 @@ const HomePage = (props) => {
         <View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
             <Spinner visible={cityLoading} />
             <View style={[Theme.styles.row_center_start, styles.header]}>
-                <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+                <View style={[Theme.styles.col_center, { flex: 1, alignItems: 'flex-start' }]}>
+                    <Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+                    <Text style={styles.headerSubTitle}>Hollys Property And Renovation Company Limited</Text>
+                </View>
                 <TouchableOpacity onPress={() => {
                     goRootStackScreen(RouteNames.NotificationsScreen)
                 }}>
                     <MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
                 </TouchableOpacity>
             </View>
-            <View style={{ width: '100%', marginTop: 10, paddingHorizontal: 20, }}>
+            <TabsTypeButton
+                value={filter_type}
+                onChange={(value) => {
+                    setFilterType(value)
+                }}
+            />
+            <View style={{ width: '100%', marginTop: 6, paddingHorizontal: 20, }}>
                 <AuthInput
-                    placeholder={'關鍵字/地區/標籤'}
+                    placeholder={'關鍵字/地區/標籤 (Search By Keyword)'}
                     underlineColorAndroid={'transparent'}
                     autoCapitalize={'none'}
                     returnKeyType={'done'}
@@ -193,15 +206,16 @@ const HomePage = (props) => {
             </View>
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
                 <FilterBar
-                    onChangeArea={(value) => {  
+                    onChangeArea={(value) => {
                         setFilterCity1(value.city1)
                         setFilterCity2(value.city2)
                         setFilterCity3(value.city3)
                     }}
-                    onChangeType={(value) => { setFilterType(value) }}
+                    onChangeType={(value) => { setFilterUseFormat(value) }}
                     onChangePrice={(value) => { setFilterPrice(value) }}
                     onChangeSize={(value) => { setFilterSize(value) }}
                     onChangeRooms={(value) => { setFilterRooms(value) }}
+                    onChangeOuter={(value) => { setFilterOuter(value) }}
                 />
             </View>
             {
@@ -225,7 +239,7 @@ const HomePage = (props) => {
                         {
                             featuredBlocks.length > 0 &&
                             <FeatureList
-                                label={'精選樓盤'}
+                                label={'精選樓盤 HOT ESTATE'}
                                 items={featuredBlocks}
                                 goVendorDetail={(vendor) => {
                                     goVendorDetail(vendor)
@@ -242,8 +256,9 @@ const HomePage = (props) => {
 }
 
 const styles = StyleSheet.create({
-    header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 40, backgroundColor: '#F7F7F7' },
-    headerTitle: { flex: 1, fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+    header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 34, backgroundColor: '#F7F7F7' },
+    headerTitle: { fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+    headerSubTitle: { fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
     operationTab: { height: 62, width: '100%', marginTop: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
     subjectTitle: { fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
     divider: { width: '100%', height: 1, backgroundColor: '#F6F6F9' },
@@ -261,13 +276,13 @@ const styles = StyleSheet.create({
 })
 
 
-const mapStateToProps = ({ app  }) => ({
+const mapStateToProps = ({ app }) => ({
     user: app.user || {},
-    isLoggedIn: app.isLoggedIn, 
-    language: app.language, 
+    isLoggedIn: app.isLoggedIn,
+    language: app.language,
     vendorData: app.vendorData,
 });
 
 export default connect(mapStateToProps, {
-     setVendorCart, updateProfileDetails, setAllCity_1, setAllCity_2, setAllCity_3
+    setVendorCart, updateProfileDetails, setAllCity_1, setAllCity_2, setAllCity_3
 })(HomePage);

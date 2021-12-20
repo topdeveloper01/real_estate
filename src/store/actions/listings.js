@@ -1,5 +1,6 @@
 import { listingCollection } from '../../common/services/firebase';
 import { isEmpty } from '../../common/services/utility';
+import { FOR_RENT, FOR_SELL } from '../../config/constants';
 
 export const getListingData = (id) => {
     return new Promise(async (resolve, reject) => {
@@ -19,13 +20,13 @@ export const getListingData = (id) => {
 export const getMyListings = (user_id, filterKeys) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 } = filterKeys;
+            const { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 } = filterKeys;
             console.log('filterKeys ', filterKeys)
             let coll_ref = listingCollection.where('owner_id', '==', user_id);
             if (filterKeys.is_featured == true) {
                 coll_ref = coll_ref.where('is_featured', '==', true);
             }
-            
+
             if (!isEmpty(filter_city_1)) {
                 coll_ref = coll_ref.where('area', '==', filter_city_1);
             }
@@ -35,20 +36,31 @@ export const getMyListings = (user_id, filterKeys) => {
             if (!isEmpty(filter_city_3)) {
                 coll_ref = coll_ref.where('building', '==', filter_city_3);
             }
-            
+
             if (!isEmpty(searchTerm)) {
                 coll_ref = coll_ref.where('title', '>=', searchTerm).where('title', '<=', searchTerm + '~');
             }
             if (filter_type != -1) {
-                if (filter_type == 0) { // sell
+                if (filter_type == FOR_SELL) { // sell
                     coll_ref = coll_ref.where('isSell', '==', true);
                 }
-                else if (filter_type == 1) { // rent
-                    coll_ref = coll_ref.where('isRent', '==', true);
+                else if (filter_type == FOR_RENT) { // rent
+                    coll_ref = coll_ref.where('isSell', '==', false);
                 }
-            } 
+            }
             if (filter_rooms != -1) {
                 coll_ref = coll_ref.where('rooms', '==', filter_rooms)
+            }
+
+            if (filter_use_format != -1) {
+                coll_ref = coll_ref.where('type_use', '==', filter_use_format);
+            }
+
+            if (filter_outer == 0) {
+                coll_ref = coll_ref.where('outer_roof', '==', true)
+            }
+            else if (filter_outer == 1) {
+                coll_ref = coll_ref.where('outer_terrace', '==', true)
             }
 
             let list = [];
@@ -58,32 +70,32 @@ export const getMyListings = (user_id, filterKeys) => {
                 })
 
                 if (filter_price != -1) {
-                    if (filter_price == 0) { 
+                    if (filter_price == 0) {
                         list = list.filter(item => item.price <= 3999999)
                     }
                     else if (filter_price == 1) {
-                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999 ) 
+                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
                     }
                     else if (filter_price == 2) {
-                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999 ) 
+                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
                     }
                     else if (filter_price == 3) {
-                        list = list.filter(item => item.price >= 50000000) 
+                        list = list.filter(item => item.price >= 50000000)
                     }
                 }
-                
+
                 if (filter_size != -1) {
                     if (filter_size == 0) {
-                        list = list.filter(item => item.size <= 299) 
+                        list = list.filter(item => item.actual_size <= 299)
                     }
                     else if (filter_size == 1) {
-                        list = list.filter(item => item.size >= 300 && item.size <= 799 )  
+                        list = list.filter(item => item.actual_size >= 300 && item.actual_size <= 799)
                     }
                     else if (filter_size == 2) {
-                        list = list.filter(item => item.size >= 800 && item.size <= 1499 )  
+                        list = list.filter(item => item.actual_size >= 800 && item.actual_size <= 1499)
                     }
                     else if (filter_size == 3) {
-                        list = list.filter(item => item.size >= 1500) 
+                        list = list.filter(item => item.actual_size >= 1500)
                     }
                 }
                 resolve(list);
@@ -100,7 +112,7 @@ export const getMyListings = (user_id, filterKeys) => {
 export const getAllListings = (filterKeys) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const { searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3  } = filterKeys;
+            const { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 } = filterKeys;
             console.log('filterKeys ', filterKeys)
             let coll_ref = listingCollection;
             if (filterKeys.is_featured == true) {
@@ -119,16 +131,36 @@ export const getAllListings = (filterKeys) => {
                 coll_ref = coll_ref.where('title', '>=', searchTerm).where('title', '<=', searchTerm + '~');
             }
             if (filter_type != -1) {
-                if (filter_type == 0) { // sell
+                if (filter_type == FOR_SELL) { // sell
                     coll_ref = coll_ref.where('isSell', '==', true);
                 }
-                else if (filter_type == 1) { // rent
-                    coll_ref = coll_ref.where('isRent', '==', true);
+                else if (filter_type == FOR_RENT) { // rent
+                    coll_ref = coll_ref.where('isSell', '==', false);
                 }
             }
-             
+
+            if (filter_type != -1) {
+                if (filter_type == FOR_SELL) { // sell
+                    coll_ref = coll_ref.where('isSell', '==', true);
+                }
+                else if (filter_type == FOR_RENT) { // rent
+                    coll_ref = coll_ref.where('isSell', '==', false);
+                }
+            }
+
             if (filter_rooms != -1) {
                 coll_ref = coll_ref.where('rooms', '==', filter_rooms)
+            }
+
+            if (filter_use_format != -1) {
+                coll_ref = coll_ref.where('type_use', '==', filter_use_format);
+            }
+
+            if (filter_outer == 0) {
+                coll_ref = coll_ref.where('outer_roof', '==', true)
+            }
+            else if (filter_outer == 1) {
+                coll_ref = coll_ref.where('outer_terrace', '==', true)
             }
 
             let list = [];
@@ -139,32 +171,32 @@ export const getAllListings = (filterKeys) => {
                 })
 
                 if (filter_price != -1) {
-                    if (filter_price == 0) { 
+                    if (filter_price == 0) {
                         list = list.filter(item => item.price <= 3999999)
                     }
                     else if (filter_price == 1) {
-                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999 ) 
+                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
                     }
                     else if (filter_price == 2) {
-                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999 ) 
+                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
                     }
                     else if (filter_price == 3) {
-                        list = list.filter(item => item.price >= 50000000) 
+                        list = list.filter(item => item.price >= 50000000)
                     }
                 }
-                
+
                 if (filter_size != -1) {
                     if (filter_size == 0) {
-                        list = list.filter(item => item.size <= 299) 
+                        list = list.filter(item => item.actual_size <= 299)
                     }
                     else if (filter_size == 1) {
-                        list = list.filter(item => item.size >= 300 && item.size <= 799 )  
+                        list = list.filter(item => item.actual_size >= 300 && item.actual_size <= 799)
                     }
                     else if (filter_size == 2) {
-                        list = list.filter(item => item.size >= 800 && item.size <= 1499 )  
+                        list = list.filter(item => item.actual_size >= 800 && item.actual_size <= 1499)
                     }
                     else if (filter_size == 3) {
-                        list = list.filter(item => item.size >= 1500) 
+                        list = list.filter(item => item.actual_size >= 1500)
                     }
                 }
 

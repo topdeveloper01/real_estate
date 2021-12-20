@@ -11,7 +11,7 @@ import MainBtn from '../../../common/components/buttons/main_button';
 import AuthInput from '../../../common/components/AuthInput';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
 import RouteNames from '../../../routes/names';
-import { facebookLogin, login, PHONE_NOT_VERIFIED, register, appleLogin, setAsLoggedIn } from '../../../store/actions/auth';
+import { facebookLogin, login, PHONE_NOT_VERIFIED, register, appleLogin, setAsLoggedIn, checkSamePhoneNumber } from '../../../store/actions/auth';
 import { extractErrorMessage, validateUserData } from '../../../common/services/utility'; 
 import alerts from '../../../common/services/alerts';
 
@@ -28,8 +28,7 @@ class RegisterScreen extends React.PureComponent {
             isKeyboadVisible: false, 
             full_name: '',
             phone: '',
-            email: '',
-            password: '',
+            email: '', 
         };
     }
 
@@ -64,55 +63,59 @@ class RegisterScreen extends React.PureComponent {
         this.setState({
             isKeyboadVisible: false
         });
-    };
-
-    next() {
-        this.setState({
-            nextScreen: true,
-        });
-    }
-
-    onEmailDone = () => {
-        this.passwordInput.focus();
-    };
+    }; 
 
     goBack = () => {
         this.props.navigation.navigate(RouteNames.HomeScreen);
     };
 
     register = () => {
-        const { full_name, phone, email, password } = this.state;
-        let pass2 = password;
-        validateUserData({ full_name, email, phone, password, pass2 }, true).then(async () => {
-            try { 
-                this.setState({loading : true})
-                const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
-                this.setState({loading : false, confirm: confirmation})
-            }
-            catch (error) {
+        const { full_name, phone, email  } = this.state; 
+        validateUserData({ full_name, email, phone, password : '', pass2 : '' }, true).then(async () => {
+            this.setState({loading : true})
+            checkSamePhoneNumber(phone).then( async (res) => {
+                if (res == true) {
+                    this.setState({loading : false})
+				    alerts.error('警告', '該電話號碼已被使用，請登錄系統');      
+                }
+                else {
+                    try {  
+                        const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+                        this.setState({loading : false, confirm: confirmation})
+                    }
+                    catch (error) {
+                        this.setState({loading : false})
+                        console.log('onsignin,', error)
+                    }
+                }
+            })
+            .catch(error => {
                 this.setState({loading : false})
-                console.log('onsignin,', error)
-            }
+                alerts.error('警告', '檢查電話號碼時出錯');
+            }) 
         });
     };
 
 	onRegisterUserData = async (id) => {  
         if (id == null) return;
-        const { full_name, phone, email, password } = this.state;
+        const { full_name, phone, email, } = this.state;
 		let logged_user_data = await this.props.register({id, full_name, email, phone, photo : '', admin : false });
 		if (logged_user_data != null) { 
 			this.props.setAsLoggedIn();
 		} 
+        else {
+            alerts.error('警告', '用戶註冊失敗');
+        }
 	}
 
     render() {
-        const { loading, confirm, full_name, phone, email, password } = this.state; 
+        const { loading, confirm, full_name, phone, email, } = this.state; 
 
         if (confirm != null) {
             return <PhoneVerificationScreen
                 isSignin={false}
                 user={{
-                    full_name, phone, email, password
+                    full_name, phone, email
                 }}
                 FbConfirm={confirm}
                 goBack={() => {
@@ -132,12 +135,11 @@ class RegisterScreen extends React.PureComponent {
                             <AppText style={styles.sub_title}>建立新帳戶</AppText>
                         </View>
                         <AuthInput
-                            placeholder={'用戶名稱'}
+                            placeholder={'用戶名稱 Username'}
                             underlineColorAndroid={'transparent'}
                             keyboardType={'default'}
                             selectionColor={Theme.colors.cyan2}
-                            onChangeText={full_name => this.setState({ full_name })}
-                            // onSubmitEditing={() => this.onEmailDone()}
+                            onChangeText={full_name => this.setState({ full_name })} 
                             returnKeyType={'next'}
                             autoCapitalize={'none'}
                             value={this.state.full_name}
@@ -147,27 +149,11 @@ class RegisterScreen extends React.PureComponent {
                             style={{ marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
                         />
                         <AuthInput
-                            placeholder={'電話號碼'}
-                            underlineColorAndroid={'transparent'}
-                            keyboardType={'phone-pad'}
-                            selectionColor={Theme.colors.cyan2}
-                            onChangeText={phone => this.setState({ phone })}
-                            // onSubmitEditing={() => this.onEmailDone()}
-                            returnKeyType={'next'}
-                            autoCapitalize={'none'}
-                            value={this.state.phone}
-                            secure={false}
-                            placeholderTextColor={Theme.colors.text}
-                            backgroundColor={Theme.colors.gray4}
-                            style={{ marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
-                        />
-                        <AuthInput
-                            placeholder={'電郵'}
+                            placeholder={'電郵 Email'}
                             underlineColorAndroid={'transparent'}
                             keyboardType={'email-address'}
                             selectionColor={Theme.colors.cyan2}
-                            onChangeText={email => this.setState({ email })}
-                            // onSubmitEditing={() => this.onEmailDone()}
+                            onChangeText={email => this.setState({ email })} 
                             returnKeyType={'next'}
                             autoCapitalize={'none'}
                             value={this.state.email}
@@ -177,22 +163,19 @@ class RegisterScreen extends React.PureComponent {
                             style={{ marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
                         />
                         <AuthInput
-                            placeholder={'密碼'}
+                            placeholder={'電話號碼 Mobile Phone number'}
                             underlineColorAndroid={'transparent'}
-                            setRef={(input) => {
-                                this.passwordInput = input;
-                            }}
+                            keyboardType={'phone-pad'}
+                            selectionColor={Theme.colors.cyan2}
+                            onChangeText={phone => this.setState({ phone })} 
+                            returnKeyType={'next'}
                             autoCapitalize={'none'}
-                            onChangeText={password => this.setState({ password })}
-                            // onSubmitEditing={() => this.login()}
-                            returnKeyType={'done'}
-                            value={this.state.password}
-                            secure={true}
+                            value={this.state.phone}
+                            secure={false}
                             placeholderTextColor={Theme.colors.text}
                             backgroundColor={Theme.colors.gray4}
                             style={{ marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
-                            setRef={ref => ref && ref.setNativeProps({ style: { fontFamily: 'Yellix-Medium' } })}
-                        />
+                        /> 
                         <MainBtn 
                             title={'確認'}
                             onPress={() => this.register()}

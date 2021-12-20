@@ -271,7 +271,7 @@ class ChatScreen extends React.Component {
                 <Header1
                     left={<View />}
                     style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
-                    title={'通訊'}
+                    title={'通訊 Message'}
                 />
                 {
                     this.state.isLoadingChat ? <BlockSpinner /> :

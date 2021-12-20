@@ -16,7 +16,7 @@ const TermsScreen = (props) => {
 					props.navigation.goBack();
 				}}
 				style={{ paddingHorizontal: 20, height : 90 }}
-				title={'條款及細則'}
+				title={'條款及細則 T&C'}
 			/>
 			<View style={styles.formView}>
 				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%', paddingHorizontal: 20 }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>

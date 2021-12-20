@@ -15,8 +15,10 @@ import { setVendorCart } from '../../../store/actions/app';
 import Theme from '../../../theme';
 import RouteNames from '../../../routes/names';
 import FilterBar from '../../../common/components/vendors/FilterVar';
-import { AuthInput,  VendorItem,   } from '../../../common/components';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
+import { AuthInput, VendorItem, } from '../../../common/components';
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
+import TabsTypeButton from '../../../common/components/buttons/tab_btn';
+import { FOR_RENT } from '../../../config/constants';
 
 const vertPerPage = 10;
 
@@ -30,18 +32,20 @@ const SearchScreen = (props) => {
 	const [searchTerm, setSearchTerm] = useState('')
 
 	const [filter_city_1, setFilterCity1] = useState(null)
-    const [filter_city_2, setFilterCity2] = useState(null)
-    const [filter_city_3, setFilterCity3] = useState(null)
-
-	const [filter_type, setFilterType] = useState(-1)
-	const [filter_price, setFilterPrice] = useState(-1)
-	const [filter_size, setFilterSize] = useState(-1)
-	const [filter_rooms, setFilterRooms] = useState(-1)
+	const [filter_city_2, setFilterCity2] = useState(null)
+	const [filter_city_3, setFilterCity3] = useState(null)
+  
+	const [filter_type, setFilterType] = useState(FOR_RENT)
+    const [filter_use_format, setFilterUseFormat] = useState(-1)
+    const [filter_price, setFilterPrice] = useState(-1)
+    const [filter_size, setFilterSize] = useState(-1)
+    const [filter_rooms, setFilterRooms] = useState(-1)
+    const [filter_outer, setFilterOuter] = useState(-1)
 
 	useEffect(() => {
 		loadVendors(true);
 	}, [
-		searchTerm, filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3
+		searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3
 	])
 
 	const goRootStackScreen = (name, params) => {
@@ -54,7 +58,7 @@ const SearchScreen = (props) => {
 	}
 
 	const getFilers = () => {
-		return { searchTerm, filter_type, filter_price, filter_size, filter_rooms , filter_city_1, filter_city_2, filter_city_3 }
+		return { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3}
 	}
 
 	const loadVendors = async (forceLoading) => {
@@ -109,16 +113,25 @@ const SearchScreen = (props) => {
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
 			{/* <Spinner visible={vertLoading}/> */}
 			<View style={[Theme.styles.row_center_start, styles.header]}>
-				<Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+				<View style={[Theme.styles.col_center, { flex: 1, alignItems: 'flex-start' }]}>
+					<Text style={styles.headerTitle}>滙槿地產有限公司</Text>
+					<Text style={styles.headerSubTitle}>Hollys Property And Renovation Company Limited</Text>
+				</View>
 				<TouchableOpacity onPress={() => {
 					goRootStackScreen(RouteNames.NotificationsScreen)
 				}}>
 					<MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
 				</TouchableOpacity>
 			</View>
-			<View style={{ width: '100%', marginTop: 10, paddingHorizontal: 20, }}>
+			<TabsTypeButton
+				value={filter_type}
+				onChange={(value) => {
+					setFilterType(value)
+				}}
+			/>
+			<View style={{ width: '100%', marginTop: 6, paddingHorizontal: 20, }}>
 				<AuthInput
-					placeholder={'關鍵字/地區/標籤'}
+					placeholder={'關鍵字/地區/標籤 (Search By Keyword)'}
 					underlineColorAndroid={'transparent'}
 					autoCapitalize={'none'}
 					returnKeyType={'done'}
@@ -139,16 +152,17 @@ const SearchScreen = (props) => {
 				/>
 			</View>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
-				<FilterBar
-					onChangeArea={(value) => {  
+				<FilterBar 
+					onChangeArea={(value) => {
                         setFilterCity1(value.city1)
                         setFilterCity2(value.city2)
                         setFilterCity3(value.city3)
                     }}
-					onChangeType={(value) => { setFilterType(value) }}
-					onChangePrice={(value) => { setFilterPrice(value) }}
-					onChangeSize={(value) => { setFilterSize(value) }}
-					onChangeRooms={(value) => { setFilterRooms(value) }}
+                    onChangeType={(value) => { setFilterUseFormat(value) }}
+                    onChangePrice={(value) => { setFilterPrice(value) }}
+                    onChangeSize={(value) => { setFilterSize(value) }}
+                    onChangeRooms={(value) => { setFilterRooms(value) }}
+                    onChangeOuter={(value) => { setFilterOuter(value) }}
 				/>
 			</View>
 			{
@@ -178,8 +192,9 @@ const SearchScreen = (props) => {
 }
 
 const styles = StyleSheet.create({
-	header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 40, backgroundColor: '#F7F7F7' },
-	headerTitle: { flex: 1, fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+	header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 34, backgroundColor: '#F7F7F7' },
+	headerTitle: {  fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+    headerSubTitle: {  fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
 	operationTab: { height: 62, width: '100%', marginTop: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
 	subjectTitle: { fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	divider: { width: '100%', height: 1, backgroundColor: '#F6F6F9' },
@@ -199,11 +214,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ app, shop }) => ({
 	user: app.user || {},
-	isLoggedIn: app.isLoggedIn, 
-	language: app.language, 
+	isLoggedIn: app.isLoggedIn,
+	language: app.language,
 	vendorData: app.vendorData,
 });
 
 export default connect(mapStateToProps, {
-   setVendorCart,
+	setVendorCart,
 })(SearchScreen);

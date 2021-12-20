@@ -14,6 +14,8 @@ import Header1 from '../../../common/components/Header1';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
 import FilterBar from '../../../common/components/vendors/FilterVar';
+import TabsTypeButton from '../../../common/components/buttons/tab_btn';
+import { FOR_RENT } from '../../../config/constants';
 
 const MyListingsScreen = (props) => {
 
@@ -31,19 +33,21 @@ const MyListingsScreen = (props) => {
     const [filter_city_2, setFilterCity2] = useState(null)
     const [filter_city_3, setFilterCity3] = useState(null)
  
-	const [filter_type, setFilterType] = useState(-1)
-	const [filter_price, setFilterPrice] = useState(-1)
-	const [filter_size, setFilterSize] = useState(-1)
-	const [filter_rooms, setFilterRooms] = useState(-1)
+	const [filter_type, setFilterType] = useState(FOR_RENT)
+    const [filter_use_format, setFilterUseFormat] = useState(-1)
+    const [filter_price, setFilterPrice] = useState(-1)
+    const [filter_size, setFilterSize] = useState(-1)
+    const [filter_rooms, setFilterRooms] = useState(-1)
+    const [filter_outer, setFilterOuter] = useState(-1)
 
 	useEffect(() => {
 		loadVendors();
 	}, [
-		filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3
+		  filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3
 	])
 
 	const getFilers = () => {
-		return { searchTerm: '', filter_type, filter_price, filter_size, filter_rooms, filter_city_1, filter_city_2, filter_city_3 }
+		return { searchTerm: '', filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 }
 	}
 
 	const loadVendors = async () => {
@@ -126,6 +130,12 @@ const MyListingsScreen = (props) => {
 				style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
 				title={'已上傳單位記錄'}
 			/>
+			<TabsTypeButton 
+                value={filter_type}
+                onChange={(value) => {
+                    setFilterType(value)
+                }}
+            />
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
 				<FilterBar
 					onChangeArea={(value) => {  
@@ -133,10 +143,11 @@ const MyListingsScreen = (props) => {
                         setFilterCity2(value.city2)
                         setFilterCity3(value.city3)
                     }}
-					onChangeType={(value) => { setFilterType(value) }}
-					onChangePrice={(value) => { setFilterPrice(value) }}
-					onChangeSize={(value) => { setFilterSize(value) }}
-					onChangeRooms={(value) => { setFilterRooms(value) }}
+					onChangeType={(value) => { setFilterUseFormat(value) }}
+                    onChangePrice={(value) => { setFilterPrice(value) }}
+                    onChangeSize={(value) => { setFilterSize(value) }}
+                    onChangeRooms={(value) => { setFilterRooms(value) }}
+                    onChangeOuter={(value) => { setFilterOuter(value) }}
 				/>
 			</View>
 			{

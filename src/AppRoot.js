@@ -1,28 +1,16 @@
 import React from 'react';
-import { AsyncStorage, StatusBar, View } from 'react-native';
+import {   StatusBar, View } from 'react-native';
 import BottomTabs from './routes/stack';
 import { setStorageKey, getStorageKey, KEYS } from './common/services/storage';
 import SplashScreen from 'react-native-splash-screen';
-import messaging from '@react-native-firebase/messaging';
-import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging'; 
 import { connect } from 'react-redux';
-import { getLoggedInUser ,setAsLoggedIn,  setUserNeedLogin } from './store/actions/auth';
-import * as RNLocalize from 'react-native-localize';
+import { getLoggedInUser ,setAsLoggedIn, } from './store/actions/auth'; 
 import { 
-	loadAppLang, 
-	goActiveScreenFromPush,
-} from './store/actions/app';  
-import { updateProfileDetails } from './store/actions/auth'; 
-import {
-	PUSH_NOTIFICATION_NEW_BLOG,
-	PUSH_NOTIFICATION_NEW_VENDOR,
-	PUSH_NOTIFICATION_OPENED_EVENT,
 	PUSH_NOTIFICATION_RECEIVED_EVENT,
 	setupPushNotifications,
 } from './common/services/pushNotifications';
-import { EventRegister } from 'react-native-event-listeners';
-import apiFactory from './common/services/apiFactory';
-import { openRateAppModal, shouldOpenRateAppModal, updateOpenedAppCount } from './common/services/rate';
+import { EventRegister } from 'react-native-event-listeners'; 
 
 class AppRoot extends React.Component {
 	constructor(props) {
@@ -38,8 +26,7 @@ class AppRoot extends React.Component {
 
 	async componentDidMount() {
 		await this.loadLoginInfo();
-
-		RNLocalize.addEventListener('change', this.handleLocalizationChange);
+ 
 		this.setupNotificationListener();
 		const wasOpenedByNotification = await setupPushNotifications();
 		if (wasOpenedByNotification) {
@@ -68,18 +55,9 @@ class AppRoot extends React.Component {
 		}
 		if (this.pushNotiListener) {
 			EventRegister.removeEventListener(this.pushNotiListener);
-		}
-		RNLocalize.removeEventListener('change', this.handleLocalizationChange);
+		} 
 	}
-
-	checkStoreRating = async () => {
-		const shouldOpen = await shouldOpenRateAppModal();
-		if (shouldOpen) {
-			openRateAppModal();
-		} else {
-			await updateOpenedAppCount();
-		}
-	};
+ 
 
 	setupNotificationListener = () => {
 		this.pushNotiListener = EventRegister.addEventListener(
@@ -91,21 +69,11 @@ class AppRoot extends React.Component {
 	};
 
 	onNotificationOpened = async (notification) => {
-		const vm = this;
-
+		const vm = this; 
 		console.log('onNotificationOpened', notification);
 		if (notification && notification.data) {
 			switch (notification.data.type) { 
-				case 'chat_notification': {
-					try {
-						await vm.props.goActiveScreenFromPush({
-							isChatVisible: true,
-							pushConversationId: notification.data.conversation_id,
-							pushChatMsgTime: notification.data.date_time
-						});
-					} catch (error) {
-						console.log('friend_request_notification', error);
-					}
+				case 'chat_notification': { 
 					break;
 				} 
 				default: {
@@ -114,35 +82,14 @@ class AppRoot extends React.Component {
 			}
 		}
 	};
-
-	handleLocalizationChange = async () => {
-		await this.props.loadAppLang().then();
-		this.forceUpdate();
-	};
+ 
 
 	appLoaded = () => {
 		this.setState({ loadedInfo: true }, () => {
 			SplashScreen.hide();
 		});
 	};
-
-	loadDimCarts = async () => {
-		try {
-			await this.props.setSafeAreaData();
-		} catch (e) {
-			console.log(e);
-		}
-		try {
-			const cartItems = await getStorageKey(KEYS.CART_ITEMS);
-			if (cartItems) {
-				this.props.updateCartItems(cartItems);
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	}
- 
-
+  
 	loadLoginInfo = async () => {  
 		try {
 			let token = await getStorageKey(KEYS.TOKEN);
@@ -170,8 +117,7 @@ class AppRoot extends React.Component {
 	render() {
 		return (
 			<View style={{ flex: 1 }}>
-				<StatusBar translucent={true} backgroundColor='transparent' barStyle='dark-content' />
-				{/* {!Config.isAndroid && <StatusBar barStyle={'dark-content'} />} */}
+				<StatusBar translucent={true} backgroundColor='transparent' barStyle='dark-content' /> 
 				{this.renderContent()}
 			</View>
 		);
@@ -181,12 +127,7 @@ class AppRoot extends React.Component {
 const mapStateToProps = ({ app }) => ({  
 });
 
-export default connect(mapStateToProps, { 
-	loadAppLang,
-
-	setAsLoggedIn,
-	setUserNeedLogin,
-	getLoggedInUser, 
-	updateProfileDetails, 
-	goActiveScreenFromPush,
+export default connect(mapStateToProps, {   
+	setAsLoggedIn, 
+	getLoggedInUser,   
 })(AppRoot);

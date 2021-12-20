@@ -1,22 +1,30 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Image, StatusBar, View, Animated, ScrollView, Share, InteractionManager, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
 import Theme from '../../../theme';
 import { connect } from 'react-redux'
 import Spinner from 'react-native-loading-spinner-overlay';
 import Feather from 'react-native-vector-icons/Feather'
+import Gallery from 'react-native-image-gallery';
 import { width } from 'react-native-dimension';
 import FastImage from 'react-native-fast-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import YoutubePlayer from "react-native-youtube-iframe";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import { AppText } from '../../../common/components';
 import Svg_divider from '../../../common/assets/svgs/cat-divider.svg';
 import RoundIconBtn from '../../../common/components/buttons/round_icon_button';
 import alerts from '../../../common/services/alerts';
-import { FOR_PERSONAL } from '../../../config/constants';
+import { FOR_RESIDENTIAL, FOR_OFFICE, FOR_SHOP, FOR_INDUSTRIAL } from '../../../config/constants';
 import ImgGalleryModal from '../../../common/components/modals/ImgGalleryModal';
+import ImgVideoTab from '../../../common/components/buttons/img_video_tab';
+import StateText from '../../../common/components/vendors/StateText';
+import { MapScreenStyles } from '../../../config/constants';
 import { createSingleChannel, findChannel } from '../../../common/services/chat';
 import { getLoggedInUserData } from '../../../store/actions/auth';
-import { isEmpty } from '../../../common/services/utility';
+import { formatNumber, isEmpty, YouTubeGetID } from '../../../common/services/utility';
 import RouteNames from '../../../routes/names';
+import Img_placeholder from '../../../common/assets/images/placeholder2.png'
+import Svg_marker from '../../../common/assets/svgs/marker.svg'
 
 const VendorScreen = (props) => {
     const _mounted = useRef(true);
@@ -24,6 +32,8 @@ const VendorScreen = (props) => {
     const [ownerData, setOwner] = useState(null)
     const [isCreatingChannel, setCreateChannelLoading] = useState(false)
     const [isGalleryModal, ShowGalleryModal] = useState(false);
+    const [media_type, setMediaType] = useState('img');
+    const [isYoutubePlaying, setYoutubePlaying] = useState(false);
 
     useEffect(() => {
         loadOwnerDetails(props.vendorData.owner_id);
@@ -33,6 +43,35 @@ const VendorScreen = (props) => {
             _mounted.current = false;
         };
     }, [props.vendorData.id])
+
+    useEffect(() => {
+        if (media_type == 'video') {
+            setYoutubePlaying(true);
+        }
+        else {
+            setYoutubePlaying(false);
+        }
+    }, [media_type])
+
+    const onYoutubePlayStateChange = useCallback((state) => {
+        if (state === "ended") {
+            setYoutubePlaying(false);
+        }
+    }, []);
+
+    const getGalleryImages = () => {
+        if (props.vendorData.photos != null && props.vendorData.photos.length > 0) {
+            let sorted = props.vendorData.photos.sort((a, b) => a.weight - b.weight);
+            let list = [];
+            sorted.map(photo => {
+                list.push({
+                    source: { uri: photo.image }
+                })
+            });
+            return list;
+        }
+        return [{ source: Img_placeholder, dimensions: { width: 250, height: 250 } }];
+    }
 
     const loadOwnerDetails = async (id) => {
         if (id == null) { return; }
@@ -82,70 +121,172 @@ const VendorScreen = (props) => {
             <Spinner visible={isCreatingChannel} />
             <KeyboardAwareScrollView style={[{ flex: 1, backgroundColor: '#fff' }]} keyboardShouldPersistTaps='handled'>
                 <View style={[Theme.styles.col_center_start, Theme.styles.background, { padding: 0 }]}>
-                    <TouchableOpacity activeOpacity={1} style={[styles.img]} onPress={()=>{
-                        ShowGalleryModal(true)
-                    }}>
-                        <FastImage
-                            source={{ uri: props.vendorData.photo }}
-                            style={[styles.img]}
-                            resizeMode={FastImage.resizeMode.cover}
-                        />
-                    </TouchableOpacity> 
+                    {
+                        media_type == 'img' ?
+                            <TouchableOpacity activeOpacity={1} style={[styles.img]} onPress={() => {
+                                if (props.vendorData.photos != null && props.vendorData.photos.length > 0) {
+                                    ShowGalleryModal(true)
+                                }
+                            }}>
+                                {(props.vendorData.photos != null && props.vendorData.photos.length > 0) &&
+                                    <Gallery
+                                        style={styles.gallery}
+                                        imageComponent={(image, dim) =>
+                                            <FastImage source={image.source} style={[styles.img]} resizeMode={FastImage.resizeMode.cover} />
+                                        }
+                                        images={getGalleryImages()}
+                                        initialPage={0}
+                                        onPageSelected={(id) => {
+                                        }}
+                                    />
+                                }
+                            </TouchableOpacity>
+                            :
+                            <YoutubePlayer
+                                height={360}
+                                play={isYoutubePlaying}
+                                videoId={YouTubeGetID(props.vendorData.youtube)}
+                                onChangeState={onYoutubePlayStateChange}
+                            />
+                    }
+                    <ImgVideoTab
+                        value={media_type}
+                        onChange={(value) => {
+                            setMediaType(value)
+                        }}
+                    />
                     <View style={{ padding: 20, width: '100%' }}>
+                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                            <AppText style={[styles.area]}>{props.vendorData.area}</AppText>
+                        </View>
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                             <AppText style={[styles.title]}>{props.vendorData.title}</AppText>
                         </View>
+                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                            <AppText style={[styles.title]}>{props.vendorData.title_en}</AppText>
+                        </View>
                         <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
-                            <AppText style={[styles.text]}>
-                                {props.vendorData.area} {props.vendorData.street} {props.vendorData.building} {props.vendorData.floor}
+                            <AppText style={[styles.text]}>街道 (Street) : </AppText>
+                            <AppText style={[styles.text]}> {props.vendorData.street} </AppText>
+                        </View>
+                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
+                            <AppText style={[styles.text]}>大廈 /屋苑 (Building/Estate) : </AppText>
+                            <AppText style={[styles.text]}>{props.vendorData.building} {props.vendorData.floor}</AppText>
+                        </View>
+                        <View style={styles.divider} />
+                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                            <AppText style={[styles.size]}>
+                                建築 Construction : {formatNumber(props.vendorData.construction_size)}呎(ft.) @
+                                {formatNumber(props.vendorData.construction_size_price)} (Price per ft.)
                             </AppText>
                         </View>
-                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
-                            <AppText style={[styles.size]}>實用面積 : {props.vendorData.size}</AppText>
+                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                            <AppText style={[styles.size]}>
+                                實用 Acrtual Size : {formatNumber(props.vendorData.actual_size)}呎(ft.) @
+                                {formatNumber(props.vendorData.actual_size_price)} (Price per ft.)
+                            </AppText>
                         </View>
                         {
-                            props.vendorData.isSell == true &&
                             <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
                                 <View style={styles.tag}>
-                                    <AppText style={[styles.tag_txt]}>售</AppText>
+                                    <AppText style={[styles.tag_txt]}>
+                                        {props.vendorData.isSell == true ? '售' : '租'} </AppText>
                                 </View>
-                                <AppText style={[styles.price]}>${props.vendorData.price}</AppText>
-                            </View>
-                        }
-                        {
-                            props.vendorData.isRent == true &&
-                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
-                                <View style={styles.tag}>
-                                    <AppText style={[styles.tag_txt]}>租</AppText>
-                                </View>
-                                <AppText style={[styles.price]}>${props.vendorData.rent_price}</AppText>
+                                <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
                             </View>
                         }
                         <View style={[Theme.styles.col_center, { width: '100%', marginTop: 24 }]}>
-                            <AppText style={styles.size}>間隔</AppText>
+                            <AppText style={styles.size}>間隔 Interval</AppText>
                             <View style={[Theme.styles.row_center, styles.infoView]}>
-                                <AppText style={styles.title}>{props.vendorData.living_rooms}廳</AppText>
+                                <View style={Theme.styles.col_center}>
+                                    <AppText style={styles.title}>{props.vendorData.living_rooms}廳</AppText>
+                                    <AppText style={styles.unit}>LIVING RM</AppText>
+                                </View>
                                 <Svg_divider />
-                                <AppText style={styles.title}>{props.vendorData.rooms}房</AppText>
+                                <View style={Theme.styles.col_center}>
+                                    <AppText style={styles.title}>{props.vendorData.rooms}房</AppText>
+                                    <AppText style={styles.unit}>ROOM</AppText>
+                                </View>
                                 <Svg_divider />
-                                <AppText style={styles.title}>{props.vendorData.toilets}廁</AppText>
+                                <View style={Theme.styles.col_center}>
+                                    <AppText style={styles.title}>{props.vendorData.toilets}廁</AppText>
+                                    <AppText style={styles.unit}>TOILET</AppText>
+                                </View>
                                 <Svg_divider />
-                                <AppText style={styles.title}>{props.vendorData.room_toilets} 套廁</AppText>
+                                <View style={Theme.styles.col_center}>
+                                    <AppText style={styles.title}>{props.vendorData.room_toilets} 套廁</AppText>
+                                    <AppText style={styles.unit}>TOILET(RM)</AppText>
+                                </View>
                                 <Svg_divider />
-                                <AppText style={styles.title}>{props.vendorData.helper_rooms} 工人房</AppText>
+                                <View style={Theme.styles.col_center}>
+                                    <AppText style={styles.title}>{props.vendorData.helper_rooms} 工人房</AppText>
+                                    <AppText style={styles.unit}>Maid RM</AppText>
+                                </View>
                             </View>
                         </View>
+                        <View style={[Theme.styles.row_center, styles.stateTxtView]}>
+                            <StateText active={props.vendorData.include_water_fee == true} text={'水 Water Fee'} />
+                            <StateText active={props.vendorData.include_electricity_fee == true} text={'電 Electricity '} />
+                            <StateText active={props.vendorData.include_manage_fee == true} text={'管理費 Management fee'} />
+                            <StateText active={props.vendorData.include_government_fee == true} text={'差餉 Government rate '} />
+                            <StateText active={props.vendorData.include_government_rent == true} text={'地租 Government rent'} />
+                        </View>
+                        <View style={[Theme.styles.row_center, styles.stateTxtView]}>
+                            <StateText active={props.vendorData.club_house == true} text={'會所 Club house'} />
+                            <StateText active={props.vendorData.swimming_pool == true} text={'泳池 Swimming pool'} />
+                            <StateText active={props.vendorData.car_park == true} text={'停車場 Car park'} />
+                        </View>
                         <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 12 }]}>
-                            <AppText style={[styles.size]}>單位資訊 : </AppText>
+                            <AppText style={[styles.size]}>其他資訊 Other Informatiton : </AppText>
                             {
                                 !isEmpty(props.vendorData.other) &&
                                 <AppText style={[styles.size, { marginTop: 4 }]}>{props.vendorData.other}</AppText>
                             }
                         </View>
                         <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 20 }]}>
-                            <AppText style={[styles.size]}>物業類型 :  </AppText>
-                            <AppText style={[styles.size, { marginTop: 4 }]}>{props.vendorData.type_use == FOR_PERSONAL ? '私人住宅物業' : '商業用途'}</AppText>
+                            <AppText style={[styles.size]}>物業類型 Estate Type : </AppText>
+                            <AppText style={[styles.size, { marginTop: 4 }]}>
+                                {props.vendorData.type_use == FOR_RESIDENTIAL && '住宅 Residential'}
+                                {props.vendorData.type_use == FOR_OFFICE && '寫字樓 Office building'}
+                                {props.vendorData.type_use == FOR_SHOP && '商鋪 Shop'}
+                                {props.vendorData.type_use == FOR_INDUSTRIAL && '工業大廈 Industrial building'}
+                            </AppText>
                         </View>
+                        {
+                            props.vendorData.google_map_position != null &&
+                            <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 16 }]}>
+                                <AppText style={[styles.size]}>單位地點 Map : </AppText>
+                                <View style={styles.mapview}>
+                                    <MapView
+                                        customMapStyle={MapScreenStyles}
+                                        provider={PROVIDER_GOOGLE}
+                                        showsUserLocation={false}
+                                        showsMyLocationButton={false}
+                                        showsPointsOfInterest={false}
+                                        showsBuildings={false}
+                                        style={{ width: '100%', height: 200 }}
+                                        region={{
+                                            latitude: props.vendorData.google_map_position.latitude,
+                                            longitude: props.vendorData.google_map_position.longitude,
+                                            latitudeDelta: 0.006,
+                                            longitudeDelta: 0.02,
+                                        }}>
+                                        <Marker
+                                            tracksInfoWindowChanges={false}
+                                            tracksViewChanges={false}
+                                            key={'marker_position'}
+                                            anchor={{ x: 0.5, y: 1 }}
+                                            coordinate={{
+                                                latitude: props.vendorData.google_map_position.latitude,
+                                                longitude: props.vendorData.google_map_position.longitude,
+                                            }}
+                                        >
+                                            <Svg_marker />
+                                        </Marker>
+                                    </MapView>
+                                </View>
+                            </View>
+                        }
                     </View>
                     {_renderHeader()}
                 </View>
@@ -165,21 +306,18 @@ const VendorScreen = (props) => {
                             resizeMode={FastImage.resizeMode.cover}
                         />
                     </View>
-                    <View style={[Theme.styles.flex_1, { marginLeft: 12 }]}>
+                    <View style={[Theme.styles.col_center_start, Theme.styles.flex_1, { alignItems: 'flex-start', marginLeft: 12 }]}>
                         <Text style={styles.owner_name}>{ownerData.full_name}</Text>
+                        <Text style={{ fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text }}>滙槿地產有限公司</Text>
                     </View>
                     <TouchableOpacity style={[Theme.styles.col_center, styles.chatBtn]} onPress={onEnterChannel}>
-                        <Text style={styles.size}>聯絡我們</Text>
+                        <Text style={styles.size}>聯絡我們 Contact US</Text>
                     </TouchableOpacity>
                 </View>
             }
             <ImgGalleryModal
                 index={0}
-                images={[
-                    {
-                        source: { uri: props.vendorData.photo },
-                    }
-                ]}
+                images={getGalleryImages()}
                 showModal={isGalleryModal}
                 onClose={() => ShowGalleryModal(false)}
             />
@@ -200,7 +338,10 @@ const styles = StyleSheet.create({
     },
     headerBtn: { width: 33, height: 33, borderRadius: 8, backgroundColor: Theme.colors.white },
     img: { width: '100%', height: 360, resizeMode: 'cover' },
+    divider: { height: 1, width: '100%', backgroundColor: Theme.colors.gray3, marginVertical: 20 },
+    area: { fontSize: 12, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
     title: { fontSize: 18, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
+    unit: { fontSize: 10, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
     text: { fontSize: 12, color: Theme.colors.gray3, fontFamily: Theme.fonts.semiBold, },
     size: { fontSize: 14, color: Theme.colors.text, fontFamily: Theme.fonts.medium, },
     tag: { padding: 6, borderRadius: 6, backgroundColor: Theme.colors.yellow1 },
@@ -223,15 +364,19 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        elevation: 4
+        elevation: 4,
+        borderTopWidth: 1,
+        borderTopColor: Theme.colors.gray6
     },
     owner_name: { fontSize: 16, color: Theme.colors.text, fontFamily: Theme.fonts.bold },
-    chatBtn: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 5, backgroundColor: Theme.colors.yellow1 },
+    chatBtn: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 5, backgroundColor: Theme.colors.yellow1 },
     photoView: { height: 50, width: 50, borderRadius: 25, },
     avatarImg: { width: 50, height: 50, borderRadius: 25, },
+    stateTxtView: { justifyContent: 'flex-start', width: '100%', flexWrap: 'wrap', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: Theme.colors.gray3 },
+    mapview: { overflow: 'hidden', width: '100%', height: 200, borderRadius: 10, marginTop: 12, marginBottom: 20, }
 });
 
-const mapStateToProps = ({ app  }) => ({
+const mapStateToProps = ({ app }) => ({
     user: app.user,
     vendorData: app.vendorData,
     isLoggedIn: app.isLoggedIn,

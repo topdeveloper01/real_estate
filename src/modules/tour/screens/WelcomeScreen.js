@@ -28,7 +28,8 @@ import {
 	appleLogin,
 	setUserNeedLogin,
 	updateProfileDetails,
-} from '../../../store/actions/auth'; 
+	checkSamePhoneNumber
+} from '../../../store/actions/auth';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
 import Svg_facebook from '../../../common/assets/svgs/auth/facebook.svg'
@@ -136,18 +137,33 @@ const WelcomeScreen = (props) => {
 		handleGoogleLogin(idToken);
 	};
 
-	const onSignin = async () => {
-		try {
-			if (phone.length == 0) return;
-			setLoading(true);
-			const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+	const onSignin = async () => { 
+		if (phone.length != 8) {
+			return alerts.error('警告', '請檢查您的電話號碼');
+		};
+		setLoading(true);
+		checkSamePhoneNumber(phone).then(async (res) => {
+			if (res == true) {
+				try {
+					const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+					setLoading(false);
+					setConfirm(confirmation);
+				}
+				catch (error) {
+					setLoading(false);
+					console.log('onsignin,', error)
+					alerts.error('警告', 'Error in Signing In With PhoneNumber');
+				} 
+			}
+			else {
+				setLoading(false);
+				alerts.error('警告', '沒有註冊的電話號碼。 請註冊系統。');
+			}
+		})
+		.catch(error => {
 			setLoading(false);
-			setConfirm(confirmation);
-		}
-		catch (error) {
-			setLoading(false);
-			console.log('onsignin,', error)
-		}
+			alerts.error('警告', '檢查電話號碼時出錯');
+		})
 	};
 
 	const _renderSocialBtns = () => {
@@ -162,14 +178,14 @@ const WelcomeScreen = (props) => {
 			return (
 				<View style={[Theme.styles.col_center, styles.socials]}>
 					<IconButton
-						icon={<Svg_facebook width={28} height={28}/>}
+						icon={<Svg_facebook width={28} height={28} />}
 						text={'Log in with Facebook'}
 						textStyle={{ color: Theme.colors.white }}
 						style={{ backgroundColor: '#3B5998', marginTop: 10 }}
 						onPress={onFbLogin}
 					/>
 					<IconButton
-						icon={<Svg_google  width={24} height={24}/>}
+						icon={<Svg_google width={24} height={24} />}
 						text={' Log in with Google '}
 						onPress={onGoogleSignin}
 						style={{ marginTop: 10, backgroundColor: Theme.colors.white, elevation: 2 }}
@@ -179,12 +195,15 @@ const WelcomeScreen = (props) => {
 		}
 	};
 
-	const onLoadUserData = async (uid) => { 
+	const onLoadUserData = async (uid) => {
 		let logged_user_data = await props.getLoggedInUser(uid);
- 
-		if (logged_user_data != null) { 
+
+		if (logged_user_data != null) {
 			props.setAsLoggedIn();
-		} 
+		}
+		else {
+			alerts.error('警告', '沒有該電話號碼的註冊用戶');
+		}
 	}
 
 	if (confirm != null) {
@@ -211,7 +230,7 @@ const WelcomeScreen = (props) => {
 				</View>
 				<View style={[{ width: '100%', marginTop: 120, justifyContent: 'space-between', }]}>
 					<AuthInput
-						placeholder={'輸入電話號碼'}
+						placeholder={'輸入電話號碼 Please enter your phone number'}
 						underlineColorAndroid={'transparent'}
 						keyboardType={'phone-pad'}
 						onChangeText={phone => setPhone(phone)}
@@ -219,7 +238,7 @@ const WelcomeScreen = (props) => {
 						autoCapitalize={'none'}
 						value={phone}
 						secure={false}
-						fontSize={14}
+						fontSize={13}
 						textAlign='center'
 						selectionColor={Theme.colors.cyan2}
 						placeholderTextColor={Theme.colors.text}
@@ -228,14 +247,16 @@ const WelcomeScreen = (props) => {
 					/>
 				</View>
 				<MainBtn
-					title={'下一步'}
+					title={'下一步 Next Step'}
 					onPress={onSignin}
 					style={{ width: '100%', backgroundColor: Theme.colors.yellow1 }}
 				/>
 				<Text style={styles.notiTxt}>系統將會發出驗證碼到閣下的電話號碼</Text>
+				<Text style={[styles.notiTxt, {marginTop: 3}]}>The system will send a verification code to your phone number</Text>
 				<TransBtn
 					style={{ marginTop: 10, marginBottom: 20 }}
 					title={'建立新帳戶'}
+					sub_title={'Create new account'}
 					onPress={() => {
 						props.navigation.navigate(RouteNames.RegisterScreen);
 					}}
@@ -249,7 +270,7 @@ const WelcomeScreen = (props) => {
 const styles = StyleSheet.create({
 	title: { fontSize: 32, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	sub_title: { fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
-	notiTxt: { marginTop: 12, fontSize: 15, color: Theme.colors.text, },
+	notiTxt: { marginTop: 12, fontSize: 15, color: Theme.colors.text, fontFamily: Theme.fonts.medium},
 	divider: { width: '100%' },
 	divider_line: { flex: 1, height: 1, backgroundColor: '#E9E9F7' },
 	ortxt: { fontSize: 12, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text, marginLeft: 5, marginRight: 5 },
@@ -275,10 +296,10 @@ function mapStateToProps({ app }) {
 
 export default connect(mapStateToProps, {
 	facebookLogin,
-	googleLogin, 
+	googleLogin,
 
 	setAsLoggedIn,
 	setUserNeedLogin,
-	getLoggedInUser, 
-	updateProfileDetails, 
+	getLoggedInUser,
+	updateProfileDetails,
 })(WelcomeScreen);

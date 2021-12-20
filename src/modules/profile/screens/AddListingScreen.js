@@ -14,11 +14,12 @@ import alerts from '../../../common/services/alerts';
 import { getImageFullURL, isEmpty, validateUserData } from '../../../common/services/utility';
 import Theme from '../../../theme';
 import AuthInput from '../../../common/components/AuthInput';
+import AutoLocInput from '../../../common/components/AutoLocInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';
 import Header1 from '../../../common/components/Header1';
-import moment from 'moment';
+import PhotoList from '../components/PhotoList';
 import { RadioBtn } from '../../../common/components';
-import { FOR_PERSONAL, FOR_BUSINESS } from '../../../config/constants';
+import { FOR_RESIDENTIAL, FOR_OFFICE, FOR_SHOP, FOR_INDUSTRIAL } from '../../../config/constants';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uploadPhoto } from '../../../common/services/firebase';
 // Svg
@@ -28,8 +29,20 @@ import Svg_addphoto from '../../../common/assets/svgs/add_a_photo.svg';
 const AddListingScreen = (props) => {
 	const [isLoading, ShowLoading] = useState(false);
 	const [showPickerModal, setShowPickerModal] = useState(false);
-	const [photo, setPhoto] = useState(null);
+	const [photos, setPhotos] = useState([]);
+	const [google_map_position, setGoogleMapPosition] = useState({});
+	const [address_text, setAddressText] = useState('');
 
+	useEffect(() => {
+		let text = google_map_position.street || '';
+		if (google_map_position.city != null && google_map_position.city != '') {
+			text = `${text} ${google_map_position.city}`;
+		}
+		if (google_map_position.country != null && google_map_position.country != '') {
+			text = `${text}, ${google_map_position.country}`;
+		}
+		setAddressText(text);
+	}, [google_map_position]);
 
 	const [value1, setValue1] = useState(null);
 	const [value2, setValue2] = useState(null);
@@ -158,52 +171,63 @@ const AddListingScreen = (props) => {
 
 
 	const [type_use_items, setTypeUseItems] = useState([
-		{ label: '私人住宅物業', value: FOR_PERSONAL },
-		{ label: '商業用途', value: FOR_BUSINESS }
+		{ label: '住宅 Residential', value: FOR_RESIDENTIAL },
+		{ label: '寫字樓 Office building', value: FOR_OFFICE },
+		{ label: '商鋪 Shop', value: FOR_SHOP },
+		{ label: '工業大廈 Industrial building', value: FOR_INDUSTRIAL },
 	]);
 
 	const [living_rooms, setLivingRooms] = useState([
 		{ label: '1廳', value: 1 },
 		{ label: '2廳', value: 2 },
-		{ label: '3廳以上', value: 3 }
+		{ label: '3廳', value: 3 }
 	]);
 
 	const [rooms, setRooms] = useState([
-		{ label: '開放式單位 ', value: 0 },
+		{ label: '開放式', value: 0 },
 		{ label: '1房 ', value: 1 },
 		{ label: '2房 ', value: 2 },
 		{ label: '3房 ', value: 3 },
-		{ label: '4房 ', value: 4 },
-		{ label: '5房以上  ', value: 5 }
 	]);
 
 	const [toilets, setToilets] = useState([
 		{ label: '1廁 ', value: 1 },
 		{ label: '2廁 ', value: 2 },
 		{ label: '3廁 ', value: 3 },
-		{ label: '4廁 ', value: 4 },
-		{ label: '5廁以上  ', value: 5 }
 	]);
 
 	const [room_toilets, setRoomToilets] = useState([
+		{ label: '0套廁 ', value: 0 },
 		{ label: '1套廁 ', value: 1 },
 		{ label: '2套廁 ', value: 2 },
-		{ label: '3套廁 ', value: 3 },
-		{ label: '4套廁 ', value: 4 },
-		{ label: '5套廁以上  ', value: 5 }
+		{ label: '3套廁 ', value: 3 }
 	]);
 
 	const [helper_rooms, setHelperRooms] = useState([
+		{ label: '0工人房', value: 0 },
 		{ label: '1工人房', value: 1 },
 		{ label: '2工人房', value: 2 },
-		{ label: '3工人房以上', value: 3 }
+		{ label: '3工人房', value: 3 }
 	]);
 
 	const [cities1, setCities1] = useState([]);
 	const [cities2, setCities2] = useState([]);
 	const [cities3, setCities3] = useState([]);
 
-	const [state, setState] = useState({})
+	const [state, setState] = useState({
+		isSell: true,
+		is_featured: false,
+		outer_roof: false,
+		outer_terrace: false,
+		include_water_fee: false,
+		include_electricity_fee: false,
+		include_manage_fee: false,
+		include_government_fee: false,
+		include_government_rent: false,
+		club_house: false,
+		swimming_pool: false,
+		car_park: false
+	})
 
 	useEffect(() => {
 		let tmp = [];
@@ -229,7 +253,7 @@ const AddListingScreen = (props) => {
 			props.city2_list.filter(item => item.city_1 == props.city1_list[index].id).map(item => {
 				tmp.push({ label: item.name, value: item.name })
 			})
-			setCities2(tmp) 
+			setCities2(tmp)
 			setValue_city2(null)
 
 			setCities3([])
@@ -263,49 +287,56 @@ const AddListingScreen = (props) => {
 		ImagePicker.openPicker({
 			mediaType: 'photo',
 			cropping: true,
-			includeBase64: true,
-		}).then((image) => {
-			setPhoto(image);
+			multiple: true,
+		}).then((images) => {
+			setPhotos(photos.concat(images.map((i, index) => { return { image: i, weight: photos.length + index + 1 } })));
 			setShowPickerModal(false);
-		});
+		})
+			.catch((error) => {
+				console.log('onImageUpload ', error)
+			});
 	};
 	const onCapture = () => {
 		ImagePicker.openCamera({
 			cropping: true,
-			includeBase64: true,
 		}).then((image) => {
-			setPhoto(image);
+			setPhotos(photos.concat([{
+				image: image,
+				weight: photos.length + 1
+			}]));
 			setShowPickerModal(false);
-		});
+		})
+			.catch((error) => {
+				console.log('onCapture ', error)
+			});
 	};
 
 	const validateInputs = () => {
-		if (photo == null) {
+		if (photos.length == 0) {
 			alerts.error('', '選擇一張照片');
 			return false;
 		}
-		if (isEmpty(state.title) || isEmpty(state.type_use) || isEmpty(value_city1) ||
-			isEmpty(value_city2) || isEmpty(value_city3) || isEmpty(state.floor) ||
-			isEmpty(state.size) || isEmpty(state.living_rooms) || isEmpty(state.rooms) ||
-			isEmpty(state.toilets) || isEmpty(state.room_toilets) || isEmpty(state.helper_rooms)) {
+		if (isEmpty(state.title) || isEmpty(state.title_en) || isEmpty(state.type_use) ||
+			isEmpty(value_city1) || isEmpty(value_city2) || isEmpty(value_city3) ||
+			isEmpty(state.construction_size) || isEmpty(state.actual_size) ||
+			isEmpty(state.construction_size_price) || isEmpty(state.actual_size_price) ||
+			isEmpty(state.living_rooms) || isEmpty(state.rooms) || isEmpty(state.toilets) ||
+			isEmpty(state.room_toilets) || isEmpty(state.helper_rooms) || isEmpty(state.price) ||
+			isEmpty(state.youtube)
+		) {
+			console.log('state ', isEmpty(state.title) , isEmpty(state.title_en) , isEmpty(state.type_use),
+			isEmpty(value_city1) , isEmpty(value_city2) , isEmpty(value_city3) ,
+			isEmpty(state.construction_size), isEmpty(state.actual_size) ,
+			isEmpty(state.construction_size_price), isEmpty(state.actual_size_price) ,
+			isEmpty(state.living_rooms) ,isEmpty(state.rooms) , isEmpty(state.toilets) ,
+			isEmpty(state.room_toilets) , isEmpty(state.helper_rooms), isEmpty(state.price) ,
+			isEmpty(state.youtube))
 			alerts.error('', '填寫所有字段');
 			return false
 		}
-		if (isEmpty(state.isSell) && isEmpty(state.isRent)) {
-			alerts.error('', '填寫所有字段');
-			return false
-		}
-		if (state.isSell != true && state.isRent != true) {
-			alerts.error('', '填寫所有字段');
-			return false
-		}
-		if (state.isSell == true && isEmpty(state.price)) {
-			alerts.error('', '填寫所有字段');
-			return false
-		}
-		if (state.isRent == true && isEmpty(state.rent_price)) {
-			alerts.error('', '填寫所有字段');
-			return false
+		if (google_map_position == null || google_map_position.latitude == null || google_map_position.longitude == null) {
+			alerts.error('', '請在谷歌地圖中選擇位置');
+			return false;
 		}
 		return true;
 	}
@@ -314,25 +345,47 @@ const AddListingScreen = (props) => {
 		if (validateInputs()) {
 			try {
 				ShowLoading(true);
-				let photoUrl = ''
-				if (photo != null) {
-					photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photo.path);
+
+				let uploadedPhotos = [];
+				for (let i = 0; i < photos.length; i++) {
+					try {
+						let photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photos[i].image.path);
+						uploadedPhotos.push({
+							image: photoUrl,
+							weight: photos[i].weight
+						})
+					} catch (error) {
+						console.log('uploadPhoto error ', error);
+					}
 				}
-				if (isEmpty(photoUrl)) {
-					ShowLoading(false);
-					alerts.error('警告', '出了些問題');
-					return
-				}
+
 				let newListingData = {
 					...state,
 					area: value_city1,
-					street : value_city2,
-					building : value_city3,
-					photo: photoUrl,
-					is_featured: false,
-					owner_id: props.user.id
-				}
-				
+					street: value_city2,
+					building: value_city3,
+					google_map_position: google_map_position,
+					photos: uploadedPhotos,
+					owner_id: props.user.id,
+					is_featured: state.is_featured == true,
+					outer_roof: state.outer_roof == true,
+					outer_terrace: state.outer_terrace == true,
+					include_water_fee: state.include_water_fee == true,
+					include_electricity_fee: state.include_electricity_fee == true,
+					include_manage_fee: state.include_manage_fee == true,
+					include_government_fee: state.include_government_fee == true,
+					include_government_rent: state.include_government_rent == true,
+					club_house: state.club_house == true,
+					swimming_pool: state.swimming_pool == true,
+					car_park: state.car_park == true,
+					actual_size  : parseInt(state.actual_size),
+					actual_size_price  : parseInt(state.actual_size_price),
+					construction_size  : parseInt(state.construction_size),
+					construction_size_price  : parseInt(state.construction_size_price),
+					price : parseInt(state.price),
+				};
+
+				console.log('newListingData ', newListingData)
 				await createListing(newListingData);
 
 				ShowLoading(false);
@@ -345,7 +398,7 @@ const AddListingScreen = (props) => {
 				alerts.error('警告', '出了些問題');
 			}
 		}
-	}; 
+	};
 
 	return (
 		<View style={styles.container}>
@@ -362,14 +415,6 @@ const AddListingScreen = (props) => {
 					<View style={Theme.styles.col_center}>
 						<View style={[Theme.styles.col_center, { width: 116, height: 116 }]}>
 							<View style={[Theme.styles.col_center, styles.photoView]}>
-								{
-									photo &&
-									<FastImage
-										source={{ uri: photo.path }}
-										style={styles.avatarImg}
-										resizeMode={FastImage.resizeMode.cover}
-									/>
-								}
 								<TouchableOpacity
 									onPress={() => setShowPickerModal(true)}
 									style={[Theme.styles.col_center, { padding: 20 }]}
@@ -379,9 +424,46 @@ const AddListingScreen = (props) => {
 							</View>
 						</View>
 					</View>
+					<View style={[Theme.styles.row_center, { width: '100%', flexWrap: 'wrap', marginVertical: 16 }]}>
+						<PhotoList photos={photos} changePhotos={(items) => setPhotos(items)} />
+					</View>
+					<View style={[Theme.styles.row_center, { marginTop: 8, marginVertical: 16 }]}>
+						<RadioBtn
+							checked={state.isSell == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, isSell: (state.isSell == true ? false : true) })
+							}}
+							text='售盤 BUY'
+							style={{ marginRight: 40 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.isSell == false}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, isSell: (state.isSell == true ? false : true) })
+							}}
+							text='租盤 RENT'
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+					</View>
 
 					<AuthInput
-						placeholder={'標題'}
+						placeholder={'Youtube URL'}
+						underlineColorAndroid={'transparent'}
+						keyboardType={'default'}
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(youtube) => setState({ ...state, youtube })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.youtube}
+						secure={false}
+						style={{ marginTop: 16, marginBottom: 12 }}
+					/>
+
+					<AuthInput
+						placeholder={'標題 / 屋苑 / 樓層 / 房號 '}
 						underlineColorAndroid={'transparent'}
 						keyboardType={'default'}
 						selectionColor={Theme.colors.cyan2}
@@ -390,7 +472,19 @@ const AddListingScreen = (props) => {
 						autoCapitalize={'none'}
 						value={state.title}
 						secure={false}
-						style={{ marginTop: 25, marginBottom: 12 }}
+						style={{ marginBottom: 12 }}
+					/>
+					<AuthInput
+						placeholder={'(英文) 標題 / 屋苑 / 樓層 / 房號 '}
+						underlineColorAndroid={'transparent'}
+						keyboardType={'default'}
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(title_en) => setState({ ...state, title_en })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.title_en}
+						secure={false}
+						style={{ marginBottom: 12 }}
 					/>
 
 					{
@@ -421,7 +515,7 @@ const AddListingScreen = (props) => {
 									setValue={setValue_city1}
 									placeholder={'地區'}
 									items={cities1}
-									setItems={setCities1} 
+									setItems={setCities1}
 									style={{
 										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 102
 									}}
@@ -439,7 +533,7 @@ const AddListingScreen = (props) => {
 									setValue={setValue_city2}
 									placeholder={'街道'}
 									items={cities2}
-									setItems={setCities2} 
+									setItems={setCities2}
 									style={{
 										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 101
 									}}
@@ -457,7 +551,7 @@ const AddListingScreen = (props) => {
 									setValue={setValue_city3}
 									placeholder={'大廈 / 屋苑'}
 									items={cities3}
-									setItems={setCities3} 
+									setItems={setCities3}
 									style={{
 										borderColor: Theme.colors.gray3, marginBottom: 12, zIndex: 100
 									}}
@@ -561,27 +655,70 @@ const AddListingScreen = (props) => {
 							</React.Fragment>
 					}
 
+					<AutoLocInput
+						address_text={address_text}
+						placeholder={'Google Map 地址'}
+						left_icon={<View />}
+						onChange={(location, address) => {
+							let tmpAddress = {
+								latitude: location.latitude,
+								longitude: location.longitude,
+								street: address.street,
+								building: address.building,
+								country: address.country,
+								city: address.city,
+							};
+							setGoogleMapPosition(tmpAddress);
+						}}
+					/>
 					<AuthInput
-						placeholder={'樓層 / 房號 '}
+						placeholder={'建築面積'}
 						underlineColorAndroid={'transparent'}
-						keyboardType={'default'}
+						keyboardType='decimal-pad'
 						selectionColor={Theme.colors.cyan2}
-						onChangeText={(floor) => setState({ ...state, floor })}
+						onChangeText={(construction_size) => setState({ ...state, construction_size })}
 						returnKeyType={'next'}
 						autoCapitalize={'none'}
-						value={state.floor}
+						value={state.construction_size}
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
+
 					<AuthInput
 						placeholder={'實用面積 '}
 						underlineColorAndroid={'transparent'}
 						keyboardType='decimal-pad'
 						selectionColor={Theme.colors.cyan2}
-						onChangeText={(size) => setState({ ...state, size })}
+						onChangeText={(actual_size) => setState({ ...state, actual_size })}
 						returnKeyType={'next'}
 						autoCapitalize={'none'}
-						value={state.size}
+						value={state.actual_size}
+						secure={false}
+						style={{ marginBottom: 12 }}
+					/>
+
+					<AuthInput
+						placeholder={'建築尺寸價錢 '}
+						underlineColorAndroid={'transparent'}
+						keyboardType='decimal-pad'
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(construction_size_price) => setState({ ...state, construction_size_price })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.construction_size_price}
+						secure={false}
+						style={{ marginBottom: 12 }}
+					/>
+
+					<AuthInput
+						placeholder={'實用尺寸價錢 '}
+						underlineColorAndroid={'transparent'}
+						keyboardType='decimal-pad'
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(actual_size_price) => setState({ ...state, actual_size_price })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.actual_size_price}
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
@@ -594,7 +731,7 @@ const AddListingScreen = (props) => {
 									onOpen={onOpen2}
 									value={value2}
 									setValue={setValue2}
-									placeholder={'多少廳'}
+									placeholder={'多少廳?'}
 									items={living_rooms}
 									setItems={setLivingRooms}
 									onChangeValue={(living_rooms) => {
@@ -614,7 +751,7 @@ const AddListingScreen = (props) => {
 									onOpen={onOpen3}
 									value={value3}
 									setValue={setValue3}
-									placeholder={'多少房'}
+									placeholder={'多少房?'}
 									items={rooms}
 									setItems={setRooms}
 									onChangeValue={(rooms) => {
@@ -634,7 +771,7 @@ const AddListingScreen = (props) => {
 									onOpen={onOpen4}
 									value={value4}
 									setValue={setValue4}
-									placeholder={'多少廁'}
+									placeholder={'多少廁?'}
 									items={toilets}
 									setItems={setToilets}
 									onChangeValue={(toilets) => {
@@ -654,7 +791,7 @@ const AddListingScreen = (props) => {
 									onOpen={onOpen5}
 									value={value5}
 									setValue={setValue5}
-									placeholder={'多少套廁'}
+									placeholder={'多少套廁?'}
 									items={room_toilets}
 									setItems={setRoomToilets}
 									onChangeValue={(room_toilets) => {
@@ -674,7 +811,7 @@ const AddListingScreen = (props) => {
 									onOpen={onOpen6}
 									value={value6}
 									setValue={setValue6}
-									placeholder={'多少工人房'}
+									placeholder={'多少工人房?'}
 									items={helper_rooms}
 									setItems={setHelperRooms}
 									onChangeValue={(helper_rooms) => {
@@ -698,7 +835,7 @@ const AddListingScreen = (props) => {
 										onOpen={onOpen2}
 										value={value2}
 										setValue={setValue2}
-										placeholder={'多少廳'}
+										placeholder={'多少廳?'}
 										items={living_rooms}
 										setItems={setLivingRooms}
 										onChangeValue={(living_rooms) => {
@@ -720,7 +857,7 @@ const AddListingScreen = (props) => {
 										onOpen={onOpen3}
 										value={value3}
 										setValue={setValue3}
-										placeholder={'多少房'}
+										placeholder={'多少房?'}
 										items={rooms}
 										setItems={setRooms}
 										onChangeValue={(rooms) => {
@@ -742,7 +879,7 @@ const AddListingScreen = (props) => {
 										onOpen={onOpen4}
 										value={value4}
 										setValue={setValue4}
-										placeholder={'多少廁'}
+										placeholder={'多少廁?'}
 										items={toilets}
 										setItems={setToilets}
 										onChangeValue={(toilets) => {
@@ -764,7 +901,7 @@ const AddListingScreen = (props) => {
 										onOpen={onOpen5}
 										value={value5}
 										setValue={setValue5}
-										placeholder={'多少套廁'}
+										placeholder={'多少套廁?'}
 										items={room_toilets}
 										setItems={setRoomToilets}
 										onChangeValue={(room_toilets) => {
@@ -786,7 +923,7 @@ const AddListingScreen = (props) => {
 										onOpen={onOpen6}
 										value={value6}
 										setValue={setValue6}
-										placeholder={'多少工人房'}
+										placeholder={'多少工人房?'}
 										items={helper_rooms}
 										setItems={setHelperRooms}
 										onChangeValue={(helper_rooms) => {
@@ -804,48 +941,127 @@ const AddListingScreen = (props) => {
 							</React.Fragment>
 					}
 
-					<AuthInput
-						placeholder={'售價錢'}
-						underlineColorAndroid={'transparent'}
-						keyboardType='decimal-pad'
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(price) => setState({ ...state, price })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.price}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
-					<AuthInput
-						placeholder={'租價錢'}
-						underlineColorAndroid={'transparent'}
-						keyboardType='decimal-pad'
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(rent_price) => setState({ ...state, rent_price })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.rent_price}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
+					<Text style={styles.subjectTitle}>外面</Text>
 					<View style={[Theme.styles.row_center_start, { marginTop: 8, marginVertical: 16 }]}>
 						<RadioBtn
-							checked={state.isSell == true}
+							checked={state.outer_roof == true}
 							onPress={() => {
 								Keyboard.dismiss()
-								setState({ ...state, isSell: (state.isSell == true ? false : true) })
+								setState({ ...state, outer_roof: (state.outer_roof == true ? false : true) })
 							}}
-							text='售'
-							style={{ marginRight: '30%' }}
+							text='天台'
+							style={{ marginRight: 32, marginTop: 12 }}
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
 						/>
 						<RadioBtn
-							checked={state.isRent == true}
+							checked={state.outer_terrace == true}
 							onPress={() => {
 								Keyboard.dismiss()
-								setState({ ...state, isRent: (state.isRent == true ? false : true) })
+								setState({ ...state, outer_terrace: (state.outer_terrace == true ? false : true) })
 							}}
-							text='租'
+							text='露台'
+							style={{ marginRight: 32, marginTop: 12 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+					</View>
+
+					<Text style={styles.subjectTitle}>租金已包</Text>
+					<View style={[Theme.styles.row_center_start, { width: '100%', flexWrap: 'wrap', marginTop: 8, marginVertical: 16 }]}>
+						<RadioBtn
+							checked={state.include_water_fee == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, include_water_fee: (state.include_water_fee == true ? false : true) })
+							}}
+							text='水'
+							style={{ marginRight: 32, marginTop: 20 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.include_electricity_fee == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, include_electricity_fee: (state.include_electricity_fee == true ? false : true) })
+							}}
+							text='電'
+							style={{ marginRight: 32, marginTop: 20 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.include_manage_fee == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, include_manage_fee: (state.include_manage_fee == true ? false : true) })
+							}}
+							text='管理費'
+							style={{ marginRight: 32, marginTop: 20 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.include_government_fee == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, include_government_fee: (state.include_government_fee == true ? false : true) })
+							}}
+							text='差餉'
+							style={{ marginRight: 32, marginTop: 20 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.include_government_rent == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, include_government_rent: (state.include_government_rent == true ? false : true) })
+							}}
+							text='地租'
+							style={{ marginRight: 32, marginTop: 20 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+					</View>
+
+					<Text style={styles.subjectTitle}>設施</Text>
+					<View style={[Theme.styles.row_center_start, { marginTop: 8, marginVertical: 16 }]}>
+						<RadioBtn
+							checked={state.club_house == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, club_house: (state.club_house == true ? false : true) })
+							}}
+							text='會所'
+							style={{ marginRight: 32, marginTop: 12 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.swimming_pool == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, swimming_pool: (state.swimming_pool == true ? false : true) })
+							}}
+							text='泳池'
+							style={{ marginRight: 32, marginTop: 12 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+						<RadioBtn
+							checked={state.car_park == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, car_park: (state.car_park == true ? false : true) })
+							}}
+							text='停車場'
+							style={{ marginRight: 32, marginTop: 12 }}
+							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
+						/>
+					</View>
+					<Text style={styles.subjectTitle}>精選樓盤</Text>
+					<View style={[Theme.styles.row_center_start, { marginTop: 8, marginVertical: 16 }]}>
+						<RadioBtn
+							checked={state.is_featured == true}
+							onPress={() => {
+								Keyboard.dismiss()
+								setState({ ...state, is_featured: (state.is_featured == true ? false : true) })
+							}}
+							text='是'
+							style={{ marginRight: 32, marginTop: 12 }}
 							textStyle={{ marginLeft: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }}
 						/>
 					</View>
@@ -862,7 +1078,19 @@ const AddListingScreen = (props) => {
 						textAlignVertical={'top'}
 						numberOfLines={4}
 						multiline={true}
-						style={{ marginBottom: 12, minHeight: 70 }}
+						style={{ marginTop: 12, marginBottom: 12, minHeight: 70 }}
+					/>
+					<AuthInput
+						placeholder={'價錢'}
+						underlineColorAndroid={'transparent'}
+						keyboardType='decimal-pad'
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(price) => setState({ ...state, price })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.price}
+						secure={false}
+						style={{ marginBottom: 12 }}
 					/>
 					<View style={{ height: 20 }}></View>
 				</KeyboardAwareScrollView>
@@ -904,6 +1132,7 @@ const styles = StyleSheet.create({
 	scrollview: {
 		flex: 1, width: '100%', paddingHorizontal: 20
 	},
+	subjectTitle: { marginTop: 12, fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
 	applyBtn: { fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.cyan2 },
 	categ_view: { height: 47, width: '100%', paddingLeft: 20, borderTopWidth: 1, borderTopColor: '#F6F6F9' },
 	categ_txt: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: '#AAA8BF' },

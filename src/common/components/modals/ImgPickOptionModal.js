@@ -21,17 +21,17 @@ const ImgPickOptionModal = ({ title, showModal, onCapture, onImageUpload, onClos
         style={{ justifyContent: 'flex-end', margin: 0 }}>
         <View style={[Theme.styles.col_center, styles.modalContent]}>
             <View style={[Theme.styles.col_center, styles.titleView]}>
-                <Text style={styles.modalTitle}>{title ? title : '選擇方式'}</Text>
+                <Text style={styles.modalTitle}>{title ? title : '選擇方式 Options'}</Text>
             </View>
             <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
                 <TouchableOpacity onPress={onCapture} style={[Theme.styles.row_center, { width: '100%', height: 50 }]}>
                     <Svg_camera />
-                    <Text style={styles.modalBtnTxt}>影相機</Text>
+                    <Text style={styles.modalBtnTxt}>影相機 Camera</Text>
                 </TouchableOpacity>
                 <View style={styles.divider} />
                 <TouchableOpacity onPress={onImageUpload} style={[Theme.styles.row_center, { width: '100%', height: 50 }]}>
                     <Svg_image />
-                    <Text style={styles.modalBtnTxt}>從相簿上傳</Text>
+                    <Text style={styles.modalBtnTxt}>從相簿上傳 Upload from album</Text>
                 </TouchableOpacity>
             </View>
         </View>

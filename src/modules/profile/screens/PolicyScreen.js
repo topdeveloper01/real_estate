@@ -17,7 +17,7 @@ const PolicyScreen = (props) => {
 					props.navigation.goBack();
 				}}
 				style={{ paddingHorizontal: 20, height: 90 }}
-				title={'私隱政策'}
+				title={'私隱政策 Policy'}
 			/>
 			<View style={styles.formView}>
 				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%', paddingHorizontal: 20 }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>

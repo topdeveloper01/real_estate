@@ -4,15 +4,20 @@ import FastImage from 'react-native-fast-image';
 import { connect } from 'react-redux'; 
 import AppText from '../AppText'; 
 import Theme from '../../../theme'; 
+import Img_placeholder from '../../assets/images/placeholder2.png'
+import { formatNumber } from '../../services/utility';
 
 const VendorItem = (props) => {
     const { data, can_delete, onSelect, onDelete, style } = props
 
     return <TouchableOpacity onPress={() => onSelect()}
         style={[Theme.styles.row_center, styles.container, style,]}>
-        <View style={[Theme.styles.col_center, styles.imgView]}>
+        <View style={[Theme.styles.col_center, styles.imgView]}> 
             <FastImage
-                source={{ uri: data.photo }}
+                source={
+                    data.photos != null && data.photos.length > 0 ? 
+                    { uri:  data.photos[0].image } : Img_placeholder
+                }
                 style={styles.img}
                 resizeMode={FastImage.resizeMode.cover}
             />
@@ -28,23 +33,14 @@ const VendorItem = (props) => {
                 } 
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                <AppText style={[styles.title]}>{data.title_en}</AppText>
+            </View>
+            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 5 }]}>
                 <AppText style={[styles.text]} numberOfLines={1}>{data.area} {data.street} {data.building} {data.floor}</AppText>
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
-                {
-                    data.isSell == true &&
-                    <View style={styles.tag}>
-                        <AppText style={[styles.tag_txt]}>售</AppText>
-                    </View>
-                }
-                {
-                    data.isRent == true &&
-                    <View style={styles.tag}>
-                        <AppText style={[styles.tag_txt]}>租</AppText>
-                    </View>
-                }
                 <View style={{ flex: 1 }} />
-                <AppText style={[styles.price]}>${data.isSell == true ? data.price : data.rent_price}</AppText>
+                <AppText style={[styles.price]}>${formatNumber(data.price)}</AppText>
             </View>
         </View>
     </TouchableOpacity>;

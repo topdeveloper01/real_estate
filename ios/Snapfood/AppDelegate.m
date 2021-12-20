@@ -25,7 +25,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [GMSServices provideAPIKey:@"AIzaSyAEe-vcJ-r8w9FQdVEskAozi1v9cWy6YAA"];
+  [GMSServices provideAPIKey:@"AIzaSyDogQ6uVTq1m6ZScGhcXj2BQAFi08WGpo4"];
   [FIRApp configure];
   // [RNFirebaseNotifications configure];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];

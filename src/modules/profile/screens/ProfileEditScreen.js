@@ -89,7 +89,7 @@ const ProfileEditScreen = (props) => {
 					props.navigation.goBack();
 				}}  
 				style={{paddingHorizontal: 20, height: 90}}
-				title={'更改帳戶資料'}
+				title={'更改帳戶資料 Edit Profile'}
 			/>
 			<View style={styles.formView}>
 				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%', paddingHorizontal: 20 }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>

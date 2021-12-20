@@ -116,19 +116,25 @@ export const openExternalUrl = (url) => {
 	});
 };
 
-export const isEmpty=(str)=>{
-	if(str == null || str == '') {
+export const YouTubeGetID=(url)=>{
+	if (url == null) { return ''}
+	url = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+	return (url[2] !== null) ? url[2].split(/[^0-9a-z_\-]/i)[0] : url[0];
+}
+
+export const isEmpty = (str) => {
+	if (str == null || str == '') {
 		return true
 	}
 	return false
 }
 
-export const isFullURL=(str)=>{
+export const isFullURL = (str) => {
 	if (str == null) { return false; }
 	return str.includes('http');
 }
 
-export const getImageFullURL=(photo)=>{
+export const getImageFullURL = (photo) => {
 	if (isFullURL(photo)) {
 		return photo;
 	}
@@ -141,17 +147,17 @@ export const getImageFullURL=(photo)=>{
 	return Config.USER_PROFILE_IMG_BASE_URL + (isEmpty(photo) ? 'default?' : photo);
 }
 
-export const seconds2Time=(seconds)=>{
+export const seconds2Time = (seconds) => {
 	const h = parseInt(seconds / (60 * 60));
-    const m = parseInt(seconds % (60 * 60) / 60);
-    const s = parseInt(seconds % 60);
+	const m = parseInt(seconds % (60 * 60) / 60);
+	const s = parseInt(seconds % 60);
 
-    return ( (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s));
+	return ((m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s));
 	// return ((h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s));
 }
 
-export const convertTimestamp2Date=(timestamp)=>{
-	if(timestamp == null) return new Date();
+export const convertTimestamp2Date = (timestamp) => {
+	if (timestamp == null) return new Date();
 	return new Date(timestamp.seconds * 1000)
 }
 
@@ -162,12 +168,12 @@ export const validateEmailAddress = (email) => {
 
 
 export const generateRandom = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
 };
- 
+
 
 export const validatePhoneNumber = (text) => {
 	return text.length == 8;
@@ -225,7 +231,7 @@ export const calculateCartTotal = (items) => {
 	return total;
 };
 
-export const checkInSameWeek=(date=new Date())=>{
+export const checkInSameWeek = (date = new Date()) => {
 	let week_days = [];
 	let today = new Date();
 	let day_week = today.getDay();
@@ -246,6 +252,11 @@ export const getStaticMapUrl = (coordinates) => {
 export const formatPrice = (price, decimalPlaces = 0) => {
 	return parseFloat(parseFloat(price)).toFixed(decimalPlaces);
 };
+
+export const formatNumber = (number) => {
+	if (number == null) { return ''}
+	return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
 
 export const groupBy = (items, key) =>
 	items.reduce(
@@ -292,8 +303,8 @@ export const getOrderDiscountValue = (order) => {
 	return order.discount
 		? parseFloat(order['discount_amount'])
 		: order.coupon
-		? parseFloat(order['coupon_amount'])
-		: 0;
+			? parseFloat(order['coupon_amount'])
+			: 0;
 };
 
 const hasOrderFreeDelivery = (order) => {

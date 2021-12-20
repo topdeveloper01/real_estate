@@ -27,8 +27,8 @@ const ProfileScreen = (props) => {
 	const [isLogoutModal, ShowLogoutModal] = useState(false);
 
 	const about_links = [
-		{ name: '私隱政策', link: RouteNames.PrivacyPolicyScreen },
-		{ name: '條款及細則', link: RouteNames.TermsScreen },
+		{ name: '私隱政策 Policy', link: RouteNames.PrivacyPolicyScreen },
+		{ name: '條款及細則 Terms and conditions', link: RouteNames.TermsScreen },
 	]
 
 	useEffect(() => {
@@ -37,11 +37,11 @@ const ProfileScreen = (props) => {
 
 	const onLogout = async () => {
 		ShowLogoutModal(false);
-		try {
-			LoginManager.logOut();
-		} catch (e) {
-			console.log('LoginManager.logOut', e)
-		}
+		// try {
+		// 	LoginManager.logOut();
+		// } catch (e) {
+		// 	console.log('LoginManager.logOut', e)
+		// }
 		try {
 			await auth().signOut();
 			await props.logout();
@@ -78,7 +78,7 @@ const ProfileScreen = (props) => {
 	return (
 		<View style={[Theme.styles.col_center_start, { flex: 1, backgroundColor: Theme.colors.white }]}>
 			<Spinner visible={isLoading} />
-			<Header1 title='帳戶設定' style={{ height: 90, marginBottom: 0 }} left={<View />} />
+			<Header1 title='帳戶 Account' style={{ height: 90, marginBottom: 0 }} left={<View />} />
 			<ScrollView style={[Theme.styles.flex_1, styles.scrollview]}>
 				<View style={Theme.styles.flex_1}>
 					<ProfileAvatarView
@@ -91,7 +91,7 @@ const ProfileScreen = (props) => {
 							props.rootStackNav.navigate(RouteNames.ProfileEditScreen);
 						}}
 					/>
-					<Text style={styles.subjectTitle}>關於我們</Text>
+					<Text style={styles.subjectTitle}>關於我們 About Us</Text>
 					{
 						about_links.map(item =>
 							<TouchableOpacity
@@ -107,11 +107,11 @@ const ProfileScreen = (props) => {
 							</TouchableOpacity>
 						)
 					}
-					<Text style={styles.subjectTitle}>帳戶操作</Text>
+					<Text style={styles.subjectTitle}>帳戶操作 Account Setting</Text>
 					<View
 						style={[Theme.styles.row_center, styles.itemView]}
 					>
-						<Text style={[styles.itemTxt, Theme.styles.flex_1]}>允許推送通知系統</Text>
+						<Text style={[styles.itemTxt, Theme.styles.flex_1]}>允許推送通知系統 Push notification</Text>
 						<TouchableOpacity
 							onPress={()=>{
 								toggleSwitch(props.user.enable_notification == true ? false : true)
@@ -183,9 +183,9 @@ const ProfileScreen = (props) => {
 
 			<ConfirmModal
 				showModal={isLogoutModal}
-				title={'確認登出？'}
-				yes={'登出'}
-				no={'取消'}
+				title={'確認登出 Confirm to logout ？'}
+				yes={'登出 Logout'}
+				no={'取消 Cancel'}
 				onYes={onLogout}
 				onClose={() => ShowLogoutModal(false)}
 			/>

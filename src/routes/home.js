@@ -111,7 +111,7 @@ const HomeTabs=(props)=>{
                     name={RouteNames.HomeStack}
                     children={(_props) => <HomeTabRoute rootStackNav={props.navigation} homeTabNav={_props.navigation} />}
                     options={{
-                        tabBarLabel: '首頁',
+                        tabBarLabel: '首頁 HOME',
                         tabBarIcon: ({ focused, color, size }) => (
                             <Entypo name='home' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'}/> 
                         ),
@@ -122,7 +122,7 @@ const HomeTabs=(props)=>{
                     name={RouteNames.ChatStack}
                     children={(_props) => <ChatTabRoute rootStackNav={props.navigation} homeTabNav={_props.navigation} />}
                     options={{
-                        tabBarLabel: '信息',
+                        tabBarLabel: '信息 MESSAGE',
                         tabBarIcon: ({ focused, color, size }) => (
                             <MaterialCommunityIcons name='message-text' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'}/> 
                         ),
@@ -133,7 +133,7 @@ const HomeTabs=(props)=>{
                     name={RouteNames.SearchStack}
                     children={(_props) => <SearchTabRoute rootStackNav={props.navigation} homeTabNav={_props.navigation} />}
                     options={{
-                        tabBarLabel: '搜索',
+                        tabBarLabel: '搜索 SEARCH',
                         tabBarIcon: ({ focused, color, size }) => (
                             <Fontisto name='search' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'}/> 
                         ),
@@ -144,7 +144,7 @@ const HomeTabs=(props)=>{
                     name={RouteNames.ProfileStack}
                     children={(_props) => <ProfileTabRoute rootStackNav={props.navigation} homeTabNav={_props.navigation} />}
                     options={{
-                        tabBarLabel: '帳戶',
+                        tabBarLabel: '帳戶 ACCOUNT',
                         tabBarIcon: ({ focused, color, size }) => (
                             <MaterialIcons name='settings' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'}/> 
                         ),
@@ -157,7 +157,7 @@ const HomeTabs=(props)=>{
 }
 
 const styles = StyleSheet.create({
-    labelStyle: { fontSize: 12, fontFamily: Theme.fonts.semiBold, textAlign: 'center', marginTop: 5, },
+    labelStyle: { fontSize: 11, fontFamily: Theme.fonts.semiBold, textAlign: 'center', marginTop: 5, },
     barStyle: {
         flexDirection: 'row', height: 72, paddingBottom: Config.isAndroid ? 13 : 21, paddingTop: 13,
         backgroundColor: Theme.colors.gray1, borderTopWidth: 1, borderTopColor: Theme.colors.gray6,
