@@ -18,8 +18,7 @@ import AutoLocInput from '../../../common/components/AutoLocInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';
 import Header1 from '../../../common/components/Header1';
 import PhotoList from '../components/PhotoList';
-import { RadioBtn } from '../../../common/components';
-import { FOR_RESIDENTIAL, FOR_OFFICE, FOR_SHOP, FOR_INDUSTRIAL } from '../../../config/constants';
+import { RadioBtn } from '../../../common/components'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uploadPhoto } from '../../../common/services/firebase';
 // Svg
@@ -171,10 +170,10 @@ const AddListingScreen = (props) => {
 
 
 	const [type_use_items, setTypeUseItems] = useState([
-		{ label: '住宅 Residential', value: FOR_RESIDENTIAL },
-		{ label: '寫字樓 Office building', value: FOR_OFFICE },
-		{ label: '商鋪 Shop', value: FOR_SHOP },
-		{ label: '工業大廈 Industrial building', value: FOR_INDUSTRIAL },
+		{ label: '住宅 Residential', value: '0' },
+		{ label: '寫字樓 Office building', value: '1' },
+		{ label: '商鋪 Shop', value: '2' },
+		{ label: '工業大廈 Industrial building', value: '3' },
 	]);
 
 	const [living_rooms, setLivingRooms] = useState([

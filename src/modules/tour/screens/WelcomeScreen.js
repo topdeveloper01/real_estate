@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useRef } from 'react';
 import { connect } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -44,7 +44,14 @@ const WelcomeScreen = (props) => {
 	const [loading, setLoading] = useState(false);
 	const [phone, setPhone] = useState('');
 
+	const isElapsed60Seconds = useRef(true);
+
 	useEffect(() => {
+		try {
+			auth().settings.appVerificationDisabledForTesting = true;
+		} catch (error) {
+			
+		} 
 		GoogleSignin.configure({
 			webClientId: '82651546395-4r336st98l1570pb45idtp498fmnklcp.apps.googleusercontent.com',
 		});
@@ -137,6 +144,12 @@ const WelcomeScreen = (props) => {
 		handleGoogleLogin(idToken);
 	};
 
+	const setCountDownTimer = ()=>{
+		setTimeout(()=>{
+			isElapsed60Seconds.current = true;
+		}, 60000)
+	}
+
 	const onSignin = async () => { 
 		if (phone.length != 8) {
 			return alerts.error('警告', '請檢查您的電話號碼');
@@ -145,14 +158,23 @@ const WelcomeScreen = (props) => {
 		checkSamePhoneNumber(phone).then(async (res) => {
 			if (res == true) {
 				try {
-					const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
-					setLoading(false);
-					setConfirm(confirmation);
+					if (isElapsed60Seconds.current != true) {
+						setLoading(false);
+						return alerts.error('警告', '請求過多，請 1 分鐘後重試。');
+					}
+					else {
+						isElapsed60Seconds.current = false;
+						setCountDownTimer();
+
+						const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+						setLoading(false);
+						setConfirm(confirmation);
+					}
 				}
 				catch (error) {
 					setLoading(false);
-					console.log('onsignin,', error)
-					alerts.error('警告', 'Error in Signing In With PhoneNumber');
+					console.log('onsignin,', error )
+					alerts.error('警告', 'something went wrong');
 				} 
 			}
 			else {

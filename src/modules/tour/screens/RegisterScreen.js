@@ -18,6 +18,7 @@ import alerts from '../../../common/services/alerts';
 
 class RegisterScreen extends React.PureComponent {
 
+    
     constructor(props) {
         super(props);
 
@@ -30,6 +31,8 @@ class RegisterScreen extends React.PureComponent {
             phone: '',
             email: '', 
         };
+
+        this.isElapsed60Seconds = true;
     }
 
     state = {
@@ -69,6 +72,12 @@ class RegisterScreen extends React.PureComponent {
         this.props.navigation.navigate(RouteNames.HomeScreen);
     };
 
+    setCountDownTimer = ()=>{
+		setTimeout(()=>{
+			this.isElapsed60Seconds = true;
+		}, 60000)
+	}
+
     register = () => {
         const { full_name, phone, email  } = this.state; 
         validateUserData({ full_name, email, phone } ).then(async () => {
@@ -80,12 +89,22 @@ class RegisterScreen extends React.PureComponent {
                 }
                 else {
                     try {  
-                        const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
-                        this.setState({loading : false, confirm: confirmation})
+                        if (this.isElapsed60Seconds != true ) {
+                            this.setState({loading : false})
+                            return alerts.error('警告', '請求過多，請 1 分鐘後重試。');
+                        }
+                        else {
+                            this.isElapsed60Seconds = false;
+                            this.setCountDownTimer();
+
+                            const confirmation = await auth().signInWithPhoneNumber('+852' + phone);
+                            this.setState({loading : false, confirm: confirmation})
+                        } 
                     }
                     catch (error) {
                         this.setState({loading : false})
-                        console.log('onsignin,', error)
+                        alerts.error('警告', 'something went wrong');
+                        console.log('register,', error)
                     }
                 }
             })

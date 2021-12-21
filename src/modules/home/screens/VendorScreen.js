@@ -54,6 +54,7 @@ const VendorScreen = (props) => {
     }, [media_type])
 
     const onYoutubePlayStateChange = useCallback((state) => {
+        console.log('onYoutubePlayStateChange ', state)
         if (state === "ended") {
             setYoutubePlaying(false);
         }
@@ -116,6 +117,9 @@ const VendorScreen = (props) => {
             </View>
         );
     };
+
+    console.log('isYoutubePlaying ', isYoutubePlaying)
+
     return (
         <React.Fragment>
             <Spinner visible={isCreatingChannel} />
@@ -145,7 +149,7 @@ const VendorScreen = (props) => {
                             <YoutubePlayer
                                 height={360}
                                 play={isYoutubePlaying}
-                                videoId={YouTubeGetID(props.vendorData.youtube)}
+                                videoId={'-RBBNwIs2kU'}  // YouTubeGetID(props.vendorData.youtube)
                                 onChangeState={onYoutubePlayStateChange}
                             />
                     }

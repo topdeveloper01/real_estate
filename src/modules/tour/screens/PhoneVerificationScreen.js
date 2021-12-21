@@ -60,6 +60,10 @@ class PhoneVerificationScreen extends React.Component {
         const { code1, code2, code3, code4, code5, code6 } = this.state;
         await this.setState({ loading: true, confirmSuccess: false });
         try {
+            if (code1 + code2 + code3 + code4 + code5 + code6 == '') {
+                this.setState({ loading: false });
+                return alerts.error('警告', '輸入驗證碼！');
+            }
             await this.state.FbConfirm.confirm(code1 + code2 + code3 + code4 + code5 + code6);
             this.setState({ loading: false, confirmSuccess: true }); 
         } catch (error) {
@@ -74,31 +78,8 @@ class PhoneVerificationScreen extends React.Component {
                 confirmSuccess: false
             });
             console.log('verify', error)
-            alerts.error('警告', '錯誤代碼！');
+            alerts.error('警告', '錯誤代碼！');  
         }
-    };
-
-    resend = async () => {
-        const { user } = this.props;
-        await this.setState({ loadingResend: true });
-        try {
-            console.log('user.phone ', user.phone)
-            const confirmation = await auth().signInWithPhoneNumber('+852' + user.phone, true);
-            this.setState({
-                loadingResend: false, 
-                FbConfirm: confirmation,
-                code1: '',
-                code2: '',
-                code3: '',
-                code4: '',
-                code5: '',
-                code6: ''
-            });
-        } catch (error) {
-            this.setState({ loadingResend: false });
-            console.log('resend', error)
-            alerts.error('警告', '出了些問題');
-        };
     };
 
     render() {
@@ -209,21 +190,12 @@ class PhoneVerificationScreen extends React.Component {
                                     fontFamily={Theme.fonts.bold}
                                     value={this.state['code' + item]}
                                     backgroundColor={Theme.colors.gray4}
-                                    style={{ width: 55, height: 60, marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
+                                    style={{ width: 50, height: 50, marginBottom: 20, backgroundColor: Theme.colors.gray4 }}
                                 />
                             )
                         }
                     </View>
-
-                    {/* <View style={[Theme.styles.row_center_start, { width: '100%', justifyContent: 'flex-start', marginVertical: 80 }]}>
-                        <Text style={styles.notiTxt}>沒有收到驗證碼?</Text>
-                        <TransBtn
-                            style={{ paddingTop: 10 }}
-                            btnTxtColor={Theme.colors.text}
-                            title={' 重發一次'}
-                            onPress={this.resend}
-                        />
-                    </View> */}
+ 
 
                     <MainBtn
                         title={'下一步 Next Step'}
