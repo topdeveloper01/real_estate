@@ -183,18 +183,15 @@ export const validatePhoneNumber = (text) => {
 	return text.length == 8;
 };
 
-export const validateUserData = ({ full_name, email, phone, password, pass2 }, isNew) => {
+export const validateUserData = ({ full_name, email, phone  } ) => {
 	return new Promise((resolve, reject) => {
 		const mobileValidate = phone && validatePhoneNumber(phone.replace(/\s/g, ''));
 		const emailValidate = email && validateEmailAddress(email);
 
-		if (!full_name || !email || !phone || !phone.replace(/\s/g, '') || (isNew && !password)) {
+		if (!full_name || !email || !phone || !phone.replace(/\s/g, '')  ) {
 			alerts.error('警告', '填寫所有字段');
 			reject();
-		} else if (isNew && password != pass2) {
-			alerts.error('警告', '密碼不匹配');
-			reject();
-		} else if (emailValidate === false) {
+		}  else if (emailValidate === false) {
 			alerts.error('警告', '電子郵件格式不正確');
 			reject();
 		} else if (mobileValidate === false) {

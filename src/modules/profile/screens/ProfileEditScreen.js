@@ -50,7 +50,7 @@ const ProfileEditScreen = (props) => {
 	};
 
 	const onSave = async () => {
-		validateUserData({ full_name, email, phone, password: '', pass2: '' }, false)
+		validateUserData({ full_name, email, phone  } )
 			.then(async () => {
 				try {
 					ShowLoading(true);

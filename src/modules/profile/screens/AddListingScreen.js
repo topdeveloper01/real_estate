@@ -11,7 +11,7 @@ import { MainBtn } from '../../../common/components';
 import { translate } from '../../../common/services/translate';
 import { createListing } from '../../../store/actions/listings'
 import alerts from '../../../common/services/alerts';
-import { getImageFullURL, isEmpty, validateUserData } from '../../../common/services/utility';
+import { getImageFullURL, isEmpty,  } from '../../../common/services/utility';
 import Theme from '../../../theme';
 import AuthInput from '../../../common/components/AuthInput';
 import AutoLocInput from '../../../common/components/AutoLocInput';

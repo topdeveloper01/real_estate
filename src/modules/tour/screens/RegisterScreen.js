@@ -71,7 +71,7 @@ class RegisterScreen extends React.PureComponent {
 
     register = () => {
         const { full_name, phone, email  } = this.state; 
-        validateUserData({ full_name, email, phone, password : '', pass2 : '' }, true).then(async () => {
+        validateUserData({ full_name, email, phone } ).then(async () => {
             this.setState({loading : true})
             checkSamePhoneNumber(phone).then( async (res) => {
                 if (res == true) {
