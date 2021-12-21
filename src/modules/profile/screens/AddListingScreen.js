@@ -178,36 +178,36 @@ const AddListingScreen = (props) => {
 	]);
 
 	const [living_rooms, setLivingRooms] = useState([
-		{ label: '1廳', value: 1 },
-		{ label: '2廳', value: 2 },
-		{ label: '3廳', value: 3 }
+		{ label: '1廳', value: '1' },
+		{ label: '2廳', value: '2' },
+		{ label: '3廳', value: '3' }
 	]);
 
 	const [rooms, setRooms] = useState([
-		{ label: '開放式', value: 0 },
-		{ label: '1房 ', value: 1 },
-		{ label: '2房 ', value: 2 },
-		{ label: '3房 ', value: 3 },
+		{ label: '開放式', value: '0' },
+		{ label: '1房 ', value: '1' },
+		{ label: '2房 ', value: '2' },
+		{ label: '3房 ', value: '3' },
 	]);
 
 	const [toilets, setToilets] = useState([
-		{ label: '1廁 ', value: 1 },
-		{ label: '2廁 ', value: 2 },
-		{ label: '3廁 ', value: 3 },
+		{ label: '1廁 ', value: '1' },
+		{ label: '2廁 ', value: '2' },
+		{ label: '3廁 ', value: '3' },
 	]);
 
 	const [room_toilets, setRoomToilets] = useState([
-		{ label: '0套廁 ', value: 0 },
-		{ label: '1套廁 ', value: 1 },
-		{ label: '2套廁 ', value: 2 },
-		{ label: '3套廁 ', value: 3 }
+		{ label: '0套廁 ', value: '0' },
+		{ label: '1套廁 ', value: '1' },
+		{ label: '2套廁 ', value: '2' },
+		{ label: '3套廁 ', value: '3' }
 	]);
 
 	const [helper_rooms, setHelperRooms] = useState([
-		{ label: '0工人房', value: 0 },
-		{ label: '1工人房', value: 1 },
-		{ label: '2工人房', value: 2 },
-		{ label: '3工人房', value: 3 }
+		{ label: '0工人房', value: '0' },
+		{ label: '1工人房', value: '1' },
+		{ label: '2工人房', value: '2' },
+		{ label: '3工人房', value: '3' }
 	]);
 
 	const [cities1, setCities1] = useState([]);
@@ -312,27 +312,77 @@ const AddListingScreen = (props) => {
 	};
 
 	const validateInputs = () => {
+		if (isEmpty(state.youtube)) {
+			alerts.error('', '輸入 Youtube URL');
+			return false
+		} 
+		if (isEmpty(state.title)) {
+			alerts.error('', '輸入標題 ');
+			return false
+		}
+		if (isEmpty(state.title_en)) {
+			alerts.error('', '輸入 (英文) 標題 ');
+			return false
+		}
+		if (isEmpty(state.type_use)) {
+			alerts.error('', '輸入物業類型');
+			return false
+		}
+		if (isEmpty(value_city1)) {
+			alerts.error('', '輸入地區');
+			return false
+		}
+		if (isEmpty(value_city2)) {
+			alerts.error('', '輸入街道');
+			return false
+		}
+		if (isEmpty(value_city3)) {
+			alerts.error('', '輸入大廈 /屋苑');
+			return false
+		}
+		if (isEmpty(state.construction_size)) {
+			alerts.error('', '輸入建築面積');
+			return false
+		}
+		if (isEmpty(state.actual_size)) {
+			alerts.error('', '輸入實用面積');
+			return false
+		}
+		if (isEmpty(state.construction_size_price)) {
+			alerts.error('', '輸入建築尺寸價錢');
+			return false
+		}
+		if (isEmpty(state.actual_size_price)) {
+			alerts.error('', '輸入實用尺寸價錢');
+			return false
+		}
+		if (isEmpty(state.living_rooms)) {
+			alerts.error('', '輸入廳');
+			return false
+		}
+		if (isEmpty(state.rooms)) {
+			alerts.error('', '輸入房');
+			return false
+		}
+		if (isEmpty(state.toilets)) {
+			alerts.error('', '輸入廁');
+			return false
+		}
+		if (isEmpty(state.room_toilets)) {
+			alerts.error('', '輸入套廁');
+			return false
+		}
+		if (isEmpty(state.helper_rooms)) {
+			alerts.error('', '輸入工人房');
+			return false
+		}
+		if (isEmpty(state.price)) {
+			alerts.error('', '輸入價錢');
+			return false
+		}
 		if (photos.length == 0) {
 			alerts.error('', '選擇一張照片');
 			return false;
-		}
-		if (isEmpty(state.title) || isEmpty(state.title_en) || isEmpty(state.type_use) ||
-			isEmpty(value_city1) || isEmpty(value_city2) || isEmpty(value_city3) ||
-			isEmpty(state.construction_size) || isEmpty(state.actual_size) ||
-			isEmpty(state.construction_size_price) || isEmpty(state.actual_size_price) ||
-			isEmpty(state.living_rooms) || isEmpty(state.rooms) || isEmpty(state.toilets) ||
-			isEmpty(state.room_toilets) || isEmpty(state.helper_rooms) || isEmpty(state.price) ||
-			isEmpty(state.youtube)
-		) {
-			console.log('state ', isEmpty(state.title) , isEmpty(state.title_en) , isEmpty(state.type_use),
-			isEmpty(value_city1) , isEmpty(value_city2) , isEmpty(value_city3) ,
-			isEmpty(state.construction_size), isEmpty(state.actual_size) ,
-			isEmpty(state.construction_size_price), isEmpty(state.actual_size_price) ,
-			isEmpty(state.living_rooms) ,isEmpty(state.rooms) , isEmpty(state.toilets) ,
-			isEmpty(state.room_toilets) , isEmpty(state.helper_rooms), isEmpty(state.price) ,
-			isEmpty(state.youtube))
-			alerts.error('', '填寫所有字段');
-			return false
 		}
 		if (google_map_position == null || google_map_position.latitude == null || google_map_position.longitude == null) {
 			alerts.error('', '請在谷歌地圖中選擇位置');
@@ -342,7 +392,7 @@ const AddListingScreen = (props) => {
 	}
 
 	const onSave = async () => {
-		if (validateInputs()) {
+		if (validateInputs() == true) {
 			try {
 				ShowLoading(true);
 
@@ -361,6 +411,7 @@ const AddListingScreen = (props) => {
 
 				let newListingData = {
 					...state,
+					type_use : parseInt(state.type_use),
 					area: value_city1,
 					street: value_city2,
 					building: value_city3,
@@ -378,11 +429,16 @@ const AddListingScreen = (props) => {
 					club_house: state.club_house == true,
 					swimming_pool: state.swimming_pool == true,
 					car_park: state.car_park == true,
-					actual_size  : parseInt(state.actual_size),
-					actual_size_price  : parseInt(state.actual_size_price),
-					construction_size  : parseInt(state.construction_size),
-					construction_size_price  : parseInt(state.construction_size_price),
-					price : parseInt(state.price),
+					actual_size: parseInt(state.actual_size),
+					actual_size_price: parseInt(state.actual_size_price),
+					construction_size: parseInt(state.construction_size),
+					construction_size_price: parseInt(state.construction_size_price),
+					price: parseInt(state.price),
+					living_rooms: parseInt(state.living_rooms),
+					rooms: parseInt(state.rooms),
+					toilets: parseInt(state.toilets),
+					room_toilets: parseInt(state.room_toilets),
+					helper_rooms: parseInt(state.helper_rooms)
 				};
 
 				console.log('newListingData ', newListingData)

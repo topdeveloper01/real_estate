@@ -116,10 +116,14 @@ export const openExternalUrl = (url) => {
 	});
 };
 
-export const YouTubeGetID=(url)=>{
-	if (url == null) { return ''}
-	url = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-	return (url[2] !== null) ? url[2].split(/[^0-9a-z_\-]/i)[0] : url[0];
+export const YouTubeGetID = (url) => {
+	if (url == null) { return '' }
+	try {
+		url = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+		return (url[2] !== null) ? url[2].split(/[^0-9a-z_\-]/i)[0] : url[0];
+	} catch (error) {
+		return '' 
+	} 
 }
 
 export const isEmpty = (str) => {
@@ -254,7 +258,7 @@ export const formatPrice = (price, decimalPlaces = 0) => {
 };
 
 export const formatNumber = (number) => {
-	if (number == null) { return ''}
+	if (number == null) { return '' }
 	return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
 

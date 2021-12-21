@@ -3,7 +3,7 @@ import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import Theme from '../../../theme';
 import AppText from '../AppText';
 
-class MainButton extends PureComponent {
+class MainButton extends React.Component {
 
     render() {
         const { style, title, onPress, disabled, loading } = this.props;

@@ -1,7 +1,7 @@
-export const FOR_RESIDENTIAL = 0;
-export const FOR_OFFICE = 1;
-export const FOR_SHOP = 2;
-export const FOR_INDUSTRIAL = 3;
+export const FOR_RESIDENTIAL = '0';
+export const FOR_OFFICE = '1';
+export const FOR_SHOP = '2';
+export const FOR_INDUSTRIAL = '3';
 
 export const FOR_SELL = 0;
 export const FOR_RENT = 1;
