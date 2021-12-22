@@ -146,19 +146,36 @@ const VendorScreen = (props) => {
                                 }
                             </TouchableOpacity>
                             :
-                            <YoutubePlayer
-                                height={360}
-                                play={isYoutubePlaying}
-                                videoId={'-RBBNwIs2kU'}  // YouTubeGetID(props.vendorData.youtube)
-                                onChangeState={onYoutubePlayStateChange}
-                            />
+                            isEmpty(props.vendorData.youtube) ? null :
+                            <View style={[Theme.styles.col_center, {width: '100%', height : 360, backgroundColor : '#000'}]}>
+                                <YoutubePlayer 
+                                    height={300}
+                                    width={width(100)}
+                                    play={isYoutubePlaying}
+                                    videoId={YouTubeGetID(props.vendorData.youtube)}  // 
+                                    onChangeState={onYoutubePlayStateChange}
+                                    webViewProps={{
+                                        injectedJavaScript: `
+                                          var element = document.getElementsByClassName('container')[0];
+                                          element.style.position = 'unset';
+                                          element.style.paddingTop = '250px';
+                                          element.style.paddingBottom = '250px';
+                                          true;
+                                        `,
+                                      }}
+                                />
+                            </View>
+                            
                     }
-                    <ImgVideoTab
-                        value={media_type}
-                        onChange={(value) => {
-                            setMediaType(value)
-                        }}
-                    />
+                    {
+                        isEmpty(props.vendorData.youtube) ? null : 
+                        <ImgVideoTab
+                            value={media_type}
+                            onChange={(value) => {
+                                setMediaType(value)
+                            }}
+                        />
+                    } 
                     <View style={{ padding: 20, width: '100%' }}>
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                             <AppText style={[styles.area]}>{props.vendorData.area}</AppText>

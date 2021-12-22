@@ -310,11 +310,7 @@ const AddListingScreen = (props) => {
 			});
 	};
 
-	const validateInputs = () => {
-		if (isEmpty(state.youtube)) {
-			alerts.error('', '輸入 Youtube URL');
-			return false
-		} 
+	const validateInputs = () => { 
 		if (isEmpty(state.title)) {
 			alerts.error('', '輸入標題 ');
 			return false
