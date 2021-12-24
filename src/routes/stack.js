@@ -46,6 +46,9 @@ function GuestRoute() {
 			>
 				<GuestStack.Screen name={RouteNames.WelcomeScreen} component={WelcomeScreen} /> 
 				<GuestStack.Screen name={RouteNames.RegisterScreen} component={RegisterScreen} /> 
+				<MemberStack.Screen name={RouteNames.BottomTabs} component={HomeTabs} /> 
+				<MemberStack.Screen name={RouteNames.VendorScreen} component={VendorScreen} />   
+			    
 			</GuestStack.Navigator>
 		</NavigationContainer>
 	);
@@ -101,7 +104,7 @@ class RootStack extends React.Component {
 		if (!isLoggedIn) {
 			return <GuestRoute />;
 		}  
-		return <MemberRoute />;
+		return <MemberRoute />; 
 	}
 }
 

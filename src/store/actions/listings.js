@@ -70,18 +70,34 @@ export const getMyListings = (user_id, filterKeys) => {
                 })
 
                 if (filter_price != -1) {
-                    if (filter_price == 0) {
-                        list = list.filter(item => item.price <= 3999999)
+                    if (filter_type == FOR_SELL) {  // For Sell
+                        if (filter_price == 0) {
+                            list = list.filter(item => item.price <= 3999999)
+                        }
+                        else if (filter_price == 1) {
+                            list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
+                        }
+                        else if (filter_price == 2) {
+                            list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
+                        }
+                        else if (filter_price == 3) {
+                            list = list.filter(item => item.price >= 50000000)
+                        }
                     }
-                    else if (filter_price == 1) {
-                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
-                    }
-                    else if (filter_price == 2) {
-                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
-                    }
-                    else if (filter_price == 3) {
-                        list = list.filter(item => item.price >= 50000000)
-                    }
+                    else { // For Rent
+                        if (filter_price == 0) {
+                            list = list.filter(item => item.price <= 9999)
+                        }
+                        else if (filter_price == 1) {
+                            list = list.filter(item => item.price >= 10000 && item.price <= 44999)
+                        }
+                        else if (filter_price == 2) {
+                            list = list.filter(item => item.price >= 45000 && item.price <= 99999)
+                        }
+                        else if (filter_price == 3) {
+                            list = list.filter(item => item.price >= 100000)
+                        }
+                    } 
                 }
 
                 if (filter_size != -1) {
@@ -171,18 +187,34 @@ export const getAllListings = (filterKeys) => {
                 })
 
                 if (filter_price != -1) {
-                    if (filter_price == 0) {
-                        list = list.filter(item => item.price <= 3999999)
+                    if (filter_type == FOR_SELL) {  // For Sell
+                        if (filter_price == 0) {
+                            list = list.filter(item => item.price <= 3999999)
+                        }
+                        else if (filter_price == 1) {
+                            list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
+                        }
+                        else if (filter_price == 2) {
+                            list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
+                        }
+                        else if (filter_price == 3) {
+                            list = list.filter(item => item.price >= 50000000)
+                        }
                     }
-                    else if (filter_price == 1) {
-                        list = list.filter(item => item.price >= 4000000 && item.price <= 9999999)
-                    }
-                    else if (filter_price == 2) {
-                        list = list.filter(item => item.price >= 10000000 && item.price <= 49999999)
-                    }
-                    else if (filter_price == 3) {
-                        list = list.filter(item => item.price >= 50000000)
-                    }
+                    else { // For Rent
+                        if (filter_price == 0) {
+                            list = list.filter(item => item.price <= 9999)
+                        }
+                        else if (filter_price == 1) {
+                            list = list.filter(item => item.price >= 10000 && item.price <= 44999)
+                        }
+                        else if (filter_price == 2) {
+                            list = list.filter(item => item.price >= 45000 && item.price <= 99999)
+                        }
+                        else if (filter_price == 3) {
+                            list = list.filter(item => item.price >= 100000)
+                        }
+                    } 
                 }
 
                 if (filter_size != -1) {
@@ -214,7 +246,7 @@ export const getAllListings = (filterKeys) => {
 export const createListing = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let listingData = { 
+            let listingData = {
                 id: data.id == null ? listingCollection.doc().id : data.id,
                 ...data,
             }

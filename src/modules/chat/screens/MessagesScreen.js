@@ -230,13 +230,13 @@ const MessagesScreen = (props) => {
 			else {
 				requestLocationPermission()
 					.catch(() => {
-						alerts.error(translate('attention'), translate('locationUnavailable'));
+						alerts.error('注意', '我們無法獲取您的位置信息。');
 					});
 			}
 		}
 		catch (error) {
 			console.log('checkLocationPermission : ', error)
-			alerts.error(translate('attention'), translate('locationUnavailable'));
+			alerts.error('注意', '我們無法獲取您的位置信息。');
 		}
 
 	};
@@ -266,7 +266,7 @@ const MessagesScreen = (props) => {
 		} catch (error) {
 			const { code, message } = error;
 			console.warn('onLater', code, message);
-			alerts.error(translate('attention'), translate('locationUnavailable'));
+			alerts.error('注意', '我們無法獲取您的位置信息。');
 		}
 	}
 
@@ -316,7 +316,7 @@ const MessagesScreen = (props) => {
 	};
 
 	const goApplicationSetting=()=>{
-		alerts.confirmation(translate('attention'), translate('audioUnavailable'), 'Settings', translate('cancel'))
+		alerts.confirmation('注意', translate('audioUnavailable'), 'Settings', translate('cancel'))
 			.then(
 				() => {
 					if (Platform.OS === 'android') {
@@ -326,7 +326,7 @@ const MessagesScreen = (props) => {
 					}
 				},
 				(error) => {
-					alerts.error(translate('attention'), translate('audioUnavailable'));
+					alerts.error('注意', translate('audioUnavailable'));
 				}
 			);
 	}

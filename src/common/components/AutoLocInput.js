@@ -53,13 +53,13 @@ const AutoLocInput = ({ onChange, language, address_text, left_icon, placeholder
                 console.log('checkLocationPermission : False')
                 requestLocationPermission()
                     .catch(() => {
-                        alerts.error(translate('attention'), translate('locationUnavailable'));
+                        alerts.error('注意', '我們無法獲取您的位置信息。');
                     });
             }
         }
         catch (error) {
             console.log('checkLocationPermission : ', error)
-            alerts.error(translate('attention'), translate('locationUnavailable'));
+            alerts.error('注意', '我們無法獲取您的位置信息。');
         }
     }
 
@@ -75,7 +75,7 @@ const AutoLocInput = ({ onChange, language, address_text, left_icon, placeholder
         } catch (error) {
             const { code, message } = error;
             console.warn('onLater', code, message);
-            alerts.error(translate('attention'), translate('locationUnavailable'));
+            alerts.error('注意', '我們無法獲取您的位置信息。');
         }
     }
 

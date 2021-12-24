@@ -9,7 +9,7 @@ const ListingImgItem = ({ image, weight, onChangeWeight, onDelete }) => {
     return <View style={[Theme.styles.col_center, styles.container,]}>
         <View style={[Theme.styles.col_center, styles.imgView]}>
             <FastImage
-                source={{ uri: image.path }}
+                source={{ uri: image.path == null ? image : image.path }}
                 style={styles.img}
                 resizeMode={FastImage.resizeMode.cover}
             />

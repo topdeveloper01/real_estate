@@ -39,4 +39,4 @@ const styles = StyleSheet.create({
     btnTxt: { fontSize: 16, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }
 });
 
-export default React.memo(TabsTypeButton);
+export default TabsTypeButton;

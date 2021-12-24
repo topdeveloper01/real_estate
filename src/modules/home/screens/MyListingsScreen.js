@@ -12,10 +12,10 @@ import RouteNames from '../../../routes/names';
 import { VendorItem } from '../../../common/components';
 import Header1 from '../../../common/components/Header1';
 import ConfirmModal from '../../../common/components/modals/ConfirmModal';
-import NoRestaurants from '../../../common/components/restaurants/NoRestaurants'; 
+import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import FilterBar from '../../../common/components/vendors/FilterVar';
 import TabsTypeButton from '../../../common/components/buttons/tab_btn';
-import { FOR_RENT } from '../../../config/constants';
+import { FOR_RENT, FOR_SELL } from '../../../config/constants';
 
 const MyListingsScreen = (props) => {
 
@@ -28,23 +28,36 @@ const MyListingsScreen = (props) => {
 	const [isDeleteConfirmModal, ShowDeleteModal] = useState(false)
 	const [deleteLoading, setDeleteLoading] = useState(false)
 
-	
+
 	const [filter_city_1, setFilterCity1] = useState(null)
-    const [filter_city_2, setFilterCity2] = useState(null)
-    const [filter_city_3, setFilterCity3] = useState(null)
- 
+	const [filter_city_2, setFilterCity2] = useState(null)
+	const [filter_city_3, setFilterCity3] = useState(null)
+
 	const [filter_type, setFilterType] = useState(FOR_RENT)
-    const [filter_use_format, setFilterUseFormat] = useState(-1)
-    const [filter_price, setFilterPrice] = useState(-1)
-    const [filter_size, setFilterSize] = useState(-1)
-    const [filter_rooms, setFilterRooms] = useState(-1)
-    const [filter_outer, setFilterOuter] = useState(-1)
+	const [filter_use_format, setFilterUseFormat] = useState(-1)
+	const [filter_price, setFilterPrice] = useState(-1)
+	const [filter_size, setFilterSize] = useState(-1)
+	const [filter_rooms, setFilterRooms] = useState(-1)
+	const [filter_outer, setFilterOuter] = useState(-1)
+
+	const tmpCntRef = useRef(0);
+	const [tmpCnt, setTmpCnt] = useState(0)
 
 	useEffect(() => {
 		loadVendors();
 	}, [
-		  filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3
+		tmpCnt, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3
 	])
+
+	useEffect(()=>{
+		const focusListener = props.navigation.addListener('focus', () => {
+			console.log('MyListingsScreen focused')
+			setTmpCnt(tmpCntRef.current == 0 ? 1 : 0);
+			tmpCntRef.current = tmpCntRef.current == 0 ? 1 : 0;
+		});
+
+		return focusListener;
+	}, [])
 
 	const getFilers = () => {
 		return { searchTerm: '', filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 }
@@ -104,8 +117,8 @@ const MyListingsScreen = (props) => {
 								setDeleteListingItem(vendor);
 								ShowDeleteModal(true)
 							}}
-							onEdit={() => { 
-								props.rootStackNav.navigate(RouteNames.AddListingScreen, {listItem : vendor});
+							onEdit={() => {
+								props.navigation.navigate(RouteNames.AddListingScreen, { listItem: vendor });
 							}}
 						/>
 					</View>
@@ -133,24 +146,25 @@ const MyListingsScreen = (props) => {
 				style={{ paddingHorizontal: 20, height: 90, marginBottom: 0 }}
 				title={'已上傳單位記錄'}
 			/>
-			<TabsTypeButton 
-                value={filter_type}
-                onChange={(value) => {
-                    setFilterType(value)
-                }}
-            />
+			<TabsTypeButton
+				value={filter_type}
+				onChange={(value) => {
+					setFilterType(value)
+				}}
+			/>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
 				<FilterBar
-					onChangeArea={(value) => {  
-                        setFilterCity1(value.city1)
-                        setFilterCity2(value.city2)
-                        setFilterCity3(value.city3)
-                    }}
+					isSell={filter_type == FOR_SELL}
+					onChangeArea={(value) => {
+						setFilterCity1(value.city1)
+						setFilterCity2(value.city2)
+						setFilterCity3(value.city3)
+					}}
 					onChangeType={(value) => { setFilterUseFormat(value) }}
-                    onChangePrice={(value) => { setFilterPrice(value) }}
-                    onChangeSize={(value) => { setFilterSize(value) }}
-                    onChangeRooms={(value) => { setFilterRooms(value) }}
-                    onChangeOuter={(value) => { setFilterOuter(value) }}
+					onChangePrice={(value) => { setFilterPrice(value) }}
+					onChangeSize={(value) => { setFilterSize(value) }}
+					onChangeRooms={(value) => { setFilterRooms(value) }}
+					onChangeOuter={(value) => { setFilterOuter(value) }}
 				/>
 			</View>
 			{
@@ -207,7 +221,7 @@ const styles = StyleSheet.create({
 })
 
 
-const mapStateToProps = ({ app,   }) => ({
+const mapStateToProps = ({ app, }) => ({
 	user: app.user || {},
 	isLoggedIn: app.isLoggedIn,
 	vendorData: app.vendorData,

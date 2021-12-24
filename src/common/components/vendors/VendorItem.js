@@ -74,4 +74,4 @@ function arePropsEqual(prevProps, nextProps) {
 const mapStateToProps = ({ app, shop }) => ({
     isLoggedIn: app.isLoggedIn,
 });
-export default connect(mapStateToProps, {   })(React.memo(VendorItem, arePropsEqual));
+export default connect(mapStateToProps, {   })(VendorItem);

@@ -28,7 +28,8 @@ const ImgVideoTab =  ({ value, onChange }) => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        padding: 20, 
+        paddingTop: 20, 
+        paddingHorizontal: 20,
         backgroundColor: '#fff',
     },
     activeBtn : { fontSize: 14, lineHeight: 21,  color: Theme.colors.text, textDecorationLine : 'underline'},

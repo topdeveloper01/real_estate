@@ -1,7 +1,7 @@
 import {APP} from '../types'; 
 import { setI18nConfig, getLanguage, setLanguage } from '../../common/services/translate';
 import apiFactory from '../../common/services/apiFactory';
-import { city1_Collection, city2_Collection, city3_Collection, pushesCollection } from '../../common/services/firebase';
+import { city1_Collection, city2_Collection, city3_Collection, pushesCollection, settings_Collection } from '../../common/services/firebase';
 
 export const setHomeTabNavigation=(payload) =>{
     return {type : APP.SET_HOMETAB_NAVIGATION, payload : payload}
@@ -130,6 +130,22 @@ export const createCity = (level, data) => {
                 .catch((e) => {
                     reject(e);
                 })
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+
+export const getTermsPolicyData = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            settings_Collection.doc('term_policy').get().then((res) => {
+                resolve(res.data());
+            })
+                .catch(err => {
+                    reject(err);
+                });
         } catch (e) {
             reject(e);
         }

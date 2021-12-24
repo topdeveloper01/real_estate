@@ -22,7 +22,7 @@ export const checkLocationPermission = () => {
 
 export const showAlertSetting = (resolve, reject) => {
 	alerts
-		.confirmation(translate('attention'), translate('locationUnavailable'), 'Settings', translate('cancel'))
+		.confirmation('注意', '我們無法獲取您的位置信息。', 'Settings', translate('cancel'))
 		.then(
 			() => {
 				if (Config.isAndroid) {

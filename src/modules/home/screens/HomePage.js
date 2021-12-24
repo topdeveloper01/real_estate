@@ -17,7 +17,8 @@ import FeatureList from '../components/FeatureList';
 import FilterBar from '../../../common/components/vendors/FilterVar';
 import BlockSpinner from '../../../common/components/BlockSpinner';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
-import { FOR_RENT } from '../../../config/constants';
+import { FOR_RENT, FOR_SELL } from '../../../config/constants';
+import alerts from '../../../common/services/alerts';
 
 const vertPerPage = 10;
 
@@ -171,6 +172,16 @@ const HomePage = (props) => {
                     <Text style={styles.headerSubTitle}>Hollys Property And Renovation Company Limited</Text>
                 </View>
                 <TouchableOpacity onPress={() => {
+                    if (props.isLoggedIn == false) {
+                        return alerts.confirmation('必須', '登入後繼續', '登入', '取消')
+                            .then(
+                                () => {
+                                    props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
+                                },
+                                (error) => {
+                                }
+                            );
+                    }
                     goRootStackScreen(RouteNames.NotificationsScreen)
                 }}>
                     <MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
@@ -206,6 +217,7 @@ const HomePage = (props) => {
             </View>
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
                 <FilterBar
+                    isSell={filter_type == FOR_SELL}
                     onChangeArea={(value) => {
                         setFilterCity1(value.city1)
                         setFilterCity2(value.city2)

@@ -7,7 +7,7 @@ import Svg_divider from '../../assets/svgs/cat-divider.svg';
 import AreaFilterModal from '../modals/AreaFilterModal';
 import { FOR_RESIDENTIAL, FOR_OFFICE, FOR_SHOP, FOR_INDUSTRIAL } from '../../../config/constants';
 
-const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, onChangeRooms, onChangeOuter }) => {
+const FilterBar = ({ isSell, onChangeArea, onChangeType, onChangePrice, onChangeSize, onChangeRooms, onChangeOuter }) => {
 
     const [isAreaFilterModal, setAreaFilterModal] = useState(false)
     const [filter_area, setFilterArea] = useState({
@@ -36,6 +36,14 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
         { label: '$50,000,000 以上 Above ', value: 3 }
     ]
 
+    const filterRentPrices = [
+        { label: '任何 Any', value: -1 },
+        { label: '$9,999 以下 below', value: 0 },
+        { label: '$10,000 – $44,999', value: 1 },
+        { label: '$45,000 – $99,999', value: 2 },
+        { label: '$100,000 以上 above ', value: 3 }
+    ]
+  
     const [isSizeFilterModal, setSizeFilterModal] = useState(false)
     const [filter_size, setFilterSize] = useState(0)
     const filterSizes = [
@@ -109,7 +117,12 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
                 <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setPriceFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>價格</AppText>
                     <AppText style={styles.filterSubLabel}>PRICE</AppText>
-                    <AppText style={styles.filterValue}>{filterPrices[filter_price].label}</AppText>
+                    <AppText style={styles.filterValue}>
+                        { isSell == true ? 
+                            filterPrices[filter_price].label : 
+                            filterRentPrices[filter_price].label
+                        }
+                    </AppText>
                 </TouchableOpacity>
                 <View style={{ paddingHorizontal: 24 }}>
                     <Svg_divider />
@@ -176,7 +189,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
         <FilterModal
             showModal={isPriceFilterModal}
             title='價格 Price'
-            items={filterPrices}
+            items={isSell == true ? filterPrices : filterRentPrices}
             value={filter_price}
             onSave={(value) => {
                 setPriceFilterModal(false);

@@ -85,6 +85,17 @@ const VendorScreen = (props) => {
     };
 
     const onEnterChannel = async () => {
+        if (props.isLoggedIn == false) {
+            return alerts.confirmation('必須', '登入後繼續', '登入', '取消')
+                .then(
+                    () => {
+                        props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
+                    },
+                    (error) => { 
+                    }
+                );
+        }
+
         let found_channel = await findChannel(props.user.id, ownerData.id)
         if (found_channel != null) {
             props.navigation.navigate(RouteNames.MessagesScreen, { channelId: found_channel.id })
@@ -178,7 +189,7 @@ const VendorScreen = (props) => {
                     }
                     <View style={{ padding: 20, width: '100%' }}>
                         {
-                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
+                            <View style={[Theme.styles.row_center_start, { width: '100%', marginBottom: 12 }]}>
                                 <View style={styles.tag}>
                                     <AppText style={[styles.tag_txt]}>
                                         {props.vendorData.isSell == true ? '售 Sales' : '租 Rent'} </AppText>
@@ -186,10 +197,10 @@ const VendorScreen = (props) => {
                                 <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
                             </View>
                         }
-                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
                             <AppText style={[styles.area]}>{props.vendorData.area}</AppText>
                         </View>
-                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
+                        <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
                             <AppText style={[styles.title]}>{props.vendorData.title}</AppText>
                         </View>
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
@@ -205,7 +216,7 @@ const VendorScreen = (props) => {
                         </View>
                         <View style={styles.divider} />
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 1, paddingRight: 10 }}>
                                 <AppText style={[styles.size]}>
                                     建築 Gross Area :
                                 </AppText>
@@ -214,7 +225,7 @@ const VendorScreen = (props) => {
                                     {formatNumber(props.vendorData.construction_size_price)} Sq. Ft.
                                 </AppText>
                             </View>
-                            <View style={{ flex: 1 }}>
+                            <View style={{ flex: 1, paddingLeft: 10 }}>
                                 <AppText style={[styles.size]}>
                                     實用 Saleable Area :
                                 </AppText>

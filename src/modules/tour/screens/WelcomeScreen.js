@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -34,6 +34,7 @@ import BlockSpinner from '../../../common/components/BlockSpinner';
 import PhoneVerificationScreen from './PhoneVerificationScreen';
 import Svg_facebook from '../../../common/assets/svgs/auth/facebook.svg'
 import Svg_google from '../../../common/assets/svgs/auth/google.svg'
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const WelcomeScreen = (props) => {
 	const backRoute = props.route.params != null ? props.route.params.backRoute : null;
@@ -50,8 +51,8 @@ const WelcomeScreen = (props) => {
 		try {
 			auth().settings.appVerificationDisabledForTesting = true;
 		} catch (error) {
-			
-		} 
+
+		}
 		GoogleSignin.configure({
 			webClientId: '82651546395-4r336st98l1570pb45idtp498fmnklcp.apps.googleusercontent.com',
 		});
@@ -70,7 +71,7 @@ const WelcomeScreen = (props) => {
 			(error) => {
 				console.log('handleFbLogin', error);
 				setLoading(false);
-				alerts.error(translate('attention'), extractErrorMessage(error));
+				alerts.error('注意', extractErrorMessage(error));
 			}
 		);
 	};
@@ -90,7 +91,7 @@ const WelcomeScreen = (props) => {
 			(error) => {
 				console.log('handleGoogleLogin', error);
 				setLoading(false);
-				alerts.error(translate('attention'), extractErrorMessage(error));
+				alerts.error('注意', extractErrorMessage(error));
 			}
 		);
 	};
@@ -109,7 +110,7 @@ const WelcomeScreen = (props) => {
 			(error) => {
 				console.log('handlePhoneLogin', error);
 				setLoading(false);
-				alerts.error(translate('attention'), extractErrorMessage(error));
+				alerts.error('注意', extractErrorMessage(error));
 			}
 		);
 	};
@@ -122,7 +123,7 @@ const WelcomeScreen = (props) => {
 		LoginManager.logInWithPermissions(['public_profile', 'email'])
 			.then((result) => {
 				if (result.isCancelled) {
-					alerts.error(translate('attention'), translate('accept_access'));
+					alerts.error('注意', translate('accept_access'));
 				} else {
 					AccessToken.getCurrentAccessToken().then(({ accessToken }) => {
 						handleFbLogin(accessToken);
@@ -130,7 +131,7 @@ const WelcomeScreen = (props) => {
 				}
 			})
 			.catch(() => {
-				alerts.error(translate('attention'), translate('accept_access'));
+				alerts.error('注意', translate('accept_access'));
 			});
 	};
 
@@ -144,13 +145,13 @@ const WelcomeScreen = (props) => {
 		handleGoogleLogin(idToken);
 	};
 
-	const setCountDownTimer = ()=>{
-		setTimeout(()=>{
+	const setCountDownTimer = () => {
+		setTimeout(() => {
 			isElapsed60Seconds.current = true;
 		}, 60000)
 	}
 
-	const onSignin = async () => { 
+	const onSignin = async () => {
 		if (phone.length != 8) {
 			return alerts.error('警告', '請檢查您的電話號碼');
 		};
@@ -173,19 +174,19 @@ const WelcomeScreen = (props) => {
 				}
 				catch (error) {
 					setLoading(false);
-					console.log('onsignin,', error )
+					console.log('onsignin,', error)
 					alerts.error('警告', 'something went wrong');
-				} 
+				}
 			}
 			else {
 				setLoading(false);
 				alerts.error('警告', '沒有註冊的電話號碼。 請註冊系統。');
 			}
 		})
-		.catch(error => {
-			setLoading(false);
-			alerts.error('警告', '檢查電話號碼時出錯');
-		})
+			.catch(error => {
+				setLoading(false);
+				alerts.error('警告', '檢查電話號碼時出錯');
+			})
 	};
 
 	const _renderSocialBtns = () => {
@@ -274,7 +275,7 @@ const WelcomeScreen = (props) => {
 					style={{ width: '100%', backgroundColor: Theme.colors.yellow1 }}
 				/>
 				<Text style={styles.notiTxt}>系統將會發出驗證碼到閣下的電話號碼</Text>
-				<Text style={[styles.notiTxt, {marginTop: 3}]}>The system will send a verification code to your phone number</Text>
+				<Text style={[styles.notiTxt, { marginTop: 3 }]}>The system will send a verification code to your phone number</Text>
 				<TransBtn
 					style={{ marginTop: 10, marginBottom: 20 }}
 					title={'建立新帳戶'}
@@ -284,6 +285,14 @@ const WelcomeScreen = (props) => {
 					}}
 				/>
 				{_renderSocialBtns()}
+				<View style={{ position: 'absolute', top: 55, right: 25,   }}>
+					<TouchableOpacity 
+						onPress={() => {
+							props.navigation.navigate(RouteNames.BottomTabs);
+						}}>
+						<Text style={styles.skipBtnTxt}>略過</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 		</KeyboardAwareScrollView>
 	);
@@ -292,7 +301,7 @@ const WelcomeScreen = (props) => {
 const styles = StyleSheet.create({
 	title: { fontSize: 32, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	sub_title: { fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
-	notiTxt: { textAlign: 'center', marginTop: 12, fontSize: 15, color: Theme.colors.text, fontFamily: Theme.fonts.medium},
+	notiTxt: { textAlign: 'center', marginTop: 12, fontSize: 15, color: Theme.colors.text, fontFamily: Theme.fonts.medium },
 	divider: { width: '100%' },
 	divider_line: { flex: 1, height: 1, backgroundColor: '#E9E9F7' },
 	ortxt: { fontSize: 12, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text, marginLeft: 5, marginRight: 5 },
@@ -307,6 +316,12 @@ const styles = StyleSheet.create({
 		marginBottom: 40,
 		width: '100%',
 	},
+	skipBtn: {
+		position: 'absolute',
+		top: 40,
+		right: 20,
+	},
+	skipBtnTxt: { fontSize: 14, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text }
 });
 
 function mapStateToProps({ app }) {

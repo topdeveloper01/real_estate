@@ -4,10 +4,21 @@ import { connect } from 'react-redux';
 import Theme from '../../../theme'; 
 import Header1 from '../../../common/components/Header1'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; 
+import { getTermsPolicyData } from '../../../store/actions/app';
 
 const TermsScreen = (props) => {
 
-	useEffect(() => { }, []);
+	const [terms, setTerms] = useState('')
+	useEffect(() => { 
+		getTermsPolicyData().then(data => {
+			if (data != null) {
+				setTerms(data.term)
+			}
+		})
+		.catch(error => {
+			alerts.error('注意', '出問題了');
+		})
+	}, []);
 
 	return (
 		<View style={styles.container}>
@@ -21,9 +32,7 @@ const TermsScreen = (props) => {
 			<View style={styles.formView}>
 				<KeyboardAwareScrollView style={[{ flex: 1, width: '100%', paddingHorizontal: 20 }]} extraScrollHeight={25} keyboardShouldPersistTaps='handled'>
 					<Text>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Neque, venenatis leo ante morbi magnis porttitor. Massa ut mauris id aliquam at dapibus dignissim aliquam. In porta arcu, purus amet ipsum, aliquet tortor. Amet, bibendum erat iaculis in ipsum integer.
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Neque, venenatis leo ante morbi magnis porttitor. Massa ut mauris id aliquam at dapibus dignissim aliquam. In porta arcu, purus amet ipsum, aliquet tortor. Amet, bibendum erat iaculis in ipsum integer.
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Neque, venenatis leo ante morbi magnis porttitor. Massa ut mauris id aliquam at dapibus dignissim aliquam. In porta arcu, purus amet ipsum, aliquet tortor. Amet, bibendum erat iaculis in ipsum integer.
+						 {terms}
 					</Text>
 				</KeyboardAwareScrollView>
 			</View>

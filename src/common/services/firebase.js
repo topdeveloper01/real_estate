@@ -8,6 +8,7 @@ export const pushesCollection = firestore().collection('PushMessages');
 export const city1_Collection = firestore().collection('city_1');
 export const city2_Collection = firestore().collection('city_2');
 export const city3_Collection = firestore().collection('city_3');
+export const settings_Collection = firestore().collection('settings');
 
 export const FieldValue = firestore.FieldValue;
  

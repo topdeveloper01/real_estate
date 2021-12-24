@@ -306,10 +306,11 @@ const AddListingScreen = (props) => {
 				tmp.push({ label: item.name, value: item.name })
 			})
 			setCities2(tmp)
-			setValue_city2(null)
+			if (tmp.length == 0) {
+				setValue_city2(null)
+			} 
 
 			setCities3([])
-			setValue_city3(null)
 		}
 		else {
 			setCities2([])
@@ -327,7 +328,9 @@ const AddListingScreen = (props) => {
 				tmp.push({ label: item.name, value: item.name })
 			})
 			setCities3(tmp)
-			setValue_city3(null)
+			if (tmp.length == 0) {
+				setValue_city3(null)
+			}
 		}
 		else {
 			setCities3([])

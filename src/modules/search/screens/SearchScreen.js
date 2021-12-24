@@ -18,7 +18,8 @@ import FilterBar from '../../../common/components/vendors/FilterVar';
 import { AuthInput, VendorItem, } from '../../../common/components';
 import NoRestaurants from '../../../common/components/restaurants/NoRestaurants';
 import TabsTypeButton from '../../../common/components/buttons/tab_btn';
-import { FOR_RENT } from '../../../config/constants';
+import { FOR_RENT, FOR_SELL } from '../../../config/constants';
+import alerts from '../../../common/services/alerts';
 
 const vertPerPage = 10;
 
@@ -34,13 +35,13 @@ const SearchScreen = (props) => {
 	const [filter_city_1, setFilterCity1] = useState(null)
 	const [filter_city_2, setFilterCity2] = useState(null)
 	const [filter_city_3, setFilterCity3] = useState(null)
-  
+
 	const [filter_type, setFilterType] = useState(FOR_RENT)
-    const [filter_use_format, setFilterUseFormat] = useState(-1)
-    const [filter_price, setFilterPrice] = useState(-1)
-    const [filter_size, setFilterSize] = useState(-1)
-    const [filter_rooms, setFilterRooms] = useState(-1)
-    const [filter_outer, setFilterOuter] = useState(-1)
+	const [filter_use_format, setFilterUseFormat] = useState(-1)
+	const [filter_price, setFilterPrice] = useState(-1)
+	const [filter_size, setFilterSize] = useState(-1)
+	const [filter_rooms, setFilterRooms] = useState(-1)
+	const [filter_outer, setFilterOuter] = useState(-1)
 
 	useEffect(() => {
 		loadVendors(true);
@@ -58,7 +59,7 @@ const SearchScreen = (props) => {
 	}
 
 	const getFilers = () => {
-		return { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3}
+		return { searchTerm, filter_type, filter_use_format, filter_price, filter_size, filter_rooms, filter_outer, filter_city_1, filter_city_2, filter_city_3 }
 	}
 
 	const loadVendors = async (forceLoading) => {
@@ -118,6 +119,16 @@ const SearchScreen = (props) => {
 					<Text style={styles.headerSubTitle}>Hollys Property And Renovation Company Limited</Text>
 				</View>
 				<TouchableOpacity onPress={() => {
+					if (props.isLoggedIn == false) {
+						return alerts.confirmation('必須', '登入後繼續', '登入', '取消')
+							.then(
+								() => {
+									props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
+								},
+								(error) => {
+								}
+							);
+					}
 					goRootStackScreen(RouteNames.NotificationsScreen)
 				}}>
 					<MaterialCommunityIcons name='bell' size={24} color={Theme.colors.text} />
@@ -152,17 +163,18 @@ const SearchScreen = (props) => {
 				/>
 			</View>
 			<View style={{ width: '100%', paddingHorizontal: 20, }}>
-				<FilterBar 
+				<FilterBar
+					isSell={filter_type == FOR_SELL}
 					onChangeArea={(value) => {
-                        setFilterCity1(value.city1)
-                        setFilterCity2(value.city2)
-                        setFilterCity3(value.city3)
-                    }}
-                    onChangeType={(value) => { setFilterUseFormat(value) }}
-                    onChangePrice={(value) => { setFilterPrice(value) }}
-                    onChangeSize={(value) => { setFilterSize(value) }}
-                    onChangeRooms={(value) => { setFilterRooms(value) }}
-                    onChangeOuter={(value) => { setFilterOuter(value) }}
+						setFilterCity1(value.city1)
+						setFilterCity2(value.city2)
+						setFilterCity3(value.city3)
+					}}
+					onChangeType={(value) => { setFilterUseFormat(value) }}
+					onChangePrice={(value) => { setFilterPrice(value) }}
+					onChangeSize={(value) => { setFilterSize(value) }}
+					onChangeRooms={(value) => { setFilterRooms(value) }}
+					onChangeOuter={(value) => { setFilterOuter(value) }}
 				/>
 			</View>
 			{
@@ -193,8 +205,8 @@ const SearchScreen = (props) => {
 
 const styles = StyleSheet.create({
 	header: { width: '100%', paddingHorizontal: 20, height: 90, paddingTop: 34, backgroundColor: '#F7F7F7' },
-	headerTitle: {  fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
-    headerSubTitle: {  fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
+	headerTitle: { fontSize: 20, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text },
+	headerSubTitle: { fontSize: 12, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
 	operationTab: { height: 62, width: '100%', marginTop: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#F6F6F9' },
 	subjectTitle: { fontSize: 16, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	divider: { width: '100%', height: 1, backgroundColor: '#F6F6F9' },
