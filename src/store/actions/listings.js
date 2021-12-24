@@ -214,9 +214,9 @@ export const getAllListings = (filterKeys) => {
 export const createListing = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let listingData = {
+            let listingData = { 
+                id: data.id == null ? listingCollection.doc().id : data.id,
                 ...data,
-                id: listingCollection.doc().id
             }
             listingCollection.doc(listingData.id).set(listingData).then(() => {
                 resolve(listingData)

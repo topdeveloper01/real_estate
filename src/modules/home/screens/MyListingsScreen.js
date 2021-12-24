@@ -104,6 +104,9 @@ const MyListingsScreen = (props) => {
 								setDeleteListingItem(vendor);
 								ShowDeleteModal(true)
 							}}
+							onEdit={() => { 
+								props.rootStackNav.navigate(RouteNames.AddListingScreen, {listItem : vendor});
+							}}
 						/>
 					</View>
 				)

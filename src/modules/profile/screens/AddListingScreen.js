@@ -11,14 +11,14 @@ import { MainBtn } from '../../../common/components';
 import { translate } from '../../../common/services/translate';
 import { createListing } from '../../../store/actions/listings'
 import alerts from '../../../common/services/alerts';
-import { getImageFullURL, isEmpty,  } from '../../../common/services/utility';
+import { getImageFullURL, isEmpty, } from '../../../common/services/utility';
 import Theme from '../../../theme';
 import AuthInput from '../../../common/components/AuthInput';
 import AutoLocInput from '../../../common/components/AutoLocInput';
 import ImgPickOptionModal from '../../../common/components/modals/ImgPickOptionModal';
 import Header1 from '../../../common/components/Header1';
 import PhotoList from '../components/PhotoList';
-import { RadioBtn } from '../../../common/components'; 
+import { RadioBtn } from '../../../common/components';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { uploadPhoto } from '../../../common/services/firebase';
 // Svg
@@ -43,12 +43,12 @@ const AddListingScreen = (props) => {
 		setAddressText(text);
 	}, [google_map_position]);
 
-	const [value1, setValue1] = useState(null);
-	const [value2, setValue2] = useState(null);
-	const [value3, setValue3] = useState(null);
-	const [value4, setValue4] = useState(null);
-	const [value5, setValue5] = useState(null);
-	const [value6, setValue6] = useState(null);
+	const [value1, setValue1] = useState(null);  // type_use
+	const [value2, setValue2] = useState(null);  // living_rooms
+	const [value3, setValue3] = useState(null);  // rooms
+	const [value4, setValue4] = useState(null);  // toilets
+	const [value5, setValue5] = useState(null);  // room_toilets
+	const [value6, setValue6] = useState(null);  // helper_rooms
 
 	const [value_city1, setValue_city1] = useState(null);
 	const [value_city2, setValue_city2] = useState(null);
@@ -244,6 +244,59 @@ const AddListingScreen = (props) => {
 		onChangeCity2(value_city2)
 	}, [value_city2])
 
+	useEffect(() => {
+		if (props.route.params.listItem != null) {
+			setState({
+				isSell: props.route.params.listItem.isSell == true,
+				is_featured: props.route.params.listItem.is_featured == true,
+				outer_roof: props.route.params.listItem.outer_roof == true,
+				outer_terrace: props.route.params.listItem.outer_terrace == true,
+				include_water_fee: props.route.params.listItem.include_water_fee == true,
+				include_electricity_fee: props.route.params.listItem.include_electricity_fee == true,
+				include_manage_fee: props.route.params.listItem.include_manage_fee == true,
+				include_government_fee: props.route.params.listItem.include_government_fee == true,
+				include_government_rent: props.route.params.listItem.include_government_rent == true,
+				club_house: props.route.params.listItem.club_house == true,
+				swimming_pool: props.route.params.listItem.swimming_pool == true,
+				car_park: props.route.params.listItem.car_park == true,
+				//
+				owner_id : props.route.params.listItem.owner_id,
+				type_use : '' + props.route.params.listItem.type_use,
+				living_rooms : '' + props.route.params.listItem.living_rooms,
+				rooms : '' + props.route.params.listItem.rooms,
+				toilets : '' + props.route.params.listItem.toilets,
+				room_toilets : '' + props.route.params.listItem.room_toilets,
+				helper_rooms : '' + props.route.params.listItem.helper_rooms,
+				actual_size : '' + props.route.params.listItem.actual_size,
+				actual_size_price : '' + props.route.params.listItem.actual_size_price,
+				construction_size : '' + props.route.params.listItem.construction_size,
+				construction_size_price : '' + props.route.params.listItem.construction_size_price,
+				price : '' + props.route.params.listItem.price,
+				other : props.route.params.listItem.other,
+				title : props.route.params.listItem.title,
+				title_en : props.route.params.listItem.title_en,
+				youtube : props.route.params.listItem.youtube,
+			})
+
+			setValue_city1(props.route.params.listItem.area)
+			setValue_city2(props.route.params.listItem.street)
+			setValue_city3(props.route.params.listItem.building)
+			 
+			setValue1('' + props.route.params.listItem.type_use);
+			setValue2('' + props.route.params.listItem.living_rooms);
+			setValue3('' + props.route.params.listItem.rooms);
+			setValue4('' + props.route.params.listItem.toilets);
+			setValue5('' + props.route.params.listItem.room_toilets);
+			setValue6('' + props.route.params.listItem.helper_rooms); 
+
+			setTimeout(()=>{
+				setGoogleMapPosition(props.route.params.listItem.google_map_position)
+			}, 600)
+			
+			setPhotos(props.route.params.listItem.photos || []) 
+		}
+	}, [props.route.params.listItem])
+
 
 	const onChangeCity1 = (_city_1) => {
 		let index = props.city1_list.findIndex(item => item.name == _city_1)
@@ -310,7 +363,7 @@ const AddListingScreen = (props) => {
 			});
 	};
 
-	const validateInputs = () => { 
+	const validateInputs = () => {
 		if (isEmpty(state.title)) {
 			alerts.error('', '輸入標題 ');
 			return false
@@ -394,7 +447,11 @@ const AddListingScreen = (props) => {
 				let uploadedPhotos = [];
 				for (let i = 0; i < photos.length; i++) {
 					try {
-						let photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photos[i].image.path);
+						let photoUrl = photos[i].image;
+						if (photos[i].image.path != null) {
+							photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photos[i].image.path);
+						}
+						
 						uploadedPhotos.push({
 							image: photoUrl,
 							weight: photos[i].weight
@@ -406,7 +463,7 @@ const AddListingScreen = (props) => {
 
 				let newListingData = {
 					...state,
-					type_use : parseInt(state.type_use),
+					type_use: parseInt(state.type_use),
 					area: value_city1,
 					street: value_city2,
 					building: value_city3,
@@ -436,6 +493,9 @@ const AddListingScreen = (props) => {
 					helper_rooms: parseInt(state.helper_rooms)
 				};
 
+				if (props.route.params.listItem != null && props.route.params.listItem.id != null) {  // edit
+					newListingData.id = props.route.params.listItem.id;
+				}
 				console.log('newListingData ', newListingData)
 				await createListing(newListingData);
 

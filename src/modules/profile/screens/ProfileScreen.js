@@ -175,7 +175,7 @@ const ProfileScreen = (props) => {
 			{
 				props.user.admin == true &&
 				<TouchableOpacity style={styles.addlistingBtn} onPress={() => {
-					props.rootStackNav.navigate(RouteNames.AddListingScreen);
+					props.rootStackNav.navigate(RouteNames.AddListingScreen, {listItem : null});
 				}}>
 					<Svg_add />
 				</TouchableOpacity>

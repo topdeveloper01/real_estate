@@ -292,7 +292,7 @@ const WelcomeScreen = (props) => {
 const styles = StyleSheet.create({
 	title: { fontSize: 32, fontFamily: Theme.fonts.bold, color: Theme.colors.text },
 	sub_title: { fontSize: 14, fontFamily: Theme.fonts.medium, color: Theme.colors.text },
-	notiTxt: { marginTop: 12, fontSize: 15, color: Theme.colors.text, fontFamily: Theme.fonts.medium},
+	notiTxt: { textAlign: 'center', marginTop: 12, fontSize: 15, color: Theme.colors.text, fontFamily: Theme.fonts.medium},
 	divider: { width: '100%' },
 	divider_line: { flex: 1, height: 1, backgroundColor: '#E9E9F7' },
 	ortxt: { fontSize: 12, fontFamily: Theme.fonts.semiBold, color: Theme.colors.text, marginLeft: 5, marginRight: 5 },

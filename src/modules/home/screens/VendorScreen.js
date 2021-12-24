@@ -147,36 +147,45 @@ const VendorScreen = (props) => {
                             </TouchableOpacity>
                             :
                             isEmpty(props.vendorData.youtube) ? null :
-                            <View style={[Theme.styles.col_center, {width: '100%', height : 360, backgroundColor : '#000'}]}>
-                                <YoutubePlayer 
-                                    height={300}
-                                    width={width(100)}
-                                    play={isYoutubePlaying}
-                                    videoId={YouTubeGetID(props.vendorData.youtube)}  // 
-                                    onChangeState={onYoutubePlayStateChange}
-                                    webViewProps={{
-                                        injectedJavaScript: `
+                                <View style={[Theme.styles.col_center, { width: '100%', height: 360, backgroundColor: '#000' }]}>
+                                    <YoutubePlayer
+                                        height={300}
+                                        width={width(100)}
+                                        play={isYoutubePlaying}
+                                        videoId={YouTubeGetID(props.vendorData.youtube)}  // 
+                                        onChangeState={onYoutubePlayStateChange}
+                                        webViewProps={{
+                                            injectedJavaScript: `
                                           var element = document.getElementsByClassName('container')[0];
                                           element.style.position = 'unset';
                                           element.style.paddingTop = '250px';
                                           element.style.paddingBottom = '250px';
                                           true;
                                         `,
-                                      }}
-                                />
-                            </View>
-                            
+                                        }}
+                                    />
+                                </View>
+
                     }
                     {
-                        isEmpty(props.vendorData.youtube) ? null : 
-                        <ImgVideoTab
-                            value={media_type}
-                            onChange={(value) => {
-                                setMediaType(value)
-                            }}
-                        />
-                    } 
+                        isEmpty(props.vendorData.youtube) ? null :
+                            <ImgVideoTab
+                                value={media_type}
+                                onChange={(value) => {
+                                    setMediaType(value)
+                                }}
+                            />
+                    }
                     <View style={{ padding: 20, width: '100%' }}>
+                        {
+                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
+                                <View style={styles.tag}>
+                                    <AppText style={[styles.tag_txt]}>
+                                        {props.vendorData.isSell == true ? '售 Sales' : '租 Rent'} </AppText>
+                                </View>
+                                <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
+                            </View>
+                        }
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                             <AppText style={[styles.area]}>{props.vendorData.area}</AppText>
                         </View>
@@ -187,7 +196,7 @@ const VendorScreen = (props) => {
                             <AppText style={[styles.title]}>{props.vendorData.title_en}</AppText>
                         </View>
                         <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
-                            <AppText style={[styles.text]}>街道 (Street) : </AppText>
+                            <AppText style={[styles.text]}>街道 (Street/Road) : </AppText>
                             <AppText style={[styles.text]}> {props.vendorData.street} </AppText>
                         </View>
                         <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
@@ -196,26 +205,27 @@ const VendorScreen = (props) => {
                         </View>
                         <View style={styles.divider} />
                         <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
-                            <AppText style={[styles.size]}>
-                                建築 Construction : {formatNumber(props.vendorData.construction_size)}呎(ft.) @
-                                {formatNumber(props.vendorData.construction_size_price)} (Price per ft.)
-                            </AppText>
-                        </View>
-                        <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
-                            <AppText style={[styles.size]}>
-                                實用 Acrtual Size : {formatNumber(props.vendorData.actual_size)}呎(ft.) @
-                                {formatNumber(props.vendorData.actual_size_price)} (Price per ft.)
-                            </AppText>
-                        </View>
-                        {
-                            <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 12 }]}>
-                                <View style={styles.tag}>
-                                    <AppText style={[styles.tag_txt]}>
-                                        {props.vendorData.isSell == true ? '售' : '租'} </AppText>
-                                </View>
-                                <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
+                            <View style={{ flex: 1 }}>
+                                <AppText style={[styles.size]}>
+                                    建築 Gross Area :
+                                </AppText>
+                                <AppText style={[styles.size]}>
+                                    {formatNumber(props.vendorData.construction_size)}平方呎 @
+                                    {formatNumber(props.vendorData.construction_size_price)} Sq. Ft.
+                                </AppText>
                             </View>
-                        }
+                            <View style={{ flex: 1 }}>
+                                <AppText style={[styles.size]}>
+                                    實用 Saleable Area :
+                                </AppText>
+                                <AppText style={[styles.size]}>
+                                    {formatNumber(props.vendorData.actual_size)}平方呎 @
+                                    {formatNumber(props.vendorData.actual_size_price)} Sq. Ft.
+                                </AppText>
+                            </View>
+
+                        </View>
+
                         <View style={[Theme.styles.col_center, { width: '100%', marginTop: 24 }]}>
                             <AppText style={styles.size}>間隔 Interval</AppText>
                             <View style={[Theme.styles.row_center, styles.infoView]}>
@@ -256,9 +266,11 @@ const VendorScreen = (props) => {
                             <StateText active={props.vendorData.club_house == true} text={'會所 Club house'} />
                             <StateText active={props.vendorData.swimming_pool == true} text={'泳池 Swimming pool'} />
                             <StateText active={props.vendorData.car_park == true} text={'停車場 Car park'} />
+                            <StateText active={props.vendorData.outer_roof == true} text={'天台 Rooftop '} />
+                            <StateText active={props.vendorData.outer_terrace == true} text={'露台 Terrace'} /> 
                         </View>
                         <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 12 }]}>
-                            <AppText style={[styles.size]}>其他資訊 Other Informatiton : </AppText>
+                            <AppText style={[styles.size]}>其他資訊 Other Information : </AppText>
                             {
                                 !isEmpty(props.vendorData.other) &&
                                 <AppText style={[styles.size, { marginTop: 4 }]}>{props.vendorData.other}</AppText>

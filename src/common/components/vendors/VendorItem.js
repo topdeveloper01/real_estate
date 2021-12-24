@@ -8,7 +8,7 @@ import Img_placeholder from '../../assets/images/placeholder2.png'
 import { formatNumber } from '../../services/utility';
 
 const VendorItem = (props) => {
-    const { data, can_delete, onSelect, onDelete, style } = props
+    const { data, can_delete, onSelect, onEdit, onDelete, style } = props
 
     return <TouchableOpacity onPress={() => onSelect()}
         style={[Theme.styles.row_center, styles.container, style,]}>
@@ -25,6 +25,12 @@ const VendorItem = (props) => {
         <View style={{ flex: 1, height: '100%', paddingVertical: 4, paddingLeft: 12, flexDirection: 'column', justifyContent: 'space-between' }}>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <AppText style={[styles.title]}>{data.title}</AppText>
+                {
+                    can_delete == true &&
+                    <TouchableOpacity style={{ paddingHorizontal: 4, marginRight: 8 }} onPress={onEdit ? onEdit : ()=>{}}>
+                        <AppText style={styles.deleteBtnTxt}>編輯</AppText>
+                    </TouchableOpacity>
+                } 
                 {
                     can_delete == true &&
                     <TouchableOpacity style={{ paddingHorizontal: 4 }} onPress={onDelete ? onDelete : ()=>{}}>

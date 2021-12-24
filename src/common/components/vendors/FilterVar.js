@@ -98,7 +98,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
             <View style={[Theme.styles.row_center]}>
                 <TouchableOpacity style={[Theme.styles.col_center]} onPress={() => { setTypeFilterModal(true) }}>
                     <AppText style={styles.filterLabel}>形式</AppText>
-                    <AppText style={styles.filterSubLabel}>FORMAT</AppText>
+                    <AppText style={styles.filterSubLabel}>TYPE</AppText>
                     <AppText style={styles.filterValue}>{filterTypes[filter_type].label}</AppText>
                 </TouchableOpacity>
                 <View style={{ paddingHorizontal: 24 }}>
@@ -217,7 +217,7 @@ const FilterBar = ({ onChangeArea, onChangeType, onChangePrice, onChangeSize, on
         />
         <FilterModal
             showModal={isOuterFilterModal}
-            title='房數 Outer'
+            title='外面 Outer'
             items={filterOuters}
             value={filter_outer}
             onSave={(value) => {
