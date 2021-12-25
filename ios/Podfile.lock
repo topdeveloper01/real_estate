@@ -803,7 +803,7 @@ PODS:
     - React-Core
   - react-native-viewpager (5.0.11):
     - React-Core
-  - react-native-webview (11.15.0):
+  - react-native-webview (11.14.3):
     - React-Core
   - React-perflogger (0.64.1)
   - React-RCTActionSheet (0.64.1):
@@ -1241,7 +1241,7 @@ SPEC CHECKSUMS:
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: f0b4824e6fde8740de4e29cedb6ae64872095ee2
+  FBReactNativeSpec: e18102d9920d28346510cbe94bcc8289cd1e453b
   FBSDKCoreKit: e7dcac0aabcfb09d0166998edd95fe3b05a0ce5d
   FBSDKLoginKit: 1b0cf04df0370b37404213157b060d6666ede814
   FBSDKShareKit: abc29e1bb4f9f59f679adf1ae191006d68455f96
@@ -1290,7 +1290,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 52342d2d80ea8faadd0ffa76d83b6051f20c5329
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-viewpager: b99b53127d830885917ef84809c5065edd614a78
-  react-native-webview: e89bf2dba26a04cda967814df3ed1be99f291233
+  react-native-webview: b83cf1aa6b4453fe53ffcc5896c36cdf37f0383f
   React-perflogger: aad6d4b4a267936b3667260d1f649b6f6069a675
   React-RCTActionSheet: fc376be462c9c8d6ad82c0905442fd77f82a9d2a
   React-RCTAnimation: ba0a1c3a2738be224a08092fa7f1b444ab77d309
