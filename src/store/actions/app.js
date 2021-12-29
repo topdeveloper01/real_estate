@@ -151,3 +151,37 @@ export const getTermsPolicyData = () => {
         }
     });
 };
+
+export const saveTermsData = (text) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            settings_Collection.doc('term_policy').update({
+                term : text
+            }).then((res) => {
+                resolve(res);
+            })
+                .catch(err => {
+                    reject(err);
+                });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+export const savePolicyData = (text) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            settings_Collection.doc('term_policy').update({
+                policy : text
+            }).then((res) => {
+                resolve(res);
+            })
+                .catch(err => {
+                    reject(err);
+                });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};

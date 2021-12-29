@@ -193,7 +193,7 @@ const HomePage = (props) => {
                     setFilterType(value)
                 }}
             />
-            <View style={{ width: '100%', marginTop: 6, paddingHorizontal: 20, }}>
+            {/* <View style={{ width: '100%', marginTop: 6, paddingHorizontal: 20, }}>
                 <AuthInput
                     placeholder={'關鍵字/地區/標籤 (Search By Keyword)'}
                     underlineColorAndroid={'transparent'}
@@ -214,7 +214,7 @@ const HomePage = (props) => {
                         </TouchableOpacity>
                     ) : null}
                 />
-            </View>
+            </View> */}
             <View style={{ width: '100%', paddingHorizontal: 20, }}>
                 <FilterBar
                     isSell={filter_type == FOR_SELL}

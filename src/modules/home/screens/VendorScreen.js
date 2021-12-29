@@ -222,7 +222,7 @@ const VendorScreen = (props) => {
                                 </AppText>
                                 <AppText style={[styles.size]}>
                                     {formatNumber(props.vendorData.construction_size)}平方呎 @
-                                    {formatNumber(props.vendorData.construction_size_price)} Sq. Ft.
+                                    ${formatNumber(props.vendorData.construction_size_price)} Sq. Ft.
                                 </AppText>
                             </View>
                             <View style={{ flex: 1, paddingLeft: 10 }}>
@@ -231,7 +231,7 @@ const VendorScreen = (props) => {
                                 </AppText>
                                 <AppText style={[styles.size]}>
                                     {formatNumber(props.vendorData.actual_size)}平方呎 @
-                                    {formatNumber(props.vendorData.actual_size_price)} Sq. Ft.
+                                    ${formatNumber(props.vendorData.actual_size_price)} Sq. Ft.
                                 </AppText>
                             </View>
 

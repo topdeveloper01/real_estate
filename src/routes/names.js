@@ -33,5 +33,7 @@ export default {
     SendNotification : 'SendNotification',
     City1Screen : 'City1Screen',
     City2Screen : 'City2Screen',
-    City3Screen : 'City3Screen'
+    City3Screen : 'City3Screen',
+    PolicyEditScreen : 'PolicyEditScreen',
+    TermsEditScreen : 'TermsEditScreen'
 };

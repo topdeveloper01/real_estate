@@ -91,21 +91,26 @@ const ProfileScreen = (props) => {
 							props.rootStackNav.navigate(RouteNames.ProfileEditScreen);
 						}}
 					/>
-					<Text style={styles.subjectTitle}>關於我們 About Us</Text>
 					{
-						about_links.map(item =>
-							<TouchableOpacity
-								key={item.name}
-								delayPressIn={100}
-								style={[Theme.styles.row_center, styles.itemView]}
-								onPress={() => {
-									props.rootStackNav.navigate(item.link);
-								}}
-							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>{item.name}</Text>
-								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
-							</TouchableOpacity>
-						)
+						props.user.admin != true &&
+						<React.Fragment>
+							<Text style={styles.subjectTitle}>關於我們 About Us</Text>
+							{
+								about_links.map(item =>
+									<TouchableOpacity
+										key={item.name}
+										delayPressIn={100}
+										style={[Theme.styles.row_center, styles.itemView]}
+										onPress={() => {
+											props.rootStackNav.navigate(item.link);
+										}}
+									>
+										<Text style={[styles.itemTxt, Theme.styles.flex_1]}>{item.name}</Text>
+										<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+									</TouchableOpacity>
+								)
+							}
+						</React.Fragment>
 					}
 					<Text style={styles.subjectTitle}>帳戶操作 Account Setting</Text>
 					<View
@@ -113,14 +118,14 @@ const ProfileScreen = (props) => {
 					>
 						<Text style={[styles.itemTxt, Theme.styles.flex_1]}>允許推送通知系統 Push notification</Text>
 						<TouchableOpacity
-							onPress={()=>{
+							onPress={() => {
 								toggleSwitch(props.user.enable_notification == true ? false : true)
 							}}
 						>
 							<Switch
 								trackColor={{ false: Theme.colors.gray4, true: Theme.colors.gray4 }}
 								thumbColor={true ? "#FCD724" : "#f4f3f4"}
-								ios_backgroundColor="#3e3e3e" 
+								ios_backgroundColor="#3e3e3e"
 								disabled={true}
 								value={props.user.enable_notification == true}
 							/>
@@ -160,6 +165,26 @@ const ProfileScreen = (props) => {
 								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>推送通知系統</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
+							<TouchableOpacity
+								delayPressIn={100}
+								style={[Theme.styles.row_center, styles.itemView]}
+								onPress={() => {
+									props.rootStackNav.navigate(RouteNames.PolicyEditScreen);
+								}}
+							>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>私隱政策</Text>
+								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+							</TouchableOpacity> 
+							<TouchableOpacity
+								delayPressIn={100}
+								style={[Theme.styles.row_center, styles.itemView]}
+								onPress={() => {
+									props.rootStackNav.navigate(RouteNames.TermsEditScreen);
+								}}
+							>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>條款及細則</Text>
+								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
+							</TouchableOpacity>
 						</React.Fragment>
 					}
 
@@ -175,7 +200,7 @@ const ProfileScreen = (props) => {
 			{
 				props.user.admin == true &&
 				<TouchableOpacity style={styles.addlistingBtn} onPress={() => {
-					props.rootStackNav.navigate(RouteNames.AddListingScreen, {listItem : null});
+					props.rootStackNav.navigate(RouteNames.AddListingScreen, { listItem: null });
 				}}>
 					<Svg_add />
 				</TouchableOpacity>
