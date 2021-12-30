@@ -12,8 +12,7 @@ const LoadingModal = ({ showModal, title }) => {
     return <Modal
         isVisible={visible}
         backdropOpacity={0.33}
-        onSwipeComplete={() => onClose()}
-        onBackdropPress={() => onClose()}  >
+          >
         <View style={[Theme.styles.col_center, styles.modalContent]}>
             <ActivityIndicator size="small" color="#FF7675" />
             <Text style={styles.modalTitle}>{title}</Text>
