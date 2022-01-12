@@ -272,10 +272,10 @@ const AddListingScreen = (props) => {
 				construction_size : '' + props.route.params.listItem.construction_size,
 				construction_size_price : '' + props.route.params.listItem.construction_size_price,
 				price : '' + props.route.params.listItem.price,
-				other : props.route.params.listItem.other,
+				other : props.route.params.listItem.other || '',
 				title : props.route.params.listItem.title,
 				title_en : props.route.params.listItem.title_en,
-				youtube : props.route.params.listItem.youtube,
+				youtube : props.route.params.listItem.youtube || '',
 			})
 
 			setValue_city1(props.route.params.listItem.area)
@@ -466,6 +466,7 @@ const AddListingScreen = (props) => {
 
 				let newListingData = {
 					...state,
+					youtube : state.youtube || '',
 					type_use: parseInt(state.type_use),
 					area: value_city1,
 					street: value_city2,
