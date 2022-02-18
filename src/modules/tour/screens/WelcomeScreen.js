@@ -48,11 +48,7 @@ const WelcomeScreen = (props) => {
 	const isElapsed60Seconds = useRef(true);
 
 	useEffect(() => {
-		try {
-			auth().settings.appVerificationDisabledForTesting = true;
-		} catch (error) {
-
-		}
+		 
 		GoogleSignin.configure({
 			webClientId: '82651546395-4r336st98l1570pb45idtp498fmnklcp.apps.googleusercontent.com',
 		});
