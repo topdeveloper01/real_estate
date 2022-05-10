@@ -271,9 +271,9 @@ const AddListingScreen = (props) => {
 				construction_size: '' + props.route.params.listItem.construction_size,
 				price: '' + props.route.params.listItem.price,
 				other: props.route.params.listItem.other || '',
-				title: props.route.params.listItem.title,
-				title_en: props.route.params.listItem.title_en,
-				property_no: props.route.params.listItem.property_no,
+				title: props.route.params.listItem.title || '',
+				title_en: props.route.params.listItem.title_en || '',
+				property_no: props.route.params.listItem.property_no || '',
 				youtube: props.route.params.listItem.youtube || '',
 			})
 
