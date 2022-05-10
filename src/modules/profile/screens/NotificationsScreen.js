@@ -6,7 +6,7 @@ import Theme from '../../../theme';
 import Header1 from '../../../common/components/Header1';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import NoNoties from '../../../common/components/empty/NoNoties';
-import { getAllPushes } from '../../../store/actions/app';
+import { getAllPushes, deletePushMessage } from '../../../store/actions/app';
 import NotificationItem from '../../../common/components/NotificationItem';
 
 const NotificationsScreen = (props) => {
@@ -32,6 +32,18 @@ const NotificationsScreen = (props) => {
 		}
 	}
 
+	const onDelete = (noti_id) => {
+		setLoading(true);
+		deletePushMessage(noti_id)
+			.then(() => {
+				setLoading(false);
+				loadNotifications()
+			})
+			.catch(() => {
+				setLoading(false);
+			})
+	}
+
 	return (
 		<View style={styles.container}>
 			<Spinner visible={isLoading == true} />
@@ -52,8 +64,11 @@ const NotificationsScreen = (props) => {
 									notis.map((item) =>
 										<NotificationItem
 											key={item.id}
-											title={item.title}  
-											message={item.message}  
+											id={item.id}
+											title={item.title}
+											message={item.message}
+											isAdmin={props.user.admin == true}
+											onDelete={onDelete}
 										/>
 									)
 								}

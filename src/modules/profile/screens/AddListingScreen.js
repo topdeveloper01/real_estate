@@ -43,16 +43,16 @@ const AddListingScreen = (props) => {
 		setAddressText(text);
 	}, [google_map_position]);
 
-	const [value1, setValue1] = useState(null);  // type_use
-	const [value2, setValue2] = useState(null);  // living_rooms
-	const [value3, setValue3] = useState(null);  // rooms
-	const [value4, setValue4] = useState(null);  // toilets
-	const [value5, setValue5] = useState(null);  // room_toilets
-	const [value6, setValue6] = useState(null);  // helper_rooms
+	const [value1, setValue1] = useState('');  // type_use
+	const [value2, setValue2] = useState('');  // living_rooms
+	const [value3, setValue3] = useState('');  // rooms
+	const [value4, setValue4] = useState('');  // toilets
+	const [value5, setValue5] = useState('');  // room_toilets
+	const [value6, setValue6] = useState('');  // helper_rooms
 
-	const [value_city1, setValue_city1] = useState(null);
-	const [value_city2, setValue_city2] = useState(null);
-	const [value_city3, setValue_city3] = useState(null);
+	const [value_city1, setValue_city1] = useState('');
+	const [value_city2, setValue_city2] = useState('');
+	const [value_city3, setValue_city3] = useState('');
 
 
 	const [open1, setOpen1] = useState(false);
@@ -260,40 +260,39 @@ const AddListingScreen = (props) => {
 				swimming_pool: props.route.params.listItem.swimming_pool == true,
 				car_park: props.route.params.listItem.car_park == true,
 				//
-				owner_id : props.route.params.listItem.owner_id,
-				type_use : '' + props.route.params.listItem.type_use,
-				living_rooms : '' + props.route.params.listItem.living_rooms,
-				rooms : '' + props.route.params.listItem.rooms,
-				toilets : '' + props.route.params.listItem.toilets,
-				room_toilets : '' + props.route.params.listItem.room_toilets,
-				helper_rooms : '' + props.route.params.listItem.helper_rooms,
-				actual_size : '' + props.route.params.listItem.actual_size,
-				actual_size_price : '' + props.route.params.listItem.actual_size_price,
-				construction_size : '' + props.route.params.listItem.construction_size,
-				construction_size_price : '' + props.route.params.listItem.construction_size_price,
-				price : '' + props.route.params.listItem.price,
-				other : props.route.params.listItem.other || '',
-				title : props.route.params.listItem.title,
-				title_en : props.route.params.listItem.title_en,
-				youtube : props.route.params.listItem.youtube || '',
+				owner_id: props.route.params.listItem.owner_id,
+				type_use: '' + props.route.params.listItem.type_use,
+				living_rooms: '' + props.route.params.listItem.living_rooms,
+				rooms: '' + props.route.params.listItem.rooms,
+				toilets: '' + props.route.params.listItem.toilets,
+				room_toilets: '' + props.route.params.listItem.room_toilets,
+				helper_rooms: '' + props.route.params.listItem.helper_rooms,
+				actual_size: '' + props.route.params.listItem.actual_size,
+				construction_size: '' + props.route.params.listItem.construction_size,
+				price: '' + props.route.params.listItem.price,
+				other: props.route.params.listItem.other || '',
+				title: props.route.params.listItem.title,
+				title_en: props.route.params.listItem.title_en,
+				property_no: props.route.params.listItem.property_no,
+				youtube: props.route.params.listItem.youtube || '',
 			})
 
 			setValue_city1(props.route.params.listItem.area)
 			setValue_city2(props.route.params.listItem.street)
 			setValue_city3(props.route.params.listItem.building)
-			 
+
 			setValue1('' + props.route.params.listItem.type_use);
 			setValue2('' + props.route.params.listItem.living_rooms);
 			setValue3('' + props.route.params.listItem.rooms);
 			setValue4('' + props.route.params.listItem.toilets);
 			setValue5('' + props.route.params.listItem.room_toilets);
-			setValue6('' + props.route.params.listItem.helper_rooms); 
+			setValue6('' + props.route.params.listItem.helper_rooms);
 
-			setTimeout(()=>{
+			setTimeout(() => {
 				setGoogleMapPosition(props.route.params.listItem.google_map_position)
 			}, 600)
-			
-			setPhotos(props.route.params.listItem.photos || []) 
+
+			setPhotos(props.route.params.listItem.photos || [])
 		}
 	}, [props.route.params.listItem])
 
@@ -308,7 +307,7 @@ const AddListingScreen = (props) => {
 			setCities2(tmp)
 			if (tmp.length == 0) {
 				setValue_city2(null)
-			} 
+			}
 
 			setCities3([])
 		}
@@ -340,10 +339,10 @@ const AddListingScreen = (props) => {
 
 	const onImageUpload = () => {
 		ImagePicker.openPicker({
-			mediaType: 'photo',
-			cropping: true,
-			multiple: true,
+			multiple: true
 		}).then((images) => {
+			console.log('photos ', photos)
+			console.log('images ', images)
 			setPhotos(photos.concat(images.map((i, index) => { return { image: i, weight: photos.length + index + 1 } })));
 			setShowPickerModal(false);
 		})
@@ -367,78 +366,6 @@ const AddListingScreen = (props) => {
 	};
 
 	const validateInputs = () => {
-		if (isEmpty(state.title)) {
-			alerts.error('', '輸入標題 ');
-			return false
-		}
-		if (isEmpty(state.title_en)) {
-			alerts.error('', '輸入 (英文) 標題 ');
-			return false
-		}
-		if (isEmpty(state.type_use)) {
-			alerts.error('', '輸入物業類型');
-			return false
-		}
-		if (isEmpty(value_city1)) {
-			alerts.error('', '輸入地區');
-			return false
-		}
-		if (isEmpty(value_city2)) {
-			alerts.error('', '輸入街道');
-			return false
-		}
-		if (isEmpty(value_city3)) {
-			alerts.error('', '輸入大廈 /屋苑');
-			return false
-		}
-		if (isEmpty(state.construction_size)) {
-			alerts.error('', '輸入建築面積');
-			return false
-		}
-		if (isEmpty(state.actual_size)) {
-			alerts.error('', '輸入實用面積');
-			return false
-		}
-		if (isEmpty(state.construction_size_price)) {
-			alerts.error('', '輸入建築尺寸價錢');
-			return false
-		}
-		if (isEmpty(state.actual_size_price)) {
-			alerts.error('', '輸入實用尺寸價錢');
-			return false
-		}
-		if (isEmpty(state.living_rooms)) {
-			alerts.error('', '輸入廳');
-			return false
-		}
-		if (isEmpty(state.rooms)) {
-			alerts.error('', '輸入房');
-			return false
-		}
-		if (isEmpty(state.toilets)) {
-			alerts.error('', '輸入廁');
-			return false
-		}
-		if (isEmpty(state.room_toilets)) {
-			alerts.error('', '輸入套廁');
-			return false
-		}
-		if (isEmpty(state.helper_rooms)) {
-			alerts.error('', '輸入工人房');
-			return false
-		}
-		if (isEmpty(state.price)) {
-			alerts.error('', '輸入價錢');
-			return false
-		}
-		if (photos.length == 0) {
-			alerts.error('', '選擇一張照片');
-			return false;
-		}
-		if (google_map_position == null || google_map_position.latitude == null || google_map_position.longitude == null) {
-			alerts.error('', '請在谷歌地圖中選擇位置');
-			return false;
-		}
 		return true;
 	}
 
@@ -454,7 +381,7 @@ const AddListingScreen = (props) => {
 						if (photos[i].image.path != null) {
 							photoUrl = await uploadPhoto(`users/photo/${new Date().getTime()}.jpg`, photos[i].image.path);
 						}
-						
+
 						uploadedPhotos.push({
 							image: photoUrl,
 							weight: photos[i].weight
@@ -466,7 +393,7 @@ const AddListingScreen = (props) => {
 
 				let newListingData = {
 					...state,
-					youtube : state.youtube || '',
+					youtube: state.youtube || '',
 					type_use: parseInt(state.type_use),
 					area: value_city1,
 					street: value_city2,
@@ -486,19 +413,20 @@ const AddListingScreen = (props) => {
 					swimming_pool: state.swimming_pool == true,
 					car_park: state.car_park == true,
 					actual_size: parseInt(state.actual_size),
-					actual_size_price: parseInt(state.actual_size_price),
 					construction_size: parseInt(state.construction_size),
-					construction_size_price: parseInt(state.construction_size_price),
 					price: parseInt(state.price),
 					living_rooms: parseInt(state.living_rooms),
 					rooms: parseInt(state.rooms),
 					toilets: parseInt(state.toilets),
 					room_toilets: parseInt(state.room_toilets),
-					helper_rooms: parseInt(state.helper_rooms)
+					helper_rooms: parseInt(state.helper_rooms),
+					created_at: new Date().getTime(),
+					updated_at: new Date().getTime(),
 				};
 
 				if (props.route.params.listItem != null && props.route.params.listItem.id != null) {  // edit
 					newListingData.id = props.route.params.listItem.id;
+					newListingData.updated_at = new Date().getTime();
 				}
 				console.log('newListingData ', newListingData)
 				await createListing(newListingData);
@@ -601,7 +529,18 @@ const AddListingScreen = (props) => {
 						secure={false}
 						style={{ marginBottom: 12 }}
 					/>
-
+					<AuthInput
+						placeholder={'物業編號 Property no.'}
+						underlineColorAndroid={'transparent'}
+						keyboardType={'default'}
+						selectionColor={Theme.colors.cyan2}
+						onChangeText={(property_no) => setState({ ...state, property_no })}
+						returnKeyType={'next'}
+						autoCapitalize={'none'}
+						value={state.property_no}
+						secure={false}
+						style={{ marginBottom: 12 }}
+					/>
 					{
 						Platform.OS == 'android' ?
 							<React.Fragment>
@@ -812,31 +751,6 @@ const AddListingScreen = (props) => {
 						style={{ marginBottom: 12 }}
 					/>
 
-					<AuthInput
-						placeholder={'建築尺寸價錢 '}
-						underlineColorAndroid={'transparent'}
-						keyboardType='decimal-pad'
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(construction_size_price) => setState({ ...state, construction_size_price })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.construction_size_price}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
-
-					<AuthInput
-						placeholder={'實用尺寸價錢 '}
-						underlineColorAndroid={'transparent'}
-						keyboardType='decimal-pad'
-						selectionColor={Theme.colors.cyan2}
-						onChangeText={(actual_size_price) => setState({ ...state, actual_size_price })}
-						returnKeyType={'next'}
-						autoCapitalize={'none'}
-						value={state.actual_size_price}
-						secure={false}
-						style={{ marginBottom: 12 }}
-					/>
 					{
 						Platform.OS == 'android' ?
 							<React.Fragment>

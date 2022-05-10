@@ -47,7 +47,7 @@ function MyTabBar({ state, descriptors, navigation, props }) {
                                 () => {
                                     props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
                                 },
-                                (error) => { 
+                                (error) => {
                                 }
                             );
                     }
@@ -82,7 +82,7 @@ function MyTabBar({ state, descriptors, navigation, props }) {
                         style={[Theme.styles.col_center, { flex: 1, paddingBottom: 4 }]}
                     >
                         {options.tabBarIcon({ focused: isFocused, color: isFocused ? Theme.colors.cyan2 : Theme.colors.gray5, size: 20 })}
-                        <Text style={[styles.labelStyle, { color: isFocused ? '#DDDDDD99' : '#DDDDDD22' }]}>
+                        <Text style={[styles.labelStyle, { color: (isFocused ? '#f7f7f7' : '#dddddd') }]}>
                             {label}
                         </Text>
                     </TouchableOpacity>
@@ -118,7 +118,7 @@ const HomeTabs = (props) => {
                     options={{
                         tabBarLabel: '首頁 HOME',
                         tabBarIcon: ({ focused, color, size }) => (
-                            <Entypo name='home' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'} />
+                            <Entypo name='home' size={22} color={focused ? '#f7f7f7' : '#dddddd'} />
                         ),
                         //   tabBarBadge: 3,
                     }}
@@ -129,7 +129,7 @@ const HomeTabs = (props) => {
                     options={{
                         tabBarLabel: '信息 MESSAGE',
                         tabBarIcon: ({ focused, color, size }) => (
-                            <MaterialCommunityIcons name='message-text' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'} />
+                            <MaterialCommunityIcons name='message-text' size={22} color={focused ? '#f7f7f7' : '#dddddd'} />
                         ),
                         //   tabBarBadge: 3,
                     }}
@@ -140,7 +140,7 @@ const HomeTabs = (props) => {
                     options={{
                         tabBarLabel: '搜索 SEARCH',
                         tabBarIcon: ({ focused, color, size }) => (
-                            <Fontisto name='search' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'} />
+                            <Fontisto name='search' size={22} color={focused ? '#f7f7f7' : '#dddddd'} />
                         ),
                         //   tabBarBadge: 3,
                     }}
@@ -151,7 +151,7 @@ const HomeTabs = (props) => {
                     options={{
                         tabBarLabel: '帳戶 ACCOUNT',
                         tabBarIcon: ({ focused, color, size }) => (
-                            <MaterialIcons name='settings' size={22} color={focused ? '#DDDDDD99' : '#DDDDDD22'} />
+                            <MaterialIcons name='settings' size={22} color={focused ? '#f7f7f7' : '#dddddd'} />
                         ),
                         //   tabBarBadge: 3,
                     }}

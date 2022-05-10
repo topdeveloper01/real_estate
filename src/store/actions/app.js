@@ -1,62 +1,62 @@
-import {APP} from '../types'; 
+import { APP } from '../types';
 import { setI18nConfig, getLanguage, setLanguage } from '../../common/services/translate';
 import apiFactory from '../../common/services/apiFactory';
 import { city1_Collection, city2_Collection, city3_Collection, pushesCollection, settings_Collection } from '../../common/services/firebase';
 
-export const setHomeTabNavigation=(payload) =>{
-    return {type : APP.SET_HOMETAB_NAVIGATION, payload : payload}
+export const setHomeTabNavigation = (payload) => {
+    return { type: APP.SET_HOMETAB_NAVIGATION, payload: payload }
 }
-export const setInitHomeTab=(payload) =>{
-    return {type : APP.SET_INIT_HOME_TAB, payload : payload}
+export const setInitHomeTab = (payload) => {
+    return { type: APP.SET_INIT_HOME_TAB, payload: payload }
 }
-         
-export const setAppLang = (language) => dispatch => { 
+
+export const setAppLang = (language) => dispatch => {
     return new Promise(async resolve => {
-        await setLanguage(language).then(); 
-        await dispatch({type : APP.SET_LANG, payload : language});
+        await setLanguage(language).then();
+        await dispatch({ type: APP.SET_LANG, payload: language });
         resolve();
     });
 };
 
-export const loadAppLang = () => dispatch => { 
+export const loadAppLang = () => dispatch => {
     return new Promise(async resolve => {
-        await setI18nConfig().then(); 
-        await dispatch({type : APP.SET_LANG, payload : getLanguage()});
+        await setI18nConfig().then();
+        await dispatch({ type: APP.SET_LANG, payload: getLanguage() });
         resolve();
     });
 };
-      
+
 export const goActiveScreenFromPush = (value) => async dispatch => {
     await dispatch({
         type: APP.SET_ACTIVE_SCREEN_FROM_PUSH,
         payload: value,
     });
 };
- 
+
 export const setVendorCart = (payload) => {
-	return { type: APP.SET_VENDOR_CART, payload: payload }
+    return { type: APP.SET_VENDOR_CART, payload: payload }
 }
 
-export const setAllChannels=(payload)=>{
-    return {type : APP.SET_CHANNELS, payload : payload}
-}
- 
-export const setAllCity_1=(payload)=>{
-    return {type : APP.SET_CITY_1_List, payload : payload}
+export const setAllChannels = (payload) => {
+    return { type: APP.SET_CHANNELS, payload: payload }
 }
 
-export const setAllCity_2=(payload)=>{
-    return {type : APP.SET_CITY_2_List, payload : payload}
+export const setAllCity_1 = (payload) => {
+    return { type: APP.SET_CITY_1_List, payload: payload }
 }
 
-export const setAllCity_3=(payload)=>{
-    return {type : APP.SET_CITY_3_List, payload : payload}
+export const setAllCity_2 = (payload) => {
+    return { type: APP.SET_CITY_2_List, payload: payload }
+}
+
+export const setAllCity_3 = (payload) => {
+    return { type: APP.SET_CITY_3_List, payload: payload }
 }
 
 
 export const sendPushNotification = (notice) => {
     return new Promise((resolve, reject) => {
-        apiFactory.post('sendPush', notice).then(async ({data}) => {
+        apiFactory.post('sendPush', notice).then(async ({ data }) => {
             resolve();
         }, reject);
     });
@@ -65,12 +65,12 @@ export const sendPushNotification = (notice) => {
 
 export const getAllPushes = () => {
     return new Promise(async (resolve, reject) => {
-        try {  
+        try {
             let list = [];
             pushesCollection.orderBy('time', 'desc').get().then((res) => {
                 res.docs.forEach(doc => {
                     list.push(doc.data())
-                }) 
+                })
                 resolve(list);
             })
                 .catch(err => {
@@ -84,7 +84,7 @@ export const getAllPushes = () => {
 
 export const getAllCities = (level) => {
     return new Promise(async (resolve, reject) => {
-        try {  
+        try {
             let coll_ref = city1_Collection;
             if (level == 2) {
                 coll_ref = city2_Collection;
@@ -96,7 +96,7 @@ export const getAllCities = (level) => {
             coll_ref.orderBy('name', 'asc').get().then((res) => {
                 res.docs.forEach(doc => {
                     list.push(doc.data())
-                }) 
+                })
                 resolve(list);
             })
                 .catch(err => {
@@ -156,7 +156,7 @@ export const saveTermsData = (text) => {
     return new Promise(async (resolve, reject) => {
         try {
             settings_Collection.doc('term_policy').update({
-                term : text
+                term: text
             }).then((res) => {
                 resolve(res);
             })
@@ -173,8 +173,24 @@ export const savePolicyData = (text) => {
     return new Promise(async (resolve, reject) => {
         try {
             settings_Collection.doc('term_policy').update({
-                policy : text
+                policy: text
             }).then((res) => {
+                resolve(res);
+            })
+                .catch(err => {
+                    reject(err);
+                });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+
+export const deletePushMessage = (msg_id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            pushesCollection.doc(msg_id).delete().then((res) => {
                 resolve(res);
             })
                 .catch(err => {

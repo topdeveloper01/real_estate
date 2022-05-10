@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { Image, StatusBar, View, Animated, ScrollView, Share, InteractionManager, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
 import Theme from '../../../theme';
 import { connect } from 'react-redux'
+import moment from 'moment';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Feather from 'react-native-vector-icons/Feather'
 import Gallery from 'react-native-image-gallery';
@@ -91,7 +92,7 @@ const VendorScreen = (props) => {
                     () => {
                         props.navigation.push(RouteNames.WelcomeScreen, { backRoute: RouteNames.BottomTabs })
                     },
-                    (error) => { 
+                    (error) => {
                     }
                 );
         }
@@ -111,6 +112,20 @@ const VendorScreen = (props) => {
                 alerts.error('警告', '出了些問題');
             }
         }
+    }
+
+    const getConstructionPrice = () => {
+        if (props.vendorData.price == null || props.vendorData.construction_size == null || parseInt(props.vendorData.construction_size) == 0) {
+            return 0;
+        }
+        return parseInt(parseInt(props.vendorData.price) / parseInt(props.vendorData.construction_size));
+    }
+
+    const getActuralSizePrice = () => {
+        if (props.vendorData.price == null || props.vendorData.actual_size == null || parseInt(props.vendorData.actual_size) == 0) {
+            return 0;
+        }
+        return parseInt(parseInt(props.vendorData.price) / parseInt(props.vendorData.actual_size));
     }
 
     const _renderHeader = () => {
@@ -222,7 +237,7 @@ const VendorScreen = (props) => {
                                 </AppText>
                                 <AppText style={[styles.size]}>
                                     {formatNumber(props.vendorData.construction_size)}平方呎 @
-                                    ${formatNumber(props.vendorData.construction_size_price)} Sq. Ft.
+                                    ${formatNumber(getConstructionPrice())} Sq. Ft.
                                 </AppText>
                             </View>
                             <View style={{ flex: 1, paddingLeft: 10 }}>
@@ -231,7 +246,7 @@ const VendorScreen = (props) => {
                                 </AppText>
                                 <AppText style={[styles.size]}>
                                     {formatNumber(props.vendorData.actual_size)}平方呎 @
-                                    ${formatNumber(props.vendorData.actual_size_price)} Sq. Ft.
+                                    ${formatNumber(getActuralSizePrice())} Sq. Ft.
                                 </AppText>
                             </View>
 
@@ -278,7 +293,7 @@ const VendorScreen = (props) => {
                             <StateText active={props.vendorData.swimming_pool == true} text={'泳池 Swimming pool'} />
                             <StateText active={props.vendorData.car_park == true} text={'停車場 Car park'} />
                             <StateText active={props.vendorData.outer_roof == true} text={'天台 Rooftop '} />
-                            <StateText active={props.vendorData.outer_terrace == true} text={'露台 Terrace'} /> 
+                            <StateText active={props.vendorData.outer_terrace == true} text={'露台 Terrace'} />
                         </View>
                         <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 12 }]}>
                             <AppText style={[styles.size]}>其他資訊 Other Information : </AppText>
@@ -296,8 +311,25 @@ const VendorScreen = (props) => {
                                 {props.vendorData.type_use == FOR_INDUSTRIAL && '工業大廈 Industrial building'}
                             </AppText>
                         </View>
+                        <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 20 }]}>
+                            <AppText style={[styles.size]}>物業編號 Property no. : </AppText>
+                            <AppText style={[styles.size, { marginTop: 4 }]}>
+                                {props.vendorData.property_no}
+                            </AppText>
+                        </View>
+                        <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 20 }]}>
+                            <AppText style={[styles.size]}>更新日期 Updated date : </AppText>
+                            {
+                                props.vendorData.updated_at != null &&
+                                <AppText style={[styles.size, { marginTop: 4 }]}>
+                                    {moment(new Date(props.vendorData.updated_at)).format('DD/MM/YYYY')}
+                                </AppText>
+                            }
+                        </View>
                         {
                             props.vendorData.google_map_position != null &&
+                            props.vendorData.google_map_position.latitude != null &&
+                            props.vendorData.google_map_position.longitude != null &&
                             <View style={[Theme.styles.col_center_start, { alignItems: 'flex-start', width: '100%', marginTop: 16 }]}>
                                 <AppText style={[styles.size]}>單位地點 Map : </AppText>
                                 <View style={styles.mapview}>
