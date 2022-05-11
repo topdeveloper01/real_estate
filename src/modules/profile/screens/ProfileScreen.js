@@ -125,7 +125,7 @@ const ProfileScreen = (props) => {
 							<Switch
 								trackColor={{ false: Theme.colors.gray4, true: Theme.colors.gray4 }}
 								thumbColor={true ? "#FCD724" : "#f4f3f4"}
-								ios_backgroundColor="#3e3e3e"
+								ios_backgroundColor={Theme.colors.gray4}
 								disabled={true}
 								value={props.user.enable_notification == true}
 							/>
@@ -134,7 +134,7 @@ const ProfileScreen = (props) => {
 					{
 						props.user.admin == true &&
 						<React.Fragment>
-							<Text style={styles.subjectTitle}>APP</Text>
+							<Text style={styles.subjectTitle}>後台管理 APP MANAGEMENT</Text>
 							<TouchableOpacity
 								delayPressIn={100}
 								style={[Theme.styles.row_center, styles.itemView]}
@@ -142,7 +142,7 @@ const ProfileScreen = (props) => {
 									props.rootStackNav.navigate(RouteNames.MyListingsScreen);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>已上傳單位記錄 Property list</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
 							<TouchableOpacity
@@ -152,7 +152,7 @@ const ProfileScreen = (props) => {
 									props.rootStackNav.navigate(RouteNames.City1Screen);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>地區</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>地區 Location</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
 							<TouchableOpacity
@@ -162,7 +162,7 @@ const ProfileScreen = (props) => {
 									props.rootStackNav.navigate(RouteNames.SendNotification);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>推送通知系統</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>推送通知系統 Push notification</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
 							<TouchableOpacity
@@ -172,7 +172,7 @@ const ProfileScreen = (props) => {
 									props.rootStackNav.navigate(RouteNames.PolicyEditScreen);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>私隱政策</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>私隱政策 Privacy policy</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity> 
 							<TouchableOpacity
@@ -182,7 +182,7 @@ const ProfileScreen = (props) => {
 									props.rootStackNav.navigate(RouteNames.TermsEditScreen);
 								}}
 							>
-								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>條款及細則</Text>
+								<Text style={[styles.itemTxt, Theme.styles.flex_1]}>條款及細則 Terms and conditions</Text>
 								<Feather name={'chevron-right'} size={18} color={Theme.colors.text} />
 							</TouchableOpacity>
 						</React.Fragment>
@@ -193,7 +193,7 @@ const ProfileScreen = (props) => {
 						onPress={() => { ShowLogoutModal(true) }}
 					>
 						<MaterialCommunityIcons name={'logout-variant'} size={18} color={Theme.colors.red} />
-						<Text style={[styles.itemTxt, { color: Theme.colors.red, marginLeft: 6 }]}>登出</Text>
+						<Text style={[styles.itemTxt, { color: Theme.colors.red, marginLeft: 6 }]}>登出 Logout</Text>
 					</TouchableOpacity>
 				</View>
 			</ScrollView>
