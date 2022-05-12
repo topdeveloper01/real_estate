@@ -144,7 +144,7 @@ const VendorScreen = (props) => {
         );
     };
 
-    console.log('isYoutubePlaying ', isYoutubePlaying)
+    console.log('props.vendorData ', props.vendorData)
 
     return (
         <React.Fragment>
@@ -209,7 +209,10 @@ const VendorScreen = (props) => {
                                     <AppText style={[styles.tag_txt]}>
                                         {props.vendorData.isSell == true ? '售 Sales' : '租 Rent'} </AppText>
                                 </View>
-                                <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
+                                {
+                                    !isEmpty(props.vendorData.price) && !isNaN(props.vendorData.price) &&
+                                    <AppText style={[styles.price]}>${formatNumber(props.vendorData.price)}</AppText>
+                                }
                             </View>
                         }
                         <View style={[Theme.styles.row_center_start, { width: '100%', marginTop: 8 }]}>
@@ -235,19 +238,25 @@ const VendorScreen = (props) => {
                                 <AppText style={[styles.size]}>
                                     建築 Gross Area :
                                 </AppText>
-                                <AppText style={[styles.size]}>
-                                    {formatNumber(props.vendorData.construction_size)}平方呎 @
-                                    ${formatNumber(getConstructionPrice())} Sq. Ft.
-                                </AppText>
+                                {
+                                    !isEmpty(props.vendorData.construction_size) && !isNaN(props.vendorData.construction_size) &&
+                                    <AppText style={[styles.size]}>
+                                        {formatNumber(props.vendorData.construction_size)}平方呎 @
+                                        ${formatNumber(getConstructionPrice())} Sq. Ft.
+                                    </AppText>
+                                }
                             </View>
                             <View style={{ flex: 1, paddingLeft: 10 }}>
                                 <AppText style={[styles.size]}>
                                     實用 Saleable Area :
                                 </AppText>
-                                <AppText style={[styles.size]}>
-                                    {formatNumber(props.vendorData.actual_size)}平方呎 @
-                                    ${formatNumber(getActuralSizePrice())} Sq. Ft.
-                                </AppText>
+                                {
+                                    !isEmpty(props.vendorData.actual_size) && !isNaN(props.vendorData.actual_size) &&
+                                    <AppText style={[styles.size]}>
+                                        {formatNumber(props.vendorData.actual_size)}平方呎 @
+                                        ${formatNumber(getActuralSizePrice())} Sq. Ft.
+                                    </AppText>
+                                }
                             </View>
 
                         </View>
@@ -256,27 +265,42 @@ const VendorScreen = (props) => {
                             <AppText style={styles.size}>間隔 Interval</AppText>
                             <View style={[Theme.styles.row_center, styles.infoView]}>
                                 <View style={Theme.styles.col_center}>
-                                    <AppText style={styles.title}>{props.vendorData.living_rooms}廳</AppText>
+                                    {
+                                        !isEmpty(props.vendorData.living_rooms) && !isNaN(props.vendorData.living_rooms) &&
+                                        <AppText style={styles.title}>{props.vendorData.living_rooms}廳</AppText>
+                                    }
                                     <AppText style={styles.unit}>LIVING RM</AppText>
                                 </View>
                                 <Svg_divider />
                                 <View style={Theme.styles.col_center}>
-                                    <AppText style={styles.title}>{props.vendorData.rooms}房</AppText>
+                                    {
+                                        !isEmpty(props.vendorData.rooms) && !isNaN(props.vendorData.rooms) &&
+                                        <AppText style={styles.title}>{props.vendorData.rooms}房</AppText>
+                                    }
                                     <AppText style={styles.unit}>ROOM</AppText>
                                 </View>
                                 <Svg_divider />
                                 <View style={Theme.styles.col_center}>
-                                    <AppText style={styles.title}>{props.vendorData.toilets}廁</AppText>
+                                    {
+                                        !isEmpty(props.vendorData.toilets) && !isNaN(props.vendorData.toilets) &&
+                                        <AppText style={styles.title}>{props.vendorData.toilets}廁</AppText>
+                                    }
                                     <AppText style={styles.unit}>TOILET</AppText>
                                 </View>
                                 <Svg_divider />
                                 <View style={Theme.styles.col_center}>
-                                    <AppText style={styles.title}>{props.vendorData.room_toilets} 套廁</AppText>
+                                    {
+                                        !isEmpty(props.vendorData.room_toilets) && !isNaN(props.vendorData.room_toilets) &&
+                                        <AppText style={styles.title}>{props.vendorData.room_toilets} 套廁</AppText>
+                                    }
                                     <AppText style={styles.unit}>TOILET(RM)</AppText>
                                 </View>
                                 <Svg_divider />
                                 <View style={Theme.styles.col_center}>
-                                    <AppText style={styles.title}>{props.vendorData.helper_rooms} 工人房</AppText>
+                                    {
+                                        !isEmpty(props.vendorData.helper_rooms) && !isNaN(props.vendorData.helper_rooms) &&
+                                        <AppText style={styles.title}>{props.vendorData.helper_rooms} 工人房</AppText>
+                                    }
                                     <AppText style={styles.unit}>Maid RM</AppText>
                                 </View>
                             </View>

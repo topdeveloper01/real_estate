@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, ImageBackground, View, Text, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { connect } from 'react-redux'; 
-import AppText from '../AppText'; 
-import Theme from '../../../theme'; 
+import { connect } from 'react-redux';
+import AppText from '../AppText';
+import Theme from '../../../theme';
 import Img_placeholder from '../../assets/images/placeholder2.png'
-import { formatNumber } from '../../services/utility';
+import { formatNumber, isEmpty } from '../../services/utility';
 
 const VendorItem = (props) => {
     const { data, can_delete, onSelect, onEdit, onDelete, style } = props
 
     return <TouchableOpacity onPress={() => onSelect()}
         style={[Theme.styles.row_center, styles.container, style,]}>
-        <View style={[Theme.styles.col_center, styles.imgView]}> 
+        <View style={[Theme.styles.col_center, styles.imgView]}>
             <FastImage
                 source={
-                    data.photos != null && data.photos.length > 0 ? 
-                    { uri:  data.photos[0].image } : Img_placeholder
+                    data.photos != null && data.photos.length > 0 ?
+                        { uri: data.photos[0].image } : Img_placeholder
                 }
                 style={styles.img}
                 resizeMode={FastImage.resizeMode.cover}
@@ -27,16 +27,16 @@ const VendorItem = (props) => {
                 <AppText style={[styles.title]}>{data.title}</AppText>
                 {
                     can_delete == true &&
-                    <TouchableOpacity style={{ paddingHorizontal: 4, marginRight: 8 }} onPress={onEdit ? onEdit : ()=>{}}>
+                    <TouchableOpacity style={{ paddingHorizontal: 4, marginRight: 8 }} onPress={onEdit ? onEdit : () => { }}>
                         <AppText style={styles.deleteBtnTxt}>編輯</AppText>
                     </TouchableOpacity>
-                } 
+                }
                 {
                     can_delete == true &&
-                    <TouchableOpacity style={{ paddingHorizontal: 4 }} onPress={onDelete ? onDelete : ()=>{}}>
+                    <TouchableOpacity style={{ paddingHorizontal: 4 }} onPress={onDelete ? onDelete : () => { }}>
                         <AppText style={styles.deleteBtnTxt}>刪除</AppText>
                     </TouchableOpacity>
-                } 
+                }
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <AppText style={[styles.title]}>{data.title_en}</AppText>
@@ -46,7 +46,10 @@ const VendorItem = (props) => {
             </View>
             <View style={[Theme.styles.row_center_start, { width: '100%' }]}>
                 <View style={{ flex: 1 }} />
-                <AppText style={[styles.price]}>${formatNumber(data.price)}</AppText>
+                {
+                    !isEmpty(data.price) && !isNaN(data.price) &&
+                    <AppText style={[styles.price]}>${formatNumber(data.price)}</AppText>
+                }
             </View>
         </View>
     </TouchableOpacity>;
@@ -74,4 +77,4 @@ function arePropsEqual(prevProps, nextProps) {
 const mapStateToProps = ({ app, shop }) => ({
     isLoggedIn: app.isLoggedIn,
 });
-export default connect(mapStateToProps, {   })(VendorItem);
+export default connect(mapStateToProps, {})(VendorItem);

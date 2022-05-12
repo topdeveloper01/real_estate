@@ -51,6 +51,10 @@ function notify(token, title, message, platform) {
 
     if (platform == "Android") {
         const payload = {
+            notification: {
+                title: title,
+                body: message
+            },
             data: {
                 title: title,
                 body: message
