@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ActivityIndicator, Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {  StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { connect } from 'react-redux';
 import GetLocation from 'react-native-get-location'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
@@ -11,8 +11,7 @@ import Config from '../../config';
 import {
     getAddressByCoordinates,
     requestLocationPermission,
-    checkLocationPermission,
-    showAlertSetting,
+    checkLocationPermission, 
 } from '../services/location';
 // svgs 
 import Svg_locpin from '../assets/svgs/msg/current_location.svg';

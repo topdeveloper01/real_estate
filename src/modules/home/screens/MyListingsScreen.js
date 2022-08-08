@@ -1,6 +1,6 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { Image, ActivityIndicator, ScrollView, TouchableOpacity, Text, View, StyleSheet, RefreshControl, KeyboardAvoidingView } from 'react-native';
+import {View, StyleSheet, RefreshControl,  } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { width, height } from 'react-native-dimension';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -66,6 +66,7 @@ const MyListingsScreen = (props) => {
 	const loadVendors = async () => {
 		try {
 			setVertLoading(true);
+			setRefreshing(true)
 			let filterKeys = getFilers();
 			let vendorsData = await getMyListings(props.user.id, filterKeys);
 			setAllVendors(vendorsData)
